@@ -22,35 +22,7 @@
             <scope>provided</scope>
         </dependency>
         
-        <!-- RESTEasy JAX RS Implementation -->
-        <!--
-        <dependency>
-	       <groupId>org.jboss.resteasy</groupId>
-	       <artifactId>resteasy-jaxrs</artifactId>
-	       <version>3.0.16.Final</version>
-        </dependency>
-        
-        <dependency>
-           <groupId>org.jboss.resteasy</groupId>
-           <artifactId>resteasy-servlet-initializer</artifactId>
-           <version>3.0.13.Final</version>
-        </dependency>
-        -->
-        
-        <!-- Hibernate JPA Support -->
-        <dependency>
-	       <groupId>org.hibernate</groupId>
-	       <artifactId>hibernate-entitymanager</artifactId>
-	       <version>5.1.0.Final</version>
-        </dependency>
-        
-        <!-- MySQL Connector/J -->
-        <dependency>
-	        <groupId>mysql</groupId>
-	        <artifactId>mysql-connector-java</artifactId>
-	        <version>5.1.38</version>
-        </dependency>
-        
+
         
     </dependencies>
 
