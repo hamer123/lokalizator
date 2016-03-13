@@ -10,6 +10,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import com.pw.lokalizator.model.User;
+import com.pw.lokalizator.repository.Dao;
 import com.pw.lokalizator.repository.UserDao;
 
 @Stateless
@@ -17,7 +18,7 @@ import com.pw.lokalizator.repository.UserDao;
 public class UserRest {
 
 	@EJB
-	private UserDao userDao;
+	private Dao userDao;
 	
 	@GET
 	@Path("/create")
@@ -48,7 +49,7 @@ public class UserRest {
 	public User findUser(@PathParam("id") long id){
 		User user = null;
 		try{
-			user = userDao.findById(id);
+			user = (User) userDao.findById(id);
 		} catch(Exception e){
 			e.printStackTrace();
 		}
