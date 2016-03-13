@@ -4,11 +4,12 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import com.pw.lokalizator.model.User;
-import com.pw.lokalizator.repository.Dao;
 import com.pw.lokalizator.repository.UserDao;
 
 @Stateless
@@ -16,7 +17,7 @@ import com.pw.lokalizator.repository.UserDao;
 public class UserRest {
 
 	@EJB
-	private Dao userDao;
+	private UserDao userDao;
 	
 	@GET
 	@Path("/create")
@@ -39,6 +40,19 @@ public class UserRest {
 		return Response
 				.ok("DODANO")
 				.build();
+	}
+	
+	@GET
+	@Path("/find/{id}")
+	@Produces({"application/xml","application/json"})
+	public User findUser(@PathParam("id") long id){
+		User user = null;
+		try{
+			user = userDao.findById(id);
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+		return user;
 	}
 
 }
