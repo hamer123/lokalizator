@@ -33,13 +33,12 @@ public class UserRest {
 		user.setEmail(email);
 		try{
 			userDao.persist(user);
-		}catch(Exception e){
-			log.info("User has been created with login " + login);
+		}catch(Throwable e){
 			return Response
 					.ok("NIE DODANO")
 					.build();
 		}
-		
+		log.info("User has been created with login " + login);
 		return Response
 				.ok("DODANO")
 				.build();
