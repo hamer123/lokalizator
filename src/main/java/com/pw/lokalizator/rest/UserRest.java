@@ -8,17 +8,14 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-
 import com.pw.lokalizator.model.User;
 import com.pw.lokalizator.repository.Dao;
-import com.pw.lokalizator.repository.UserDao;
 
 @Stateless
 @Path("/user")
 public class UserRest {
-
 	@EJB
-	private Dao userDao;
+	private Dao<User> userDao;
 	
 	@GET
 	@Path("/create")
@@ -45,7 +42,7 @@ public class UserRest {
 	
 	@GET
 	@Path("/find/{id}")
-	@Produces({"application/xml","application/json"})
+	@Produces({"application/xml"})
 	public User findUser(@PathParam("id") long id){
 		User user = null;
 		try{
@@ -55,5 +52,19 @@ public class UserRest {
 		}
 		return user;
 	}
+	
+	@GET
+	@Path("/find/json/{id}")
+	@Produces({"application/json"})
+	public User findUserJSON(@PathParam("id") long id){
+		User user = null;
+		try{
+			user = (User) userDao.findById(id);
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+		return user;
+	}
+	
 
 }

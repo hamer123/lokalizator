@@ -1,16 +1,14 @@
 package com.pw.lokalizator.model;
 
 import java.io.Serializable;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
@@ -20,16 +18,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 		  @NamedQuery(name="USER.findAll", query = "Select u From User u")		
 		})
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class User implements Serializable {
 	@Id
-	@XmlAttribute
-	@XmlID
+	@XmlElement
 	private long id;
-	@XmlAttribute
+	@XmlElement
 	private String login;
-	@XmlAttribute
+	@XmlElement
 	private String password;
-	@XmlAttribute
+	@XmlElement
 	private String email;
 	
 	
