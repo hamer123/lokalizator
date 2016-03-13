@@ -7,6 +7,11 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
 @Table(name ="USERS")
@@ -14,11 +19,17 @@ import javax.persistence.Table;
 		value = {
 		  @NamedQuery(name="USER.findAll", query = "Select u From User u")		
 		})
+@XmlRootElement
 public class User implements Serializable {
 	@Id
+	@XmlAttribute
+	@XmlID
 	private long id;
+	@XmlAttribute
 	private String login;
+	@XmlAttribute
 	private String password;
+	@XmlAttribute
 	private String email;
 	
 	
