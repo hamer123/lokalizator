@@ -8,12 +8,16 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
+
+import org.jboss.logging.Logger;
+
 import com.pw.lokalizator.model.User;
 import com.pw.lokalizator.repository.Dao;
 
 @Stateless
 @Path("/user")
 public class UserRest {
+	private Logger log = Logger.getLogger(UserRest.class);
 	@EJB
 	private Dao<User> userDao;
 	
@@ -30,6 +34,7 @@ public class UserRest {
 		try{
 			userDao.persist(user);
 		}catch(Exception e){
+			log.info("User has been created with login " + login);
 			return Response
 					.ok("NIE DODANO")
 					.build();
