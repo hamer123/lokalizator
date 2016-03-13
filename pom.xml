@@ -23,6 +23,7 @@
         </dependency>
         
         <!-- RESTEasy JAX RS Implementation -->
+        <!--
         <dependency>
 	       <groupId>org.jboss.resteasy</groupId>
 	       <artifactId>resteasy-jaxrs</artifactId>
@@ -34,6 +35,7 @@
            <artifactId>resteasy-servlet-initializer</artifactId>
            <version>3.0.13.Final</version>
         </dependency>
+        -->
         
         <!-- Hibernate JPA Support -->
         <dependency>
