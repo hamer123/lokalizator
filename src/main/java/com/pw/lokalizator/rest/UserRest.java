@@ -1,7 +1,6 @@
 package com.pw.lokalizator.rest;
 
 import javax.ejb.EJB;
-import javax.websocket.server.PathParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -11,7 +10,7 @@ import com.pw.lokalizator.repository.UserDao;
 
 @Path("/user")
 public class UserRest {
-
+/*
 	@EJB
 	private UserDao userDao;
 	
@@ -31,4 +30,5 @@ public class UserRest {
 				.ok()
 				.build();
 	}
+*/
 }
