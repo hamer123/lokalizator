@@ -1,18 +1,22 @@
 package com.pw.lokalizator.rest;
 
 import javax.ejb.EJB;
+import javax.ejb.Stateless;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import com.pw.lokalizator.model.User;
+import com.pw.lokalizator.repository.Dao;
 import com.pw.lokalizator.repository.UserDao;
 
+@Stateless
 @Path("/user")
 public class UserRest {
-/*
+
 	@EJB
-	private UserDao userDao;
+	private Dao userDao;
 	
 	@GET
 	@Path("/create")
@@ -20,15 +24,21 @@ public class UserRest {
 			                   @QueryParam("password") String password,
 			                   @QueryParam("email") String email){
 		
+		User user = new User();
+		user.setLogin(login);
+		user.setPassword(password);
+		user.setEmail(email);
 		try{
-			
+			userDao.persist(user);
 		}catch(Exception e){
-			
+			return Response
+					.ok("NIE DODANO")
+					.build();
 		}
 		
 		return Response
-				.ok()
+				.ok("DODANO")
 				.build();
 	}
-*/
+
 }

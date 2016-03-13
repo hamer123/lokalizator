@@ -1,7 +1,9 @@
 package com.pw.lokalizator.repository;
 
 import java.util.List;
+import javax.ejb.Remote;
 
+@Remote
 public interface Dao<T> {
 
 	void persist(T e);
