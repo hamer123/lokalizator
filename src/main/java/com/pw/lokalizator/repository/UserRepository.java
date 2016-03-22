@@ -1,0 +1,8 @@
+package com.pw.lokalizator.repository;
+
+import javax.ejb.Local;
+
+import com.pw.lokalizator.model.User;
+
+@Local
+public interface UserRepository extends JpaRepository<User, Long> {}

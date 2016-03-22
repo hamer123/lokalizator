@@ -7,6 +7,7 @@
     <packaging>war</packaging>
     <version>1.0</version>
     <name>lokalizator</name>
+     
   
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -22,17 +23,39 @@
             <scope>provided</scope>
         </dependency>
 
+<!--  -->
+	<dependency>
+		<groupId>org.jboss.resteasy</groupId>
+		<artifactId>resteasy-jaxrs</artifactId>
+		<version>3.0.16.Final</version>
+		<scope>provided</scope>
+	</dependency>
+
 	<dependency>
 		<groupId>org.jboss.resteasy</groupId>
 		<artifactId>resteasy-jaxb-provider</artifactId>
 		<version>3.0.16.Final</version>
+		<scope>provided</scope>
 	</dependency>
+
 	<dependency>
 	   <groupId>org.jboss.resteasy</groupId>
 	   <artifactId>resteasy-jackson-provider</artifactId>
 	   <version>3.0.16.Final</version>
+	   <scope>provided</scope>
     </dependency>
-	
+
+<dependency>
+	<groupId>org.jboss.logging</groupId>
+	<artifactId>jboss-logging</artifactId>
+	<version>3.3.0.Final</version>
+</dependency>	
+
+<dependency>  
+    <groupId>org.primefaces</groupId>  
+    <artifactId>primefaces</artifactId>  
+    <version>5.2</version>  
+</dependency> 
         
     </dependencies>
 
