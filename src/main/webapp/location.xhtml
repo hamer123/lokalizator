@@ -11,6 +11,51 @@
     </h:head>  
       
     <h:body>  
-       <p:gmap center="51.601357, 18.972930" zoom="15" type="HYBRID" style="width:100%;height:400px" model="#{gmapView.emptyModel}"/>
+       <h:form>
+       
+         <p:gmap center="51.601357, 18.972930" zoom="15" type="HYBRID" style="width:100%;height:400px" model="#{gmapView.emptyModel}"/>
+         
+         <p:separator/>
+       
+       <p:messages id="messages" showDetail="false" />
+       
+       <p:panel header="Dane">
+         <p:panelGrid columns="4" >
+         
+           <p:outputLabel for="fromDate" value="From datetime:" />
+           <p:calendar id="fromDate" value="#{gmapView.fromDate}" pattern="MM/dd/yyyy HH:mm:ss" />
+        
+           <p:outputLabel for="endDate" value="End datetime:" />
+           <p:calendar id="endDate" value="#{gmapView.endDate}" pattern="MM/dd/yyyy HH:mm:ss" />
+           
+         </p:panelGrid>
+         
+         <p:commandButton id="check" action="#{lokalizatorSession.checkIsLogged()}" value="Find" style="margin-top: 20px" />
+         
+    <p:dataTable var="loc" value="#{gmapView.locationList}" style="margin-top: 20px">
+    <p:column headerText="date">
+        <h:outputText value="#{loc.date}" />
+    </p:column>
+ 
+    <p:column headerText="latitude">
+        <h:outputText value="#{loc.latitude}" />
+    </p:column>
+ 
+    <p:column headerText="longitude">
+        <h:outputText value="#{loc.longitude}" />
+    </p:column>
+ 
+    <p:column headerText="Display">
+        <p:commandButton/>
+    </p:column>
+    </p:dataTable>
+         
+       </p:panel>
+       </h:form>
+       
+       
+       <script>
+         
+       </script>
     </h:body>  
 </html>

@@ -5,4 +5,6 @@ import javax.ejb.Local;
 import com.pw.lokalizator.model.User;
 
 @Local
-public interface UserRepository extends JpaRepository<User, Long> {}
+public interface UserRepository extends JpaRepository<User, Long> {
+	public User findByLoginAndPassword(String login, String password);
+}

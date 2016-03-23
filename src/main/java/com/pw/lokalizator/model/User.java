@@ -8,6 +8,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -31,7 +32,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries(
 		value = {
 		  @NamedQuery(name="USER.findAll", query = "SELECT u FROM User u"),
-		  @NamedQuery(name="USER.deleteByID", query="DELETE FROM User u WHERE u.id = :id")
+		  @NamedQuery(name="USER.deleteByID", query="DELETE FROM User u WHERE u.id = :id"),
+		  @NamedQuery(name="USER.findByLoginAndPassword", query="SELECT u FROM User u WHERE u.login = :login AND u.password = :password")
 		})
 
 @XmlRootElement
@@ -63,7 +65,7 @@ public class User implements Serializable {
 	private UserSecurity userSecurity;
 	
 	@XmlElement
-	@OneToOne(cascade={CascadeType.ALL})
+	@OneToOne(cascade={CascadeType.ALL}, fetch=FetchType.EAGER)
 	private CurrentLocation currentLocation;
 	
 	@XmlElement

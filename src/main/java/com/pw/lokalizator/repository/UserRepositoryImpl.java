@@ -1,9 +1,13 @@
 package com.pw.lokalizator.repository;
 
 import java.util.Collection;
+
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+
 import com.pw.lokalizator.model.User;
 
 @Stateless
@@ -39,5 +43,13 @@ public class UserRepositoryImpl implements UserRepository{
 	public Collection<User> findAll() {
 		return em.createNamedQuery("USER.findAll", User.class)
 				 .getResultList();
+	}
+
+	@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+	public User findByLoginAndPassword(String login, String password) {
+		return em.createNamedQuery("USER.findByLoginAndPassword", User.class)
+				 .setParameter("login", login)
+				 .setParameter("password", password)
+				 .getSingleResult();
 	}
 }
