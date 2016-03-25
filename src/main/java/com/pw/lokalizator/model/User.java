@@ -1,6 +1,7 @@
 package com.pw.lokalizator.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -61,16 +62,26 @@ public class User implements Serializable {
 	private boolean enable;
 	
 	@XmlElement
-	@OneToOne(cascade={CascadeType.ALL})
+	@OneToOne(cascade=CascadeType.ALL, orphanRemoval=true, mappedBy="user")
 	private UserSecurity userSecurity;
 	
 	@XmlElement
-	@OneToOne(cascade={CascadeType.ALL}, fetch=FetchType.EAGER)
+	@OneToOne(cascade=CascadeType.ALL, orphanRemoval=true, mappedBy="user")
 	private CurrentLocation currentLocation;
 	
 	@XmlElement
-	@OneToMany
-	private Collection<Location>locations;
+	@OneToMany(cascade=CascadeType.ALL, orphanRemoval=true)
+	private Collection<Location>locations = new ArrayList<Location>();
+	
+	public void addLocation(Location location){
+		locations.add(location);
+		location.setUser(this);
+	}
+	
+	public void removeLocation(Location location){
+		locations.remove(location);
+		location.setUser(null);
+	}
 	
 	public long getId() {
 		return id;
@@ -107,5 +118,17 @@ public class User implements Serializable {
 	}
 	public void setUserSecurity(UserSecurity userSecurity) {
 		this.userSecurity = userSecurity;
+	}
+	public CurrentLocation getCurrentLocation() {
+		return currentLocation;
+	}
+	public void setCurrentLocation(CurrentLocation currentLocation) {
+		this.currentLocation = currentLocation;
+	}
+	public Collection<Location> getLocations() {
+		return locations;
+	}
+	public void setLocations(Collection<Location> locations) {
+		this.locations = locations;
 	}
 }

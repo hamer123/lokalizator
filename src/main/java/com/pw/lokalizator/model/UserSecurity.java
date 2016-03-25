@@ -37,7 +37,7 @@ public class UserSecurity implements Serializable{
 	private String serviceKey;
 	@XmlElement
 	private String tokenKey;
-	@OneToOne(cascade={CascadeType.REFRESH, CascadeType.MERGE}, mappedBy="userSecurity")
+	@OneToOne
 	private User user;
 	@Enumerated(EnumType.ORDINAL)
 	private Role rola;

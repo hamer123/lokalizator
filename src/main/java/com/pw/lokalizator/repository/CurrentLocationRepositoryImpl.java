@@ -3,6 +3,8 @@ package com.pw.lokalizator.repository;
 import java.util.Collection;
 
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
@@ -18,6 +20,7 @@ public class CurrentLocationRepositoryImpl implements CurrentLocationRepository{
 		return entity;
 	}
 
+	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
 	public CurrentLocation save(CurrentLocation entity) {
 		return em.merge(entity);
 	}

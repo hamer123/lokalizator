@@ -3,6 +3,7 @@ package com.pw.lokalizator.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -43,7 +44,7 @@ public class CurrentLocation implements Serializable{
 	@Column(updatable=false,nullable=false)
 	@XmlElement
 	private Date date;
-	@OneToOne(mappedBy="currentLocation")
+	@OneToOne
 	private User user;
 	
 	public long getId() {

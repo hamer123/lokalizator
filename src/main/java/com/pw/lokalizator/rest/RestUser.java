@@ -35,18 +35,18 @@ public class RestUser {
 
 	@GET
 	//@Consumes(value = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-	@Produces(value = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+	@Produces(value = {MediaType.APPLICATION_JSON})
 	@Path("/{id}")
 	public Response findUSer(@PathParam("id") Long id){
 		User user = null;
-		try{
-			user = userRepository.findById(id);
-			return Response.status(201)
+		user = userRepository.findById(id);
+		if(user != null){
+			return Response.status(200)
 					       .entity(user)
 					       .build();
-		}catch (Exception e){
+		}else{
 			return Response.status(404)
-				           .build();
+			               .build();
 		}
 	}
 	
@@ -88,4 +88,5 @@ public class RestUser {
 			               .build();
 		}
 	}
+	
 }

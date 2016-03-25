@@ -30,7 +30,8 @@ public class SecurityService {
 			/*
 			 * Create HttpSession
 			 */
-			request.getSession().setAttribute("user", us.getUser());
+			//request.getSession().setAttribute("user", us.getUser());
+			request.setAttribute("user_entity", us.getUser());
 			
 			/*
 			 * Create SecurityContext
