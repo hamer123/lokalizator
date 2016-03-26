@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.NONE)
 @NamedQueries(
 		value={
-				@NamedQuery(name="findByTokenAndService", query="SELECT s FROM UserSecurity s WHERE s.serviceKey = :skey AND s.tokenKey = :tkey")
+				//@NamedQuery(name="findByTokenAndService", query="SELECT s FROM UserSecurity s WHERE s.serviceKey = :skey AND s.tokenKey = :tkey")
 		}
 		)
 public class UserSecurity implements Serializable{
@@ -35,8 +35,8 @@ public class UserSecurity implements Serializable{
 	private long id;
 	@XmlElement
 	private String serviceKey;
-	@XmlElement
-	private String tokenKey;
+	//@XmlElement
+	//private String tokenKey;
 	@OneToOne
 	private User user;
 	@Enumerated(EnumType.ORDINAL)
@@ -54,12 +54,12 @@ public class UserSecurity implements Serializable{
 	public void setServiceKey(String serviceKey) {
 		this.serviceKey = serviceKey;
 	}
-	public String getTokenKey() {
-		return tokenKey;
-	}
-	public void setTokenKey(String tokenKey) {
-		this.tokenKey = tokenKey;
-	}
+	//public String getTokenKey() {
+	//	return tokenKey;
+	//}
+	//public void setTokenKey(String tokenKey) {
+	//	this.tokenKey = tokenKey;
+	//}
 	public User getUser() {
 		return user;
 	}

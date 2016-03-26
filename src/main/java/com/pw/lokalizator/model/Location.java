@@ -25,10 +25,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @NamedQueries(value={
 		@NamedQuery(name="Location.findOlderThan", query="SELECT l FROM Location l WHERE l.date > :date"),
+		@NamedQuery(name="Location.findYoungerThan", query="SELECT l FROM Location l WHERE l.date > :date"),
 		@NamedQuery(name="Location.deleteById", query="DELETE FROM Location l WHERE l.id = :id"),
 		@NamedQuery(name="Location.deleteOlderThan", query="DELETE FROM Location l WHERE l.user = :user AND l.date < :date"),
 		@NamedQuery(name="Location.deleteYoungerThan", query="DELETE FROM Location l WHERE l.user = :user AND l.date > :date"),
-		@NamedQuery(name="Location.count", query="SELECT COUNT(l) FROM Location l where l.user = :user")
+		@NamedQuery(name="Location.count", query="SELECT COUNT(l) FROM Location l where l.user = :user"),
+		@NamedQuery(name="Location.findOlderThanAndYoungerThan", query="SELECT l FROM Location l WHERE l.date > :younger AND l.date < :older")
 })
 public class Location implements Serializable{
 	@SequenceGenerator(allocationSize=1, initialValue=1, name="LOC_SEQ",sequenceName="LOCATION_S")

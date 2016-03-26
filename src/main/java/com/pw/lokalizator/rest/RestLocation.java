@@ -13,8 +13,10 @@ import org.jboss.logging.Logger;
 
 import com.pw.lokalizator.model.CurrentLocation;
 import com.pw.lokalizator.model.Location;
+import com.pw.lokalizator.model.RestSession;
 import com.pw.lokalizator.model.User;
 import com.pw.lokalizator.service.LocationService;
+import com.pw.lokalizator.singleton.RestSessionSimulator;
 
 @Path("/location")
 public class RestLocation {
@@ -27,8 +29,8 @@ public class RestLocation {
 	@Consumes
 	public Response createLocation(Location location, @Context HttpServletRequest request){
 		
-		User user = (User)request.getAttribute("user_entity");
-		CurrentLocation currentLocation = user.getCurrentLocation();
+		RestSession session = (RestSession)request.getSession().getAttribute( RestSession.REST_SESSION_ATR );
+		CurrentLocation currentLocation = session.getUser().getCurrentLocation();
 		
 		if(currentLocation == null){
 			currentLocation = new CurrentLocation();
@@ -40,7 +42,7 @@ public class RestLocation {
 		location.setDate(new Date());
 		
 		try{
-			locationService.createLocationAndSaveCurrentLocation(location, currentLocation, user.getId());
+			locationService.createLocationAndSaveCurrentLocation(location, currentLocation, session.getUser().getId());
 		}catch(Exception e){
 			e.printStackTrace();
 			return Response.status( Response.Status.EXPECTATION_FAILED )

@@ -35,26 +35,23 @@ public class RESTRequestFilter implements ContainerRequestFilter{
 	public void filter(ContainerRequestContext requestCtx) throws IOException {
 
         String path = requestCtx.getUriInfo().getPath();
-        log.info( "Filtering request path: " + path );
-        log.info( "Is HttpServletRequest null? " + request);
+		log.info("INFO FROM REST REQUEST FILTER -> " + requestCtx.getRequest().getMethod() + " PATH-> " + path );
           
         // IMPORTANT!!! First, Acknowledge any pre-flight test from browsers for this case before validating the headers (CORS stuff)
         if ( requestCtx.getRequest().getMethod().equals( "OPTIONS" ) ) {
             requestCtx.abortWith(Response.status( Response.Status.OK ).build() );
  
             return;
-        }
-        
-        log.info("are they true? " + path.startsWith("/user/create"));
+        }  
         
         // Then check are tokens exist and are valid.    
-        if( !(path.startsWith("/user/login") || path.startsWith("/user/create"))){
+        if( !path.startsWith("/user/login") ){
             String serviceKey = requestCtx.getHeaderString( HTTPHeaderNames.SERVICE_KEY );
             String authToken = requestCtx.getHeaderString( HTTPHeaderNames.AUTH_TOKEN );
             
             if(authToken != null && serviceKey != null){
                 try{
-                	SecurityContext sc = securityService.createSecurityContext(authToken , serviceKey, request);
+                	SecurityContext sc = securityService.createSecurityContext ( serviceKey, authToken, request );
                 	requestCtx.setSecurityContext(sc);
                 }catch(Exception e){
                 	requestCtx.abortWith( Response.status( Response.Status.UNAUTHORIZED ).build() );
@@ -64,8 +61,7 @@ public class RESTRequestFilter implements ContainerRequestFilter{
             	requestCtx.abortWith( Response.status( Response.Status.UNAUTHORIZED ).build() );
             }
         }
-        
-		log.info("INFO FROM REST REQUEST FILTER -> " + " REQUEST -> " + requestCtx.getRequest().getMethod() + " PATH-> " + path );
+       
 	}
 
 }

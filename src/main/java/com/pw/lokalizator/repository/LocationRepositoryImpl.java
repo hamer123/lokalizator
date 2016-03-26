@@ -1,10 +1,13 @@
 package com.pw.lokalizator.repository;
 
 import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TemporalType;
 
 import com.pw.lokalizator.model.Location;
 
@@ -26,25 +29,29 @@ public class LocationRepositoryImpl implements LocationRepository{
 		em.remove(entity);
 	}
 
-	@Override
 	public void remove(Long id) {
 		int result = em.createNamedQuery("Location.deleteById", Location.class).executeUpdate();
 		if(result == 0)
 			throw new IllegalArgumentException("nie mozna usunac Location o id = " + id + ", brak takiej encji");
 	}
 
-	@Override
 	public Location findById(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+		return em.find(Location.class, id);
 	}
 
 	public Collection<Location> findAll() {
-		return em.createNamedQuery("", Location.class).getResultList();
+		return em.createQuery("SELECT l FROM Location l", Location.class).getResultList();
 	}
 
 	public long count() {
 		return em.createNamedQuery("Location.count").getFirstResult();
+	}
+
+	public List<Location> getLocationYoungThanAndOlderThan(Date younger, Date older) {
+		return em.createNamedQuery("Location.findOlderThanAndYoungerThan", Location.class)
+				 .setParameter("younger", younger, TemporalType.TIMESTAMP)
+				 .setParameter("older", older, TemporalType.TIMESTAMP)
+				 .getResultList();
 	}
 
 }

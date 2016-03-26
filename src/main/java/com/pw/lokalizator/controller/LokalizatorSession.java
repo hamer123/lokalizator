@@ -93,9 +93,15 @@ public class LokalizatorSession implements Serializable{
 	public void setLogged(boolean isLogged) {
 		this.isLogged = isLogged;
 	}
-	
-	public String gotoPage(){
-		return "login";
+
+
+	public User getCurrentUser() {
+		return currentUser;
+	}
+
+
+	public void setCurrentUser(User currentUser) {
+		this.currentUser = currentUser;
 	}
 	
 }

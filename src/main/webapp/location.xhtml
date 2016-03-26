@@ -6,20 +6,22 @@
       xmlns:p="http://primefaces.org/ui"> 
 
     <h:head>  
-      <script src="https://raw.githubusercontent.com/HPNeo/gmaps/master/gmaps.js"/>
+      <!-- <script src="https://raw.githubusercontent.com/HPNeo/gmaps/master/gmaps.js"/> -->
       <script src="https://maps.googleapis.com/maps/api/js"/>
     </h:head>  
       
     <h:body>  
-       <h:form>
        
-         <p:gmap center="51.601357, 18.972930" zoom="15" type="HYBRID" style="width:100%;height:400px" model="#{gmapView.emptyModel}"/>
+       
+         <p:gmap id="gmap" center="#{gmapView.location}" zoom="15" type="HYBRID" style="width:100%;height:400px" model="#{gmapView.emptyModel}"/>
          
          <p:separator/>
        
        <p:messages id="messages" showDetail="false" />
        
        <p:panel header="Dane">
+         
+         <h:form>     
          <p:panelGrid columns="4" >
          
            <p:outputLabel for="fromDate" value="From datetime:" />
@@ -29,10 +31,11 @@
            <p:calendar id="endDate" value="#{gmapView.endDate}" pattern="MM/dd/yyyy HH:mm:ss" />
            
          </p:panelGrid>
+         </h:form>
          
-         <p:commandButton id="check" action="#{lokalizatorSession.checkIsLogged()}" value="Find" style="margin-top: 20px" />
+         <p:commandButton id="find" actionListener="#{gmapView.findLocations}" value="Find" style="margin-top: 20px" update="locations" />
          
-    <p:dataTable var="loc" value="#{gmapView.locationList}" style="margin-top: 20px">
+    <p:dataTable var="loc" value="#{gmapView.locationList}" style="margin-top: 20px" id="locations">
     <p:column headerText="date">
         <h:outputText value="#{loc.date}" />
     </p:column>
@@ -45,17 +48,13 @@
         <h:outputText value="#{loc.longitude}" />
     </p:column>
  
+ 
     <p:column headerText="Display">
-        <p:commandButton/>
+        <p:commandButton value="Show" actionListener="#{gmapView.changeLocation(loc.latitude, loc.longitude)}" update="gmap" />
     </p:column>
     </p:dataTable>
          
-       </p:panel>
-       </h:form>
-       
-       
-       <script>
-         
-       </script>
+    </p:panel>
+
     </h:body>  
 </html>

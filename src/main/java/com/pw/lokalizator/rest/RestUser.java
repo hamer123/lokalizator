@@ -9,6 +9,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -18,75 +19,58 @@ import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.logging.Logger;
 
+import com.pw.lokalizator.model.RestSecurityKeys;
+import com.pw.lokalizator.model.RestSession;
 import com.pw.lokalizator.model.Role;
 import com.pw.lokalizator.model.User;
 import com.pw.lokalizator.model.UserSecurity;
 import com.pw.lokalizator.repository.UserRepository;
+import com.pw.lokalizator.security.HTTPHeaderNames;
+import com.pw.lokalizator.security.SecurityService;
 
 @Path("/user")
-//@Stateless
 public class RestUser {
-	//@PersistenceContext
-	//EntityManager em;
 	@EJB
-	private UserRepository userRepository;
-	
+	private SecurityService securityService;
 	Logger log = Logger.getLogger(RestUser.class);
-
-	@GET
-	//@Consumes(value = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-	@Produces(value = {MediaType.APPLICATION_JSON})
-	@Path("/{id}")
-	public Response findUSer(@PathParam("id") Long id){
-		User user = null;
-		user = userRepository.findById(id);
-		if(user != null){
-			return Response.status(200)
-					       .entity(user)
-					       .build();
-		}else{
-			return Response.status(404)
-			               .build();
-		}
-	}
 	
+	@Path("/login")
 	@POST
-	@Consumes(value = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-	@Produces(value = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-	@Path("/create")
-	public Response findUSer(User user){
-
-		log.info("/user/create-> login " + user.getLogin() + ", password " + user.getPassword() + ", email " + user.getEmail());
-		
+	@Consumes( value = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML} )
+	@Produces( value = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML} )
+	public Response login(User user){
 		try{
-			UserSecurity us = new UserSecurity();
-			us.setRola(Role.USER);
-			us.setServiceKey("1234");
-			us.setTokenKey("4321");
+			RestSession session = securityService.validateRestLogin(user.getLogin(), user.getPassword());
 			
-			user.setUserSecurity(us);
-			user = userRepository.add(user);
-			return Response.status(200)
-					       .entity(user)
+			return Response.status( Response.Status.OK )
+					       .entity( new RestSecurityKeys( session.getUser().getUserSecurity().getServiceKey(), session.getAuthToken() ))
 					       .build();
 		}catch(Exception e){
-			log.error(e.toString());
-			return Response.status(400)
+			//TODO
+			e.printStackTrace();
+			
+			return Response.status( Response.Status.EXPECTATION_FAILED )
 					       .build();
 		}
+		
 	}
 	
-	@DELETE
-	@Path("/delete/{id}")
-	public Response deleteUser(@PathParam("id") long id){
+	@Path("/logout")
+	@GET
+	public Response logout( @HeaderParam( HTTPHeaderNames.SERVICE_KEY )String serviceKey ){
 		try{
-			userRepository.remove(id);
-			return Response.status(200)
-					       .build();
+			boolean result = securityService.logout(serviceKey);
+			if(result == true){
+				return Response.status( Response.Status.OK )
+						       .build();
+			}
 		}catch(Exception e){
-			return Response.status(400)
-			               .build();
+			//TODO
+			e.printStackTrace();
 		}
+		
+		return Response.status( Response.Status.EXPECTATION_FAILED )
+				       .build();
 	}
 	
 }
