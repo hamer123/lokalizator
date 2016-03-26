@@ -11,33 +11,33 @@
 </h:head> 
 
 <h:body> 
-   <h:form>
+   <h:form id="mainForm">
      <p:growl id="messages" showDetail="true" life="2000" />
    
      <p:gmap id="gmap" center="51.601357, 18.97293" zoom="15" type="HYBRID" style="width:100%;height:400px" model="#{polyglon.polygonModel}">
-       <p:ajax event="pointSelect" listener="#{polyglon.onPointSelect}" update="gmap" />
-       <p:ajax process="@this" update="points :fTable"/>
+       <p:ajax event="pointSelect" listener="#{polyglon.onPointSelect}" update="gmap points" />
+
      </p:gmap>
-   </h:form>
    
-   <h:form id="fTable">
-     <p:panel>
-       <p:dataTable var="points" value="#{polyglon.points.values()}" style="margin-top: 20px" id="points" >
+     <p:panel header="Polygon creater">
+       <p:dataTable var="point" value="#{polyglon.points}" style="margin-top: 20px; padding: 5px;" id="points" rowIndexVar="index">
+         
          <p:column headerText="number">
-           <h:outputText value="#{polyglon.points.rowIndex + 1}" />
+           <h:outputText value="#{index + 1}" />
          </p:column>
          
          <p:column headerText="lat">
-           <h:outputText value="#{points.lat}" />
+           <h:outputText value="#{point.lat}" />
          </p:column>
          
          <p:column headerText="lng">
-           <h:outputText value="#{points.lng}" />
+           <h:outputText value="#{point.lng}" />
          </p:column>
          
          <p:column headerText="remove">
-           <p:commandButton/>
+           <p:commandButton value="remove" actionListener="#{polyglon.actionRemove(index + 1)}" update="mainForm:points mainForm:gmap"/>
          </p:column>
+         
        </p:dataTable>
      </p:panel>
    </h:form>
