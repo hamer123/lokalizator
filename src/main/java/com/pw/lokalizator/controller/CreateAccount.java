@@ -12,8 +12,8 @@ import javax.inject.Named;
 import com.pw.lokalizator.model.User;
 import com.pw.lokalizator.service.UserService;
 
-//@Named(value="account")
-@RequestScoped
+@Named(value="account")
+@ViewScoped
 public class CreateAccount implements Serializable{
 	private static final long serialVersionUID = 1L;
 

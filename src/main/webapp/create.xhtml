@@ -10,12 +10,17 @@
 </h:head> 
 
 <h:body> 
+
+	  	<ui:insert name="menu" >
+	 	  <ui:include src="/WEB-INF/menu_templete.xhtml" />
+	   	</ui:insert> 	
+	   	
   <h:form>
     <p:messages id="messages" showDetail="false" />
     
     <p:panel id="panel" header="create account">
     
-      <p:panelGrid columns="3" cellpadding="5">
+      <h:panelGrid columns="3" cellpadding="5">
         
         <p:outputLabel value="User name:" for="login"/>
         <p:inputText id="login" value="#{account.login}" required="true">
@@ -31,11 +36,11 @@
         
         <p:outputLabel value="Email:" for="email"/>
         <p:inputText id="email" value="#{account.email}" required="true">
-          <f:validateRegex pattern="^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$"/>
+          <f:validateRegex pattern="[\w\.-]*[a-zA-Z0-9_]@[\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]"/>
         </p:inputText>
         <p:message for="email"/>
         
-      </p:panelGrid>
+      </h:panelGrid>
       
       <p:commandButton action="#{account.createAccount()}" value="Create" update="messages panel"/>
     </p:panel>

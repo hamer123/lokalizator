@@ -11,15 +11,16 @@
     </h:head>  
       
     <h:body>  
-       
+    
+       	<ui:insert name="menu" >
+	 	  <ui:include src="/WEB-INF/menu_templete.xhtml" />
+	   	</ui:insert>
        
          <p:gmap id="gmap" center="#{gmapView.location}" zoom="15" type="HYBRID" style="width:100%;height:400px" model="#{gmapView.emptyModel}"/>
          
          <p:separator/>
        
        <p:messages id="messages" showDetail="false" />
-       
-       <p:button value="Create polygon" outcome="polygon"/>
        
        <p:panel header="Dane">
          

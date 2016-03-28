@@ -28,15 +28,16 @@ public class UserService implements Serializable{
 		currentLocation.setLatitude(51.60604194516316);
 		currentLocation.setLongitude(18.937854766845703);
 		currentLocation.setDate(new Date());
-		//currentLocation.setUser(user);
+		currentLocation.setUser(user);
 		
 		UserSecurity security = new UserSecurity();
 		security.setRola(Role.USER);
 		security.setServiceKey(serviceKeyGenerator(user.getLogin().hashCode()));
-		//security.setUser(user);
+		security.setUser(user);
 		
 		user.setUserSecurity(security);
 		user.setCurrentLocation(currentLocation);
+		user.setEnable(true);
 		
 		userRepository.add(user);
 	}

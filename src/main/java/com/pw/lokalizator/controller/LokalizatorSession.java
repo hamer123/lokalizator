@@ -57,7 +57,6 @@ public class LokalizatorSession implements Serializable{
 	}
 	
 	public String logout(){
-		log.debug("invalidating session for " + userLogin);
 		FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
 		log.debug("logout successful for " + userLogin);
 		
