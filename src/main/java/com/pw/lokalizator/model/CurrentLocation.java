@@ -14,6 +14,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -29,8 +30,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
 public class CurrentLocation implements Serializable{
-	@SequenceGenerator(initialValue=1, allocationSize=1, name="CUR_LOC_SEQ", sequenceName="CUR_LOC_S")
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="CUR_LOC_SEQ")
+    @TableGenerator(
+            name="currLocGen", 
+            table="ID_GEN", 
+            pkColumnName="GEN_KEY", 
+            valueColumnName="GEN_VALUE", 
+            pkColumnValue="CUR_LOC_ID"
+            )
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="currLocGen")
 	@Id
 	private long id;
 	

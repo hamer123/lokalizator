@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"> 
+
+<h:head>
+  <title>Create account</title>
+</h:head> 
+
+<h:body> 
+  <h:form>
+    <p:messages id="messages" showDetail="false" />
+    
+    <p:panel id="panel" header="create account">
+    
+      <p:panelGrid columns="3" cellpadding="5">
+        
+        <p:outputLabel value="User name:" for="login"/>
+        <p:inputText id="login" value="#{account.login}" required="true">
+          <f:validateLength minimum="6" maximum="15"/>
+        </p:inputText>
+        <p:message for="login"/>
+        
+        <p:outputLabel value="Password:" for="password"/>
+        <p:password id="password" value="#{account.password}" required="true">
+          <f:validateLength minimum="6" maximum="15"/>
+        </p:password>
+        <p:message for="password"/>
+        
+        <p:outputLabel value="Email:" for="email"/>
+        <p:inputText id="email" value="#{account.email}" required="true">
+          <f:validateRegex pattern="^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$"/>
+        </p:inputText>
+        <p:message for="email"/>
+        
+      </p:panelGrid>
+      
+      <p:commandButton action="#{account.createAccount()}" value="Create" update="messages panel"/>
+    </p:panel>
+  </h:form>
+</h:body> 
+</html>

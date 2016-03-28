@@ -13,6 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -33,8 +34,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 		@NamedQuery(name="Location.findOlderThanAndYoungerThan", query="SELECT l FROM Location l WHERE l.date > :younger AND l.date < :older")
 })
 public class Location implements Serializable{
-	@SequenceGenerator(allocationSize=1, initialValue=1, name="LOC_SEQ",sequenceName="LOCATION_S")
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="LOC_SEQ")
+    @TableGenerator(
+            name="locationGen", 
+            table="ID_GEN", 
+            pkColumnName="GEN_KEY", 
+            valueColumnName="GEN_VALUE", 
+            pkColumnValue="LOC_ID"
+            )
+	@GeneratedValue(strategy=GenerationType.TABLE, generator="locationGen")
 	@Id
 	private long id;
 	@XmlElement

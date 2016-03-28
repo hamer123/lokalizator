@@ -15,6 +15,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.TableGenerator;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -30,8 +31,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 		)
 public class UserSecurity implements Serializable{
 	@Id
-	@SequenceGenerator(name="USER_SECURITY_S", sequenceName="USER_SECUITY_SEQ")
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="USER_SECURITY_S")
+    @TableGenerator(
+            name="userSecGen", 
+            table="ID_GEN", 
+            pkColumnName="GEN_KEY", 
+            valueColumnName="GEN_VALUE", 
+            pkColumnValue="USER_SEC_ID"
+            )
+	@GeneratedValue(strategy=GenerationType.TABLE, generator="userSecGen")
 	private long id;
 	@XmlElement
 	private String serviceKey;

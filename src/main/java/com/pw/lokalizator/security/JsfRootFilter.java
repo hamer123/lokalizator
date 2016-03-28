@@ -1,6 +1,8 @@
 package com.pw.lokalizator.security;
 
 import java.io.IOException;
+
+import javax.inject.Inject;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -8,13 +10,25 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.pw.lokalizator.controller.LokalizatorSession;
 
 /**
  * Servlet Filter implementation class JsfRootFilter
  */
-//@WebFilter("/JsfRootFilter")
-public class JsfRootFilter implements Filter {
 
+
+@WebFilter(
+		urlPatterns = {"/location.xhtml", "/polygon.xhtml"}
+		)
+
+public class JsfRootFilter implements Filter {
+	@Inject
+	LokalizatorSession lokalizatorSession;
+	private final String LOGIN_URI = "/login.xhtml";
+	
     /**
      * Default constructor. 
      */
@@ -33,10 +47,10 @@ public class JsfRootFilter implements Filter {
 	 * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
 	 */
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-		// TODO Auto-generated method stub
-		// place your code here
-
-		// pass the request along the filter chain
+		HttpServletRequest req = (HttpServletRequest)request;
+		HttpServletResponse res = (HttpServletResponse)response;
+		if(!lokalizatorSession.isLogged())
+			res.sendRedirect(req.getContextPath() + LOGIN_URI);
 		chain.doFilter(request, response);
 	}
 

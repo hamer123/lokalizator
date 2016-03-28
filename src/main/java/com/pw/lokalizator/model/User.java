@@ -20,6 +20,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.TableGenerator;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -41,8 +42,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.NONE)
 public class User implements Serializable {
 	@Id
-	@SequenceGenerator(name="USER_SEQ",sequenceName="USER_SEQ")
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="USER_SEQ")
+    @TableGenerator(
+            name="userGen", 
+            table="ID_GEN", 
+            pkColumnName="GEN_KEY", 
+            valueColumnName="GEN_VALUE", 
+            pkColumnValue="USER_ID"
+            )
+	@GeneratedValue(strategy=GenerationType.TABLE, generator="userGen")
 	private long id;
 	
 	@Column(unique=true, updatable=false, nullable=false, length=16)
