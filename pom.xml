@@ -7,6 +7,14 @@
     <packaging>war</packaging>
     <version>1.0</version>
     <name>lokalizator</name>
+    
+	<repositories>
+		<repository>
+			<id>prime-repo</id>
+			<name>Prime Repo</name>
+			<url>http://repository.primefaces.org</url>
+		</repository>
+	</repositories>
      
   
     <properties>
@@ -55,7 +63,13 @@
     <groupId>org.primefaces</groupId>  
     <artifactId>primefaces</artifactId>  
     <version>5.2</version>  
-</dependency> 
+</dependency>
+
+    <dependency>  
+        <groupId>org.primefaces.themes</groupId>  
+        <artifactId>all-themes</artifactId>  
+        <version>1.0.10</version>  
+    </dependency>   
         
     </dependencies>
 

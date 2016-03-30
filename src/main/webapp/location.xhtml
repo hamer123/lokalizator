@@ -16,48 +16,84 @@
 	 	  <ui:include src="/WEB-INF/menu_templete.xhtml" />
 	   	</ui:insert>
        
-         <p:gmap id="gmap" center="#{gmapView.location}" zoom="15" type="HYBRID" style="width:100%;height:400px" model="#{gmapView.emptyModel}"/>
+         <p:gmap id="gmap" center="#{location.setting.center}" zoom="#{location.setting.zoom}" type="#{location.setting.googleMapType}" style="width:100%;height:400px" model="#{location.map}" />
          
          <p:separator/>
        
        <p:messages id="messages" showDetail="false" />
        
-       <p:panel header="Dane">
+       <p:tabView id="tabView">
          
-         <h:form>     
-         <p:panelGrid columns="4" >
+        <p:tab title="Twoje dane" id="twojeDane">
          
-           <p:outputLabel for="fromDate" value="From datetime:" />
-           <p:calendar id="fromDate" value="#{gmapView.fromDate}" pattern="MM/dd/yyyy HH:mm:ss" />
+         <h:form>
+             
+         <p:panelGrid columns="5" >
+         
+           <p:outputLabel for="fromDate" value="Od kiedy" />
+           <p:calendar id="fromDate" value="#{location.fromDate}" pattern="MM/dd/yyyy HH:mm:ss" required="true" maxdate="#{location.maxDate}"/>
         
-           <p:outputLabel for="endDate" value="End datetime:" />
-           <p:calendar id="endDate" value="#{gmapView.endDate}" pattern="MM/dd/yyyy HH:mm:ss" />
+           <p:outputLabel for="endDate" value="Do kiedy" />
+           <p:calendar id="endDate" value="#{location.endDate}" pattern="MM/dd/yyyy HH:mm:ss" required="true" maxdate="#{location.maxDate}"/>
            
-         </p:panelGrid>
-         </h:form>
-         
-         <p:commandButton id="find" actionListener="#{gmapView.findLocations}" value="Find" style="margin-top: 20px" update="locations" />
-         
-    <p:dataTable var="loc" value="#{gmapView.locationList}" style="margin-top: 20px" id="locations">
-    <p:column headerText="date">
-        <h:outputText value="#{loc.date}" />
-    </p:column>
+           <p:commandButton id="find" actionListener="#{location.findLocations}" value="Find" update=":tabView:locations  :messages" />
+           
+          </p:panelGrid>
+        </h:form>
+  
+
+          <p:dataTable var="loc" value="#{location.locations}" style="margin-top: 20px" id="locations" reflow="true" rows="25" paginator="true" >
+             <p:column headerText="date">
+               <h:outputText value="#{loc.date}" />
+             </p:column>
  
-    <p:column headerText="latitude">
-        <h:outputText value="#{loc.latitude}" />
-    </p:column>
+             <p:column headerText="latitude">
+               <h:outputText value="#{loc.latitude}" />
+             </p:column>
  
-    <p:column headerText="longitude">
-        <h:outputText value="#{loc.longitude}" />
-    </p:column>
- 
- 
-    <p:column headerText="Display">
-        <p:commandButton value="Show" actionListener="#{gmapView.changeLocation(loc.latitude, loc.longitude)}" update="gmap" />
-    </p:column>
-    </p:dataTable>
-         
-    </p:panel>
+             <p:column headerText="longitude">
+               <h:outputText value="#{loc.longitude}" />
+             </p:column>
+
+             <p:column headerText="Display">
+               <p:commandButton value="Show" actionListener="#{location.changeLocation(loc.latitude, loc.longitude)}" update="gmap" />
+             </p:column>
+           </p:dataTable>
+           
+          </p:tab>
+          
+          <p:tab title="Przyjaciele">
+          
+          </p:tab>
+          
+          <p:tab title="Ustawienia">
+          
+            <h:form>
+            <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+              
+              <p:outputLabel for="console" value="Typ mapy" />
+              <p:selectOneMenu id="console" value="#{location.setting.googleMapType}" style="width:125px">
+              
+                <p:ajax update=":gmap" />
+                
+                <f:selectItem itemLabel="Hybrid" itemValue="HYBRID" />
+                <f:selectItem itemLabel="Terrain" itemValue="TERRAIN" />
+                <f:selectItem itemLabel="Satelite" itemValue="SATELLITE" />
+                <f:selectItem itemLabel="Roadmap" itemValue="ROADMAP" />
+              </p:selectOneMenu>
+              
+              <p:outputLabel for="check" value="Pokaz ulice" />
+              <p:selectBooleanCheckbox id="check" value="#{location.setting.streetView}">
+                <p:ajax update=":gmap" />
+              </p:selectBooleanCheckbox>
+             
+            </h:panelGrid>
+           
+            </h:form>
+            
+          </p:tab>
+          
+       </p:tabView>
 
     </h:body>  
 </html>

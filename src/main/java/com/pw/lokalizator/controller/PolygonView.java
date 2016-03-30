@@ -10,6 +10,9 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.primefaces.event.map.PointSelectEvent;
 import org.primefaces.event.map.StateChangeEvent;
@@ -23,19 +26,17 @@ import org.primefaces.model.map.Polygon;
 public class PolygonView implements Serializable{
 	@Inject
 	private LokalizatorSession lokalizatorSession;
+	@Inject
+	private GoogleMapSetting googleMapSetting;
 	
 	private MapModel polygonModel;
 	private List<LatLng>points;
-	private String center;
-	private int zoom;
 	
 	@PostConstruct
 	private void postConstruct(){
 		polygonModel = new DefaultMapModel();
 		points = new ArrayList<LatLng>();
 		Polygon polygon = new Polygon();
-		zoom = 15;
-		center = "51.601357, 18.97293";
 		
         polygon.setStrokeColor("#FF9900");
         polygon.setFillColor("#FF9900");
@@ -46,10 +47,8 @@ public class PolygonView implements Serializable{
 	}
 	
 	public void onStateChanged(StateChangeEvent event){
-		center = event.getCenter().getLat() + ", " + event.getCenter().getLng();
-		zoom = event.getZoomLevel();
-		
-		System.err.println("STATE CHANGED " + event.getCenter());
+		googleMapSetting.setCenter(event.getCenter());
+		googleMapSetting.setZoom(event.getZoomLevel());
 	}
 	
 	public void onPointSelect(PointSelectEvent event){
@@ -79,14 +78,6 @@ public class PolygonView implements Serializable{
 		this.points = points;
 	}
 
-	public String getCenter() {
-		return center;
-	}
-
-	public void setCenter(String center) {
-		this.center = center;
-	}
-
 	public LokalizatorSession getLokalizatorSession() {
 		return lokalizatorSession;
 	}
@@ -95,12 +86,12 @@ public class PolygonView implements Serializable{
 		this.lokalizatorSession = lokalizatorSession;
 	}
 
-	public int getZoom() {
-		return zoom;
+	public GoogleMapSetting getGoogleMapSetting() {
+		return googleMapSetting;
 	}
 
-	public void setZoom(int zoom) {
-		this.zoom = zoom;
+	public void setGoogleMapSetting(GoogleMapSetting googleMapSetting) {
+		this.googleMapSetting = googleMapSetting;
 	}
-	
+
 }

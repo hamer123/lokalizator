@@ -27,6 +27,7 @@ public class Polygon {
 	@OneToMany(fetch=FetchType.EAGER, cascade=CascadeType.ALL, mappedBy="polygon")
 	@MapKey(name="number")
 	private Map<Integer, PolygonPoint>points;
+
 	
 	public long getId() {
 		return id;
