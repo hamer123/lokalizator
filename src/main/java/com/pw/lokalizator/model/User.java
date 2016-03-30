@@ -14,6 +14,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -80,6 +81,15 @@ public class User implements Serializable {
 	@OneToMany(cascade=CascadeType.ALL, orphanRemoval=true)
 	private Collection<Location>locations = new ArrayList<Location>();
 	
+	@OneToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL, mappedBy="provider")
+	private List<Polygon>polygons;
+	
+	@OneToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL, mappedBy="user")
+	private List<Friend>friends;
+	
+	@OneToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL, mappedBy="from")
+	private List<FriendInvitation>friendInvitations;
+	
 	public void addLocation(Location location){
 		locations.add(location);
 		location.setUser(this);
@@ -137,5 +147,13 @@ public class User implements Serializable {
 	}
 	public void setLocations(Collection<Location> locations) {
 		this.locations = locations;
+	}
+
+	public List<Polygon> getPolygons() {
+		return polygons;
+	}
+
+	public void setPolygons(List<Polygon> polygons) {
+		this.polygons = polygons;
 	}
 }

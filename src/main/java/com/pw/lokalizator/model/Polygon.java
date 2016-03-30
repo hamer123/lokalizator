@@ -1,14 +1,18 @@
 package com.pw.lokalizator.model;
 
 import java.util.Map;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.TableGenerator;
 
 @Entity
@@ -27,6 +31,12 @@ public class Polygon {
 	@OneToMany(fetch=FetchType.EAGER, cascade=CascadeType.ALL, mappedBy="polygon")
 	@MapKey(name="number")
 	private Map<Integer, PolygonPoint>points;
+	@OneToOne
+	private User target;
+	@ManyToOne
+	private User provider;
+	@Enumerated
+	private PolygonType polygonType;
 
 	
 	public long getId() {
@@ -46,6 +56,24 @@ public class Polygon {
 	}
 	public void setPoints(Map<Integer, PolygonPoint> points) {
 		this.points = points;
+	}
+	public User getTarget() {
+		return target;
+	}
+	public void setTarget(User target) {
+		this.target = target;
+	}
+	public User getProvider() {
+		return provider;
+	}
+	public void setProvider(User provider) {
+		this.provider = provider;
+	}
+	public PolygonType getPolygonType() {
+		return polygonType;
+	}
+	public void setPolygonType(PolygonType polygonType) {
+		this.polygonType = polygonType;
 	}
 
 }

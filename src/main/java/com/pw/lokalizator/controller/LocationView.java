@@ -17,6 +17,7 @@ import javax.inject.Named;
 
 import org.apache.commons.logging.Log;
 import org.jboss.resteasy.logging.Logger;
+import org.primefaces.event.map.StateChangeEvent;
 import org.primefaces.model.map.DefaultMapModel;
 import org.primefaces.model.map.LatLng;
 import org.primefaces.model.map.MapModel;
@@ -24,6 +25,7 @@ import org.primefaces.model.map.Marker;
 
 import com.pw.lokalizator.model.CurrentLocation;
 import com.pw.lokalizator.model.Location;
+import com.pw.lokalizator.repository.CurrentLocationRepository;
 import com.pw.lokalizator.repository.LocationRepository;
 
 @Named(value="location")
@@ -36,15 +38,15 @@ public class LocationView implements Serializable{
 	private GoogleMapSetting setting;
 	@EJB
 	private LocationRepository locationRepository;
+	@EJB
+	private CurrentLocationRepository currentLocationRepository;
+	
 	Logger log = Logger.getLogger(LocationView.class);
 	
 	private MapModel map;
-    private double yourLat;
-    private double yourLng;
     private Date fromDate;
     private Date endDate;
     private Date maxDate;
-    
     private Marker oldMarker;
     private Marker currentMarker;
     
@@ -53,10 +55,8 @@ public class LocationView implements Serializable{
 	@PostConstruct
 	private void postConstruct(){
 		CurrentLocation currentLocation = session.getCurrentUser().getCurrentLocation();
-		yourLat = currentLocation.getLatitude();
-		yourLng = currentLocation.getLongitude();
 		setting.setCenter(new LatLng( currentLocation.getLatitude(), currentLocation.getLongitude() ));
-		currentMarker = new Marker( new LatLng(yourLat, yourLng), "Twoja pozycja " + currentLocation.getDate() );
+		currentMarker = new Marker( new LatLng( currentLocation.getLatitude(), currentLocation.getLongitude() ), "Twoja pozycja " + currentLocation.getDate() );
 		map = new DefaultMapModel();
 		map.addOverlay(currentMarker);
 		maxDate = new Date();
@@ -74,17 +74,36 @@ public class LocationView implements Serializable{
 		}
 	}
 	
-	public void changeLocation(String latS, String lngS){
-		double lat = Double.parseDouble(latS);
-		double lng = Double.parseDouble(lngS);
+	public void changeLocation(String index){
+		Location choosed = locations.get( Integer.valueOf(index) );
 		
 		if(oldMarker == null){
-			oldMarker = new Marker(new LatLng( lat, lng ), "Your location");
+			oldMarker = new Marker(new LatLng( choosed.getLatitude(), choosed.getLongitude() ), "Your location at " + choosed.getDate() );
+			setting.setCenter(new LatLng( choosed.getLatitude(), choosed.getLongitude() ));
 			map.addOverlay(oldMarker);
 		}else{
-			oldMarker.setLatlng(new LatLng( lat, lng ));
+			oldMarker.setLatlng(new LatLng( choosed.getLatitude(), choosed.getLongitude() ));
+			setting.setCenter(new LatLng( choosed.getLatitude(), choosed.getLongitude() ));
 		}
 	    
+	}
+	
+	public void onStateChanged(StateChangeEvent event){
+		setting.setCenter(event.getCenter());
+		setting.setZoom(event.getZoomLevel());
+	}
+	
+	public void onPolling(){
+		System.err.println("POLLING");
+		try{
+			CurrentLocation location = currentLocationRepository.findByUserId( session.getCurrentUser().getId() );
+			currentMarker.setLatlng( new LatLng( location.getLatitude(), location.getLongitude() ));
+			session.getCurrentUser().setCurrentLocation(location);
+			System.err.println("POLLING !!! " + location.getLatitude() + ", " + location.getLongitude());
+
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 	
 	//////////////////////////////////////////////////// GET AND SET ///////////////////////////////////////////////////////////////////
@@ -136,7 +155,5 @@ public class LocationView implements Serializable{
 	public void setLocations(List<Location> locations) {
 		this.locations = locations;
 	}
-
-
 	
 }

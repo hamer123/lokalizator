@@ -11,14 +11,24 @@
     </h:head>  
       
     <h:body>  
-    
+
+
+<h:form>
+    <p:poll interval="60" listener="#{location.onPolling}" update="gmap" />
+</h:form>
+
+
        	<ui:insert name="menu" >
 	 	  <ui:include src="/WEB-INF/menu_templete.xhtml" />
 	   	</ui:insert>
        
-         <p:gmap id="gmap" center="#{location.setting.center}" zoom="#{location.setting.zoom}" type="#{location.setting.googleMapType}" style="width:100%;height:400px" model="#{location.map}" />
-         
-         <p:separator/>
+         <p:gmap id="gmap" center="#{location.setting.center}" zoom="#{location.setting.zoom}" type="#{location.setting.googleMapType}" style="width:100%;height:400px" model="#{location.map}">
+           <p:ajax event="stateChange" listener="#{location.onStateChanged}" update="gmap" />
+         </p:gmap>
+   
+       <p:separator/>
+       
+
        
        <p:messages id="messages" showDetail="false" />
        
@@ -27,7 +37,7 @@
         <p:tab title="Twoje dane" id="twojeDane">
          
          <h:form>
-             
+
          <p:panelGrid columns="5" >
          
            <p:outputLabel for="fromDate" value="Od kiedy" />
@@ -42,7 +52,7 @@
         </h:form>
   
 
-          <p:dataTable var="loc" value="#{location.locations}" style="margin-top: 20px" id="locations" reflow="true" rows="25" paginator="true" >
+          <p:dataTable var="loc" value="#{location.locations}" style="margin-top: 20px" id="locations" reflow="true" rows="25" paginator="true" rowIndexVar="index">
              <p:column headerText="date">
                <h:outputText value="#{loc.date}" />
              </p:column>
@@ -56,7 +66,7 @@
              </p:column>
 
              <p:column headerText="Display">
-               <p:commandButton value="Show" actionListener="#{location.changeLocation(loc.latitude, loc.longitude)}" update="gmap" />
+               <p:commandButton value="Show" actionListener="#{location.changeLocation(index)}" update=":gmap" />
              </p:column>
            </p:dataTable>
            
