@@ -6,90 +6,115 @@
       xmlns:p="http://primefaces.org/ui"> 
 
     <h:head>  
-      <!-- <script src="https://raw.githubusercontent.com/HPNeo/gmaps/master/gmaps.js"/> -->
       <script src="https://maps.googleapis.com/maps/api/js"/>
     </h:head>  
       
-    <h:body>  
-
-
-<h:form>
-    <p:poll interval="60" listener="#{location.onPolling}" update="gmap" />
-</h:form>
-
-
-       	<ui:insert name="menu" >
-	 	  <ui:include src="/WEB-INF/menu_templete.xhtml" />
-	   	</ui:insert>
+    <h:body> 
+     
+      <ui:insert name="menu" >
+	    <ui:include src="/WEB-INF/menu_templete.xhtml" />
+	  </ui:insert>
+	  
+	  <h:form id="fgrowl">
+        <p:poll interval="60" listener="#{location.onPoll}" update="gmap tabView:fform:ftable" />
+        <p:growl id="growl" showDetail="true" />
+      </h:form>
        
-         <p:gmap id="gmap" center="#{location.setting.center}" zoom="#{location.setting.zoom}" type="#{location.setting.googleMapType}" style="width:100%;height:400px" model="#{location.map}">
-           <p:ajax event="stateChange" listener="#{location.onStateChanged}" update="gmap" />
-         </p:gmap>
+      <p:gmap id="gmap" center="#{location.setting.center}" zoom="#{location.setting.zoom}" type="#{location.setting.googleMapType}" style="width:100%;height:400px" model="#{location.map}">
+        <p:ajax event="stateChange" listener="#{location.onStateChanged}" update="gmap" />
+        <p:ajax event="overlaySelect" listener="#{location.onMarkerSelect}" update="fgrowl:growl" />
+      </p:gmap>
    
-       <p:separator/>
+      <p:separator/>
        
-
+      <p:messages id="messages" showDetail="false" />
        
-       <p:messages id="messages" showDetail="false" />
-       
-       <p:tabView id="tabView">
-         
-        <p:tab title="Twoje dane" id="twojeDane">
-         
-         <h:form>
-
-         <p:panelGrid columns="5" >
-         
-           <p:outputLabel for="fromDate" value="Od kiedy" />
-           <p:calendar id="fromDate" value="#{location.fromDate}" pattern="MM/dd/yyyy HH:mm:ss" required="true" maxdate="#{location.maxDate}"/>
+      <p:tabView id="tabView">
         
-           <p:outputLabel for="endDate" value="Do kiedy" />
-           <p:calendar id="endDate" value="#{location.endDate}" pattern="MM/dd/yyyy HH:mm:ss" required="true" maxdate="#{location.maxDate}"/>
+        <p:tab title="Twoje dane" id="twojeDane">
+          <h:form>
+            <p:panelGrid columns="5" >
+              <p:outputLabel for="fromDate" value="Od kiedy" />
+              <p:calendar id="fromDate" value="#{location.fromDate}" pattern="MM/dd/yyyy HH:mm:ss" required="true" maxdate="#{location.maxDate}"/>
+        
+              <p:outputLabel for="endDate" value="Do kiedy" />
+              <p:calendar id="endDate" value="#{location.endDate}" pattern="MM/dd/yyyy HH:mm:ss" required="true" maxdate="#{location.maxDate}"/>
            
-           <p:commandButton id="find" actionListener="#{location.findLocations}" value="Find" update=":tabView:locations  :messages" />
-           
-          </p:panelGrid>
-        </h:form>
+              <p:commandButton id="find" actionListener="#{location.findLocations}" value="Find" update=":tabView:locations  :messages" />
+            </p:panelGrid>
+          </h:form>
   
-
-          <p:dataTable var="loc" value="#{location.locations}" style="margin-top: 20px" id="locations" reflow="true" rows="25" paginator="true" rowIndexVar="index">
-             <p:column headerText="date">
-               <h:outputText value="#{loc.date}" />
-             </p:column>
+          <p:dataTable var="loc" value="#{location.locations}" style="margin-top: 20px" id="locations" reflow="true" rows="25" paginator="true" 
+                       selectionMode="single" rowKey="#{loc.id}"  selection="#{location.selectedLocation}">
+            <p:ajax event="rowSelect" listener="#{location.onRowSelect}" update=":gmap" />           
+            
+            <p:column headerText="date">
+              <h:outputText value="#{loc.date}" />
+            </p:column>
  
-             <p:column headerText="latitude">
-               <h:outputText value="#{loc.latitude}" />
-             </p:column>
+            <p:column headerText="latitude">
+              <h:outputText value="#{loc.latitude}" />
+            </p:column>
  
-             <p:column headerText="longitude">
-               <h:outputText value="#{loc.longitude}" />
-             </p:column>
+            <p:column headerText="longitude">
+              <h:outputText value="#{loc.longitude}" />
+            </p:column>
 
-             <p:column headerText="Display">
-               <p:commandButton value="Show" actionListener="#{location.changeLocation(index)}" update=":gmap" />
-             </p:column>
-           </p:dataTable>
+          </p:dataTable>
            
-          </p:tab>
+        </p:tab>
           
-          <p:tab title="Przyjaciele">
+        <p:tab title="Przyjaciele">
+         
+         <p:panel header="Dodaj Przyjaciela">
+          <h:form>
+            <p:messages id="msg_przyjeaciele" showDetail="false"/>
+            <h:panelGrid columns="3" >
+              <p:outputLabel for="nick" value="Dodaj przyjaciela"/>
+              <p:inputText id="nick" placeholder="nick" value="#{location.friendNick}" required="true">
+                <f:validateLength minimum="6"/>
+              </p:inputText>
+              <p:commandButton value="Invite" actionListener="#{location.onSendInvitation}" update="msg_przyjeaciele"/>
+            </h:panelGrid>
+          </h:form>
+         </p:panel>
           
-          </p:tab>
+         <p:panel header="Lista Przyjaciol"> 
+          <h:panelGrid columns="1" style="margin-top: 10px;">
+           <h:form id="fform">
+            <p:dataTable id="ftable" var="f" value="#{location.friends}" selectionMode="single" rowKey="#{f.id}" >
+              <p:ajax event="rowSelect" listener="#{location.onRowSelectFriend}" update=":gmap"/>
+            
+              <p:column headerText="Login">
+                <h:outputText value="#{f.friend.login}" />
+              </p:column>
+              
+              <p:column headerText="Last date">
+                <h:outputText value="#{f.friend.currentLocation.date}" />
+              </p:column>
+              
+              <p:column headerText="Remove friend">
+                  <p:commandButton value="Remove" update=":gmap ftable"/>
+              </p:column>
+           
+            </p:dataTable>
+           </h:form>
+          </h:panelGrid>
+         </p:panel>
+        </p:tab>
           
-          <p:tab title="Ustawienia">
-          
-            <h:form>
+        <p:tab title="Ustawienia">
+          <h:form>
             <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
               
               <p:outputLabel for="console" value="Typ mapy" />
               <p:selectOneMenu id="console" value="#{location.setting.googleMapType}" style="width:125px">
-              
                 <p:ajax update=":gmap" />
                 
-                <f:selectItem itemLabel="Hybrid" itemValue="HYBRID" />
-                <f:selectItem itemLabel="Terrain" itemValue="TERRAIN" />
+                <f:selectItem itemLabel="Hybrid"   itemValue="HYBRID" />
+                <f:selectItem itemLabel="Terrain"  itemValue="TERRAIN" />
                 <f:selectItem itemLabel="Satelite" itemValue="SATELLITE" />
-                <f:selectItem itemLabel="Roadmap" itemValue="ROADMAP" />
+                <f:selectItem itemLabel="Roadmap"  itemValue="ROADMAP" />
               </p:selectOneMenu>
               
               <p:outputLabel for="check" value="Pokaz ulice" />
@@ -98,12 +123,8 @@
               </p:selectBooleanCheckbox>
              
             </h:panelGrid>
-           
-            </h:form>
-            
-          </p:tab>
-          
-       </p:tabView>
-
+          </h:form>
+        </p:tab>
+      </p:tabView>
     </h:body>  
 </html>

@@ -36,7 +36,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 		value = {
 		  @NamedQuery(name="USER.findAll", query = "SELECT u FROM User u"),
 		  @NamedQuery(name="USER.deleteByID", query="DELETE FROM User u WHERE u.id = :id"),
-		  @NamedQuery(name="USER.findByLoginAndPassword", query="SELECT u FROM User u WHERE u.login = :login AND u.password = :password")
+		  @NamedQuery(name="USER.findByLoginAndPassword", query="SELECT u FROM User u WHERE u.login = :login AND u.password = :password"),
+		  @NamedQuery(name="USER.findByLogin", query="SELECT u FROM User u WHERE u.login = :login")
 		})
 
 @XmlRootElement

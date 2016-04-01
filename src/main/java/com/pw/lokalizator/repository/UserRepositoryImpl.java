@@ -52,4 +52,11 @@ public class UserRepositoryImpl implements UserRepository{
 				 .setParameter("password", password)
 				 .getSingleResult();
 	}
+
+	@Override
+	public User findByLogin(String login) {
+		return em.createNamedQuery("USER.findByLogin", User.class)
+				 .setParameter("login", login)
+				 .getSingleResult();
+	}
 }

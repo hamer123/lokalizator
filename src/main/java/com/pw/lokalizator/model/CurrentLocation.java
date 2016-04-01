@@ -27,7 +27,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries(value={
 		@NamedQuery(name="CurrentLocation.deleteById", query="DELETE FROM CurrentLocation c WHERE c.id = :id"),
 		@NamedQuery(name="CurrentLocation.findAll", query="SELECT c FROM CurrentLocation c"),
-		@NamedQuery(name="CurrentLocation.findBuUserId", query="SELECT c FROM CurrentLocation c WHERE c.user.id = :id")
+		@NamedQuery(name="CurrentLocation.findBuUserId", query="SELECT c FROM CurrentLocation c WHERE c.user.id = :id"),
+		@NamedQuery(name="CurrentLocation.findByUsersId", query="SELECT new com.pw.lokalizator.model.CurrentLocation (c.latitude, c.longitude, c.date, c.user.id, c.user.login) FROM CurrentLocation c WHERE c.user.id IN (:ids)")
 })
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
@@ -56,6 +57,23 @@ public class CurrentLocation implements Serializable{
 	@OneToOne(fetch=FetchType.LAZY)
 	private User user;
 	
+	public CurrentLocation(){}
+	
+	public CurrentLocation(double lat, double lon, Date date, long id, String login){
+		this.latitude = lat;
+		this.longitude = lon;
+		this.date = date;
+		this.user = new User();
+		user.setId(id);
+		user.setLogin(login);
+	}
+	
+	public CurrentLocation(double lat, double lon, Date date){
+		this.latitude = lat;
+		this.longitude = lon;
+		this.date = date;
+	}
+
 	public long getId() {
 		return id;
 	}
