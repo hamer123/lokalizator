@@ -2,7 +2,6 @@ package com.pw.lokalizator.controller;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -16,11 +15,10 @@ import javax.faces.event.ActionEvent;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.persistence.NoResultException;
 
-import org.apache.commons.logging.Log;
 import org.jboss.resteasy.logging.Logger;
 import org.primefaces.event.SelectEvent;
-import org.primefaces.event.TabChangeEvent;
 import org.primefaces.event.map.OverlaySelectEvent;
 import org.primefaces.event.map.StateChangeEvent;
 import org.primefaces.model.map.DefaultMapModel;
@@ -28,12 +26,13 @@ import org.primefaces.model.map.LatLng;
 import org.primefaces.model.map.MapModel;
 import org.primefaces.model.map.Marker;
 
-import com.pw.lokalizator.exception.FriendArleadyExist;
 import com.pw.lokalizator.model.CurrentLocation;
 import com.pw.lokalizator.model.Friend;
+import com.pw.lokalizator.model.FriendInvitation;
 import com.pw.lokalizator.model.Location;
 import com.pw.lokalizator.model.User;
 import com.pw.lokalizator.repository.CurrentLocationRepository;
+import com.pw.lokalizator.repository.FriendInvitationRepository;
 import com.pw.lokalizator.repository.FriendRepository;
 import com.pw.lokalizator.repository.LocationRepository;
 import com.pw.lokalizator.service.FriendService;
@@ -53,6 +52,8 @@ public class LocationView implements Serializable{
 	@EJB
 	private FriendRepository friendRepository;
 	@EJB
+	private FriendInvitationRepository friendInvitationRepository;
+	@EJB
 	private FriendService friendService;
 	
 	Logger log = Logger.getLogger(LocationView.class);
@@ -68,6 +69,7 @@ public class LocationView implements Serializable{
     private List<Location>locations;
     private List<Friend>friends;
     private Map<Long, Marker>friendsMarker;
+    private List<FriendInvitation>friendInvitations;
     
 	@PostConstruct
 	private void postConstruct(){
@@ -85,6 +87,8 @@ public class LocationView implements Serializable{
 			friendsMarker.put(f.getFriend().getId() , m);
 			map.addOverlay(m);
 		}
+		
+		friendInvitations = friendInvitationRepository.getByByNadawcaId( session.getCurrentUser().getId() );
 	}
 	
 	/*
@@ -92,13 +96,22 @@ public class LocationView implements Serializable{
 	 */
 	public void findLocations(ActionEvent actionEvent){
 		try{
+			if(fromDate.getTime() > endDate.getTime()){
+		        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Bledne ustawienie przedialu daty",  null);
+		        FacesContext.getCurrentInstance().addMessage(null, message);
+		        return;
+			}
+			
 			locations = locationRepository.getLocationYoungThanAndOlderThan(fromDate, endDate);
+			
+			if(locations.size() < 1){
+		        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Could not find locations",  null);
+		        FacesContext.getCurrentInstance().addMessage(null, message);
+			}
+
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			
-	        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Could not find locations",  null);
-	        FacesContext.getCurrentInstance().addMessage(null, message);
 		}
 	}
 	
@@ -146,21 +159,38 @@ public class LocationView implements Serializable{
 	public void onSendInvitation(ActionEvent event){
 		try{
 			for(Friend f : friends){
-				if(f.getFriend().getLogin().equalsIgnoreCase(friendNick))
-					throw new FriendArleadyExist("ten uzytkownik juz jest na liscie");
+				if(f.getFriend().getLogin().equalsIgnoreCase(friendNick)){
+			        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, friendNick + " jest juz na twoiej liscie przyjaciol ",  null);
+			        FacesContext.getCurrentInstance().addMessage(null, message);
+			        return;
+				}
 			}
+			//do siebie ?
+			if(friendNick.equals( session.getUserLogin() )){
+		        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Nie mozna wyslac zaproszenia do siebie " + friendNick,  null);
+		        FacesContext.getCurrentInstance().addMessage(null, message);
+		        return;
+			}
+			// go ahead !
 			friendService.sendInvitation(session.getCurrentUser(), friendNick);
-			throw new FriendArleadyExist(friendNick + " jest juz dodany do listy " + session.getUserLogin());
-		}catch(IllegalArgumentException iae){
-			
-		}catch(FriendArleadyExist fae){
-			log.info(fae.getMessage());
-	        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, friendNick + " jest juz na twoiej liscie przyjaciol ",  null);
+			// send message
+	        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Zaproszenie zostalo wyslane do " + friendNick,  null);
 	        FacesContext.getCurrentInstance().addMessage(null, message);
-		}catch(Exception e){
-			e.printStackTrace();
+	        //try to handle exceptions
+		}catch(Throwable ejbException){
+				try {
+					throw ejbException.getCause();
+				}catch(IllegalArgumentException iae){
+			        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Zaproszenie juz istnieje",  null);
+			        FacesContext.getCurrentInstance().addMessage(null, message);
+			    }catch(NoResultException lnre){
+			        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, friendNick + "nie znaleziono uzytkownika o nicku " + friendNick,  null);
+			        FacesContext.getCurrentInstance().addMessage(null, message);
+				}catch(Throwable e){
+			        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Nie udalo sie wyslac zaproszenia",  null);
+			        FacesContext.getCurrentInstance().addMessage(null, message);
+				}
 		}
-		
 	}
 	
 	/*
@@ -269,6 +299,14 @@ public class LocationView implements Serializable{
 
 	public void setFriends(List<Friend> friends) {
 		this.friends = friends;
+	}
+
+	public List<FriendInvitation> getFriendInvitations() {
+		return friendInvitations;
+	}
+
+	public void setFriendInvitations(List<FriendInvitation> friendInvitations) {
+		this.friendInvitations = friendInvitations;
 	}
 	
 }

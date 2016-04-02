@@ -20,7 +20,7 @@
         <p:growl id="growl" showDetail="true" />
       </h:form>
        
-      <p:gmap id="gmap" center="#{location.setting.center}" zoom="#{location.setting.zoom}" type="#{location.setting.googleMapType}" style="width:100%;height:400px" model="#{location.map}">
+      <p:gmap id="gmap" center="#{location.setting.center}" zoom="#{location.setting.zoom}" type="#{location.setting.googleMapType}" style="width:100%;height:600px" model="#{location.map}">
         <p:ajax event="stateChange" listener="#{location.onStateChanged}" update="gmap" />
         <p:ajax event="overlaySelect" listener="#{location.onMarkerSelect}" update="fgrowl:growl" />
       </p:gmap>
@@ -71,7 +71,7 @@
             <p:messages id="msg_przyjeaciele" showDetail="false"/>
             <h:panelGrid columns="3" >
               <p:outputLabel for="nick" value="Dodaj przyjaciela"/>
-              <p:inputText id="nick" placeholder="nick" value="#{location.friendNick}" required="true">
+              <p:inputText id="nick" placeholder="login" value="#{location.friendNick}" required="true">
                 <f:validateLength minimum="6"/>
               </p:inputText>
               <p:commandButton value="Invite" actionListener="#{location.onSendInvitation}" update="msg_przyjeaciele"/>
@@ -97,6 +97,30 @@
                   <p:commandButton value="Remove" update=":gmap ftable"/>
               </p:column>
            
+            </p:dataTable>
+           </h:form>
+          </h:panelGrid>
+         </p:panel>
+         
+         <p:panel header="Zaproszenia">
+          <h:panelGrid columns="2" >
+           <h:form>
+            <p:dataTable var="inv" value="#{location.friendInvitations}">
+             <p:column headerText="Login">
+               <h:outputText value="#{inv.to.login}" />
+             </p:column>
+           
+             <p:column headerText="Data">
+               <h:outputText value="#{inv.date}" />
+             </p:column>
+             
+             <p:column headerText="Akceptacja">
+             
+             </p:column>
+             
+             <p:column headerText="Usun">
+             
+             </p:column>
             </p:dataTable>
            </h:form>
           </h:panelGrid>

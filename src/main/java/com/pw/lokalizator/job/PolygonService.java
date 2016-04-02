@@ -8,7 +8,7 @@ import javax.ejb.Stateless;
 @LocalBean
 public class PolygonService {
 
-	//@Schedule(minute="*/1", hour="*")
+	@Schedule(minute="*/1", hour="*")
 	public void checkIsUserInPolygon(){
 		System.err.println("HERE WILL BE SERVICE TO HANDLE POLYGON");
 	}
