@@ -22,7 +22,7 @@ public class RestSecurityKeys {
 		return serviceKey;
 	}
 	public void setServiceKey(String serviceKey) {
-		serviceKey = serviceKey;
+		this.serviceKey = serviceKey;
 	}
 	public String getAuthToken() {
 		return authToken;
