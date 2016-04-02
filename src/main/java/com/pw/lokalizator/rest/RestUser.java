@@ -74,4 +74,11 @@ public class RestUser {
 				       .build();
 	}
 	
+	@GET
+	public Response test(){
+		return Response.status( Response.Status.OK )
+				       .entity("TEST REST EASY")
+				       .build();
+	}
+	
 }
