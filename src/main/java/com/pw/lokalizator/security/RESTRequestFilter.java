@@ -36,6 +36,7 @@ public class RESTRequestFilter implements ContainerRequestFilter{
 
         String path = requestCtx.getUriInfo().getPath();
 		log.info("INFO FROM REST REQUEST FILTER -> " + requestCtx.getRequest().getMethod() + " PATH-> " + path );
+		System.err.println("INFO FROM REST REQUEST FILTER -> " + requestCtx.getRequest().getMethod() + " PATH-> " + path );
           
         // IMPORTANT!!! First, Acknowledge any pre-flight test from browsers for this case before validating the headers (CORS stuff)
         if ( requestCtx.getRequest().getMethod().equals( "OPTIONS" ) ) {
