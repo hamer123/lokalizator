@@ -34,10 +34,11 @@ public class RestUser {
 	private SecurityService securityService;
 	Logger log = Logger.getLogger(RestUser.class);
 	
-	@Path("/login")
+	
 	@POST
-	@Consumes( value = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML} )
-	@Produces( value = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML} )
+	@Path("/login")
+	//@Consumes( value = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML} )
+	//@Produces( value = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML} )
 	public Response login(User user){
 		try{
 			RestSession session = securityService.validateRestLogin(user.getLogin(), user.getPassword());
