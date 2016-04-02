@@ -21,8 +21,8 @@ import org.omg.CORBA.CTX_RESTRICT_SCOPE;
 
 import com.pw.lokalizator.model.User;
 
-@Provider
-@PreMatching
+//@Provider
+//@PreMatching
 public class RESTRequestFilter implements ContainerRequestFilter{
 	@EJB
 	private SecurityService securityService;
