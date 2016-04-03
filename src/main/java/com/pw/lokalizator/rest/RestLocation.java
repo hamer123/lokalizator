@@ -42,6 +42,7 @@ public class RestLocation {
 			
 			//Persist location
 			location.setDate( new Date() );
+			location.setUser(user);
 			locationRepository.add( location );
 			
 		}catch(Exception e){
