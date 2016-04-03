@@ -8,6 +8,7 @@ import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import com.pw.lokalizator.model.Location;
 import com.pw.lokalizator.model.User;
 
 @Stateless
@@ -59,4 +60,5 @@ public class UserRepositoryImpl implements UserRepository{
 				 .setParameter("login", login)
 				 .getSingleResult();
 	}
+
 }

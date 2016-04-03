@@ -2,6 +2,7 @@ package com.pw.lokalizator.repository;
 
 import javax.ejb.Local;
 
+import com.pw.lokalizator.model.Location;
 import com.pw.lokalizator.model.User;
 
 @Local

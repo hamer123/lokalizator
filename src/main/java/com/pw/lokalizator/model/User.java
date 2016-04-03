@@ -3,31 +3,25 @@ package com.pw.lokalizator.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
-
-import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
-import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
@@ -54,43 +48,53 @@ public class User implements Serializable {
 	@GeneratedValue(strategy=GenerationType.TABLE, generator="userGen")
 	private long id;
 	
-	@Column(unique=true, updatable=false, nullable=false, length=16)
 	@XmlElement
+	@Column(unique=true, updatable=false, nullable=false, length=16)
 	private String login;
 	
-	@Column(unique=false, nullable=false, length=16)
 	@XmlElement
+	@Column(unique=false, nullable=false, length=16)
 	private String password;
 
 	@Column(unique=true, length=50)
-	@XmlElement
 	private String email;
 
-	@Column(nullable=true)
-	@XmlElement
+	@Column(nullable=false)
 	private boolean enable;
 	
-	@XmlElement
-	@OneToOne(cascade=CascadeType.ALL, orphanRemoval=true, mappedBy="user")
+	@Column(nullable=false)
+	private double latitude;
+	
+	@Column(nullable=false)
+	private double longitude;
+	
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(nullable=false)
+	private Date date;
+	
+	/*
+	 * Feach default EAGER
+	 */
+	
+	@OneToOne(cascade=CascadeType.ALL, mappedBy="user",  orphanRemoval = true)
 	private UserSecurity userSecurity;
 	
-	@XmlElement
-	@OneToOne(cascade=CascadeType.ALL, orphanRemoval=true, mappedBy="user")
-	private CurrentLocation currentLocation;
-	
-	@XmlElement
-	@OneToMany(cascade=CascadeType.ALL, orphanRemoval=true)
+	/*
+	 * Feach default LAZY
+	 */
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
 	private Collection<Location>locations = new ArrayList<Location>();
 	
-	@OneToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL, mappedBy="provider")
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "provider", orphanRemoval = true)
 	private List<Polygon>polygons;
 	
-	@OneToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL, mappedBy="user")
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
 	private List<Friend>friends;
 	
-	@OneToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL, mappedBy="from")
+	@OneToMany(cascade = CascadeType.ALL, mappedBy="from", orphanRemoval = true)
 	private List<FriendInvitation>friendInvitations;
 	
+
 	public void addLocation(Location location){
 		locations.add(location);
 		location.setUser(this);
@@ -137,12 +141,6 @@ public class User implements Serializable {
 	public void setUserSecurity(UserSecurity userSecurity) {
 		this.userSecurity = userSecurity;
 	}
-	public CurrentLocation getCurrentLocation() {
-		return currentLocation;
-	}
-	public void setCurrentLocation(CurrentLocation currentLocation) {
-		this.currentLocation = currentLocation;
-	}
 	public Collection<Location> getLocations() {
 		return locations;
 	}
@@ -156,5 +154,45 @@ public class User implements Serializable {
 
 	public void setPolygons(List<Polygon> polygons) {
 		this.polygons = polygons;
+	}
+
+	public double getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(double latitude) {
+		this.latitude = latitude;
+	}
+
+	public double getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(double longitude) {
+		this.longitude = longitude;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+
+	public List<Friend> getFriends() {
+		return friends;
+	}
+
+	public void setFriends(List<Friend> friends) {
+		this.friends = friends;
+	}
+
+	public List<FriendInvitation> getFriendInvitations() {
+		return friendInvitations;
+	}
+
+	public void setFriendInvitations(List<FriendInvitation> friendInvitations) {
+		this.friendInvitations = friendInvitations;
 	}
 }

@@ -42,8 +42,6 @@ public class UserSecurity implements Serializable{
 	private long id;
 	@XmlElement
 	private String serviceKey;
-	//@XmlElement
-	//private String tokenKey;
 	@OneToOne
 	private User user;
 	@Enumerated(EnumType.ORDINAL)
@@ -61,12 +59,6 @@ public class UserSecurity implements Serializable{
 	public void setServiceKey(String serviceKey) {
 		this.serviceKey = serviceKey;
 	}
-	//public String getTokenKey() {
-	//	return tokenKey;
-	//}
-	//public void setTokenKey(String tokenKey) {
-	//	this.tokenKey = tokenKey;
-	//}
 	public User getUser() {
 		return user;
 	}

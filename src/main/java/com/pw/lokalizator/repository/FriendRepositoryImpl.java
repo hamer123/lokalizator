@@ -1,14 +1,10 @@
 package com.pw.lokalizator.repository;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-
-import com.pw.lokalizator.model.CurrentLocation;
 import com.pw.lokalizator.model.Friend;
 
 

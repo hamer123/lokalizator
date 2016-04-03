@@ -31,7 +31,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 		@NamedQuery(name="Location.deleteOlderThan", query="DELETE FROM Location l WHERE l.user = :user AND l.date < :date"),
 		@NamedQuery(name="Location.deleteYoungerThan", query="DELETE FROM Location l WHERE l.user = :user AND l.date > :date"),
 		@NamedQuery(name="Location.count", query="SELECT COUNT(l) FROM Location l where l.user = :user"),
-		@NamedQuery(name="Location.findOlderThanAndYoungerThan", query="SELECT l FROM Location l WHERE l.date > :younger AND l.date < :older")
+		@NamedQuery(name="Location.findOlderThanAndYoungerThan", query="SELECT l FROM Location l WHERE l.date > :younger AND l.date < :older"),
+		@NamedQuery(name="Location.findFromUser", query="SELECT new com.pw.lokalizator.model.Location(u.date, u.latitude, u.longitude) FROM User u WHERE u.id =:id"),
+		@NamedQuery(name="Location.findFromUsers", query="SELECT new com.pw.lokalizator.model.Location(u.date, u.latitude, u.longitude) FROM User u WHERE u.id IN (:ids)")
+
 })
 public class Location implements Serializable{
     @TableGenerator(
@@ -45,17 +48,26 @@ public class Location implements Serializable{
 	@Id
 	private long id;
 	@XmlElement
-	@Column(updatable=false,nullable=false)
+	@Column(nullable=false)
 	private double latitude;
-	@Column(updatable=false,nullable=false)
+	@Column(nullable=false)
 	@XmlElement
 	private double longitude;
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(updatable=false,nullable=false)
+	@Column(nullable=false)
 	@XmlElement
 	private Date date;
 	@ManyToOne
 	private User user;
+	
+	public Location(){}
+	
+	public Location(Date date, double lat, double lon){
+		this.date = date;
+		this.latitude = lat;
+		this.longitude = lon;
+	}
+	
 	public long getId() {
 		return id;
 	}

@@ -3,6 +3,7 @@ package com.pw.lokalizator.repository;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -52,6 +53,20 @@ public class LocationRepositoryImpl implements LocationRepository{
 				 .setParameter("younger", younger, TemporalType.TIMESTAMP)
 				 .setParameter("older", older, TemporalType.TIMESTAMP)
 				 .getResultList();
+	}
+
+	@Override
+	public Location getFromUser(long id) {
+		return em.createNamedQuery("Location.findFromUser", Location.class)
+				 .setParameter("id", id)
+				 .getSingleResult();
+	}
+
+	@Override
+	public List<Location> getFromUser(Set<Long> ids) {
+		return em.createNamedQuery("Location.findFromUsers", Location.class)
+				.setParameter("ids", ids)
+				.getResultList();
 	}
 
 }

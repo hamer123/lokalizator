@@ -8,8 +8,6 @@ import java.util.Date;
 import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Stateless;
-
-import com.pw.lokalizator.model.CurrentLocation;
 import com.pw.lokalizator.model.Role;
 import com.pw.lokalizator.model.User;
 import com.pw.lokalizator.model.UserSecurity;
@@ -24,20 +22,16 @@ public class UserService implements Serializable{
 	
 	public void createAccount(User user){
 		
-		CurrentLocation currentLocation = new CurrentLocation();
-		currentLocation.setLatitude(51.60604194516316);
-		currentLocation.setLongitude(18.937854766845703);
-		currentLocation.setDate(new Date());
-		currentLocation.setUser(user);
-		
 		UserSecurity security = new UserSecurity();
 		security.setRola(Role.USER);
 		security.setServiceKey(serviceKeyGenerator(user.getLogin().hashCode()));
 		security.setUser(user);
 		
 		user.setUserSecurity(security);
-		user.setCurrentLocation(currentLocation);
 		user.setEnable(true);
+		user.setDate(new Date());
+		user.setLatitude(0);
+		user.setLongitude(0);
 		
 		userRepository.add(user);
 	}

@@ -1,12 +1,10 @@
 package com.pw.lokalizator.controller;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
@@ -16,7 +14,6 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
-
 import org.jboss.resteasy.logging.Logger;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.map.OverlaySelectEvent;
@@ -25,13 +22,10 @@ import org.primefaces.model.map.DefaultMapModel;
 import org.primefaces.model.map.LatLng;
 import org.primefaces.model.map.MapModel;
 import org.primefaces.model.map.Marker;
-
-import com.pw.lokalizator.model.CurrentLocation;
 import com.pw.lokalizator.model.Friend;
 import com.pw.lokalizator.model.FriendInvitation;
 import com.pw.lokalizator.model.Location;
 import com.pw.lokalizator.model.User;
-import com.pw.lokalizator.repository.CurrentLocationRepository;
 import com.pw.lokalizator.repository.FriendInvitationRepository;
 import com.pw.lokalizator.repository.FriendRepository;
 import com.pw.lokalizator.repository.LocationRepository;
@@ -48,13 +42,13 @@ public class LocationView implements Serializable{
 	@EJB
 	private LocationRepository locationRepository;
 	@EJB
-	private CurrentLocationRepository currentLocationRepository;
-	@EJB
 	private FriendRepository friendRepository;
 	@EJB
 	private FriendInvitationRepository friendInvitationRepository;
 	@EJB
 	private FriendService friendService;
+
+
 	
 	Logger log = Logger.getLogger(LocationView.class);
 	
@@ -73,17 +67,19 @@ public class LocationView implements Serializable{
     
 	@PostConstruct
 	private void postConstruct(){
-		CurrentLocation currentLocation = session.getCurrentUser().getCurrentLocation();
+		Location currentLocation = new Location(session.getCurrentUser().getDate() , session.getCurrentUser().getLatitude(), session.getCurrentUser().getLongitude()); 
 		setting.setCenter(new LatLng( currentLocation.getLatitude(), currentLocation.getLongitude() ));
 		currentMarker = new Marker( new LatLng( currentLocation.getLatitude(), currentLocation.getLongitude() ), "Twoja pozycja [ " + currentLocation.getDate() + " ]");
+		
 		map = new DefaultMapModel();
 		map.addOverlay(currentMarker);
 		maxDate = new Date();
+		
 		friendsMarker = new HashMap<Long, Marker>();
 		friends = friendRepository.findByUserId( session.getCurrentUser().getId() );
 		for(Friend f : friends){
-			Marker m = new Marker( new LatLng( f.getFriend().getCurrentLocation().getLatitude(), f.getFriend().getCurrentLocation().getLongitude()),
-					               f.getFriend().getLogin() + " [ " + f.getFriend().getCurrentLocation().getDate() + " ]");
+			Marker m = new Marker( new LatLng( f.getFriend().getLatitude(), f.getFriend().getLongitude()),
+					               f.getFriend().getLogin() + " [ " + f.getFriend().getDate() + " ]");
 			friendsMarker.put(f.getFriend().getId() , m);
 			map.addOverlay(m);
 		}
@@ -130,23 +126,21 @@ public class LocationView implements Serializable{
 		log.info("update current locations is about to start");
 		try{
 			//set your current location
-			CurrentLocation location = currentLocationRepository.findByUserId( session.getCurrentUser().getId() );
+			User user = session.getCurrentUser();
+			Location location = locationRepository.getFromUser( user.getId() );
 			currentMarker.setLatlng( new LatLng( location.getLatitude(), location.getLongitude() ));
-			session.getCurrentUser().setCurrentLocation(location);
+			
+			//set location for JSF session 
+			user.setDate(location.getDate());
+			user.setLatitude(location.getLatitude());
+			user.setLongitude(location.getLongitude());
 			
 			//set your friends location
-			List<User>users = new ArrayList<User>();
-			for(Friend f : friends)
-				users.add(f.getUser());
-			List<CurrentLocation> friendsLocation = currentLocationRepository.findByUsersId(friendsMarker.keySet());
-			for(CurrentLocation cl : friendsLocation){
-				friendsMarker.get(cl.getUser().getId()).setLatlng( new LatLng( cl.getLatitude(), cl.getLongitude() ));
-				friendsMarker.get(cl.getUser().getId()).setTitle( cl.getUser().getLogin() + " [ " + cl.getDate() + " ]");
-				for(Friend f : friends)
-					if(f.getFriend().getId() == cl.getUser().getId())
-						f.getFriend().setCurrentLocation(cl);
+			friends = friendRepository.findByUserId( user.getId() );
+			for(Friend friend : friends){
+				friendsMarker.get( friend.getFriend().getId() ).setLatlng( new LatLng( friend.getFriend().getLatitude(), friend.getFriend().getLongitude() ));
+				friendsMarker.get( friend.getFriend().getId() ).setTitle( friend.getFriend().getLogin() + " [ " + friend.getFriend().getDate() + " ]");
 			}
-			
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -214,7 +208,7 @@ public class LocationView implements Serializable{
 	 */
 	public void onRowSelectFriend(SelectEvent event){
 		Friend f = (Friend)event.getObject();
-		setting.setCenter(new LatLng(f.getFriend().getCurrentLocation().getLatitude(), f.getFriend().getCurrentLocation().getLongitude()));
+		setting.setCenter(new LatLng(f.getFriend().getLatitude(), f.getFriend().getLongitude()));
 	}
 	
 	/*
