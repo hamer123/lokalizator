@@ -6,6 +6,7 @@ import java.util.Date;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -57,6 +58,9 @@ public class Location implements Serializable{
 	@Column(nullable=false)
 	@XmlElement
 	private Date date;
+	@XmlElement
+	@Enumerated
+	private ProviderType provider;
 	@ManyToOne
 	private User user;
 	
@@ -97,5 +101,13 @@ public class Location implements Serializable{
 	}
 	public void setUser(User user) {
 		this.user = user;
+	}
+
+	public ProviderType getProvider() {
+		return provider;
+	}
+
+	public void setProvider(ProviderType provider) {
+		this.provider = provider;
 	}
 }

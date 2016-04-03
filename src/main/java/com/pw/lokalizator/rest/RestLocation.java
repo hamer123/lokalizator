@@ -31,17 +31,16 @@ public class RestLocation {
 		RestSession session = (RestSession)request.getSession().getAttribute( RestSession.REST_SESSION_ATR );
 		
 		try{
-			log.info("DO ZAPISANIA NOWA LOKACJA DLA " + session.getUser().getLogin() + " [ " + location.getLatitude() + ", " + location.getLongitude() + " ]");
+			log.info("DO ZAPISANIA NOWA LOKACJA DLA " + session.getUser().getLogin() + " [ " + location.getLatitude() + ", " + location.getLongitude() + " ] " + location.getDate() + " : " + location.getProvider());
 			
 			//Merge user
 			User user = session.getUser();
-			user.setDate( new Date() );
+			user.setDate( location.getDate() );
 			user.setLatitude( location.getLatitude() );
 			user.setLongitude( location.getLongitude() );
 			session.setUser( userRepository.save(user) );
 			
 			//Persist location
-			location.setDate( new Date() );
 			location.setUser(user);
 			locationRepository.add( location );
 			
