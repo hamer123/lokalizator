@@ -44,8 +44,6 @@ public class UserService implements Serializable{
 	
 	public String serviceKeyGenerator(int hash){
 		random = new SecureRandom();
-		return new BigInteger(130, random).toString(32) 
-			   + "-"
-			   + hash;
+		return new BigInteger(130, random).toString(32) + Math.abs(hash);
 	}
 }

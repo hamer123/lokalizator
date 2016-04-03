@@ -1,5 +1,6 @@
 package com.pw.lokalizator.service;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.ejb.EJB;
@@ -21,10 +22,15 @@ public class LocationService {
 	UserRepository userRepository;
 	
 	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-	public void createLocationAndSaveCurrentLocation(Location location, CurrentLocation currentLocation, long userId){
+	public void createLocationAndSaveCurrentLocation(Location location, long userId){
+		//find user by id
 		User user = userRepository.findById(userId);
-		currentLocation.setUser(user);
-		user.setCurrentLocation(currentLocation);
+		CurrentLocation cl = user.getCurrentLocation();
+		//update current location
+		cl.setDate(new Date());
+		cl.setLatitude(location.getLatitude());
+		cl.setLongitude(location.getLongitude());
+		// persist location
 		location.setUser(user);
 		locationRepository.add(location);
 	}

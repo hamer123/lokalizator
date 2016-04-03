@@ -14,9 +14,8 @@ import org.jboss.logging.Logger;
 import com.pw.lokalizator.model.CurrentLocation;
 import com.pw.lokalizator.model.Location;
 import com.pw.lokalizator.model.RestSession;
-import com.pw.lokalizator.model.User;
 import com.pw.lokalizator.service.LocationService;
-import com.pw.lokalizator.singleton.RestSessionSimulator;
+
 
 @Path("/location")
 public class RestLocation {
@@ -42,7 +41,7 @@ public class RestLocation {
 		location.setDate(new Date());
 		
 		try{
-			locationService.createLocationAndSaveCurrentLocation(location, currentLocation, session.getUser().getId());
+			locationService.createLocationAndSaveCurrentLocation(location, session.getUser().getId());
 		}catch(Exception e){
 			e.printStackTrace();
 			return Response.status( Response.Status.EXPECTATION_FAILED )
