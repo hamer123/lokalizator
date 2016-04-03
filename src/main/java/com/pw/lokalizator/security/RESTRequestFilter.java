@@ -50,6 +50,8 @@ public class RESTRequestFilter implements ContainerRequestFilter{
             String serviceKey = requestCtx.getHeaderString( HTTPHeaderNames.SERVICE_KEY );
             String authToken = requestCtx.getHeaderString( HTTPHeaderNames.AUTH_TOKEN );
             
+            log.info("TOKENS -> " + serviceKey + ", " + authToken);
+            
             if(authToken != null && serviceKey != null){
                 try{
                 	SecurityContext sc = securityService.createSecurityContext ( serviceKey, authToken, request );
