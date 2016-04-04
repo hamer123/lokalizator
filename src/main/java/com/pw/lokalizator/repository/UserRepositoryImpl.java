@@ -1,6 +1,7 @@
 package com.pw.lokalizator.repository;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -59,6 +60,21 @@ public class UserRepositoryImpl implements UserRepository{
 		return em.createNamedQuery("USER.findByLogin", User.class)
 				 .setParameter("login", login)
 				 .getSingleResult();
+	}
+
+	@Override
+	public List<User> findFriendsById(long id) {
+		List<User>friends = null;
+		
+		try{
+			
+			friends = em.find(User.class, id).getFriends();
+			friends.size();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		return friends;
 	}
 
 }

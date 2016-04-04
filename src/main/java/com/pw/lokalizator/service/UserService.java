@@ -26,13 +26,8 @@ public class UserService implements Serializable{
 		security.setRola(Role.USER);
 		security.setServiceKey(serviceKeyGenerator(user.getLogin().hashCode()));
 		security.setUser(user);
-		
 		user.setUserSecurity(security);
 		user.setEnable(true);
-		user.setDate(new Date());
-		user.setLatitude(0);
-		user.setLongitude(0);
-		
 		userRepository.add(user);
 	}
 	

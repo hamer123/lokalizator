@@ -71,7 +71,7 @@
             <p:messages id="msg_przyjeaciele" showDetail="false"/>
             <h:panelGrid columns="3" >
               <p:outputLabel for="nick" value="Dodaj przyjaciela"/>
-              <p:inputText id="nick" placeholder="login" value="#{location.friendNick}" required="true">
+              <p:inputText id="nick"  value="#{location.friendNick}" required="true">
                 <f:validateLength minimum="6"/>
               </p:inputText>
               <p:commandButton value="Invite" actionListener="#{location.onSendInvitation}" update="msg_przyjeaciele"/>
@@ -82,15 +82,15 @@
          <p:panel header="Lista Przyjaciol"> 
           <h:panelGrid columns="1" style="margin-top: 10px;">
            <h:form id="fform">
-            <p:dataTable id="ftable" var="f" value="#{location.friends}" selectionMode="single" rowKey="#{f.id}" >
+            <p:dataTable id="ftable" var="f" value="#{location.users.values()}" selectionMode="single" rowKey="#{f.id}" >
               <p:ajax event="rowSelect" listener="#{location.onRowSelectFriend}" update=":gmap"/>
             
               <p:column headerText="Login">
-                <h:outputText value="#{f.friend.login}" />
+                <h:outputText value="#{f.login}" />
               </p:column>
               
               <p:column headerText="Last date">
-                <h:outputText value="#{f.friend.date}" />
+                
               </p:column>
               
               <p:column headerText="Remove friend">

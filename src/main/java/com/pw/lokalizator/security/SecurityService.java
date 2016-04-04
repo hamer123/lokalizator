@@ -37,13 +37,13 @@ public class SecurityService {
 	 */
 	public SecurityContext createSecurityContext(String serviceKey, String authToken, HttpServletRequest request){
 		
-		log.info("Trying to create SecurityContext with " + serviceKey + ", token-> " + authToken);
+		log.info("Trying to create SecurityContext [ service : " + serviceKey + " ] [ token : " + authToken + " ]");
 		
 		try{
 			RestSession session = restSessionSimulator.getRestSession(serviceKey);
 			
 			if(!session.getAuthToken().equals(authToken)){
-				throw new SecurityException("Bledny authToken dla uzytkowniak " + serviceKey);
+				throw new SecurityException("Bledny token dla uzytkowniak " + serviceKey);
 			}
 			request.getSession().setAttribute(RestSession.REST_SESSION_ATR , session);
 

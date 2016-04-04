@@ -33,9 +33,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 		@NamedQuery(name="Location.deleteYoungerThan", query="DELETE FROM Location l WHERE l.user = :user AND l.date > :date"),
 		@NamedQuery(name="Location.count", query="SELECT COUNT(l) FROM Location l where l.user = :user"),
 		@NamedQuery(name="Location.findOlderThanAndYoungerThan", query="SELECT l FROM Location l WHERE l.date > :younger AND l.date < :older"),
+		/*
 		@NamedQuery(name="Location.findFromUser", query="SELECT new com.pw.lokalizator.model.Location(u.date, u.latitude, u.longitude) FROM User u WHERE u.id =:id"),
 		@NamedQuery(name="Location.findFromUsers", query="SELECT new com.pw.lokalizator.model.Location(u.date, u.latitude, u.longitude) FROM User u WHERE u.id IN (:ids)")
-
+        */
 })
 public class Location implements Serializable{
     @TableGenerator(
@@ -48,19 +49,25 @@ public class Location implements Serializable{
 	@GeneratedValue(strategy=GenerationType.TABLE, generator="locationGen")
 	@Id
 	private long id;
+    
 	@XmlElement
 	@Column(nullable=false)
 	private double latitude;
+	
 	@Column(nullable=false)
 	@XmlElement
 	private double longitude;
+	
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(nullable=false)
 	@XmlElement
 	private Date date;
+	
 	@XmlElement
 	@Enumerated
+	@Column(nullable=false)
 	private ProviderType provider;
+	
 	@ManyToOne
 	private User user;
 	

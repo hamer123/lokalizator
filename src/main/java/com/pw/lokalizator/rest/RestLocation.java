@@ -1,5 +1,4 @@
 package com.pw.lokalizator.rest;
-import java.util.Date;
 import javax.ejb.EJB;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -9,6 +8,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 import com.pw.lokalizator.model.Location;
+import com.pw.lokalizator.model.ProviderType;
 import com.pw.lokalizator.model.RestSession;
 import com.pw.lokalizator.model.User;
 import com.pw.lokalizator.repository.LocationRepository;
@@ -31,21 +31,30 @@ public class RestLocation {
 		RestSession session = (RestSession)request.getSession().getAttribute( RestSession.REST_SESSION_ATR );
 		
 		try{
-			log.info("DO ZAPISANIA NOWA LOKACJA DLA " + session.getUser().getLogin() + " [ " + location.getLatitude() + ", " + location.getLongitude() + " ] " + location.getDate() + " : " + location.getProvider());
+			log.info("zapisywanie lokalizacji dla " + session.getUser().getLogin() 
+					+ "  [ " + location.getLatitude() + ", " + location.getLongitude() + " ] " + location.getDate() 
+					+ " : " + location.getProvider());
 			
-			//Merge user
 			User user = session.getUser();
-			user.setDate( location.getDate() );
-			user.setLatitude( location.getLatitude() );
-			user.setLongitude( location.getLongitude() );
+			
+			//zapisanie nowej lokalizacji
+			location.setUser(user);
+			location = locationRepository.add( location );
+			
+			//zaktualizowanie obecnej pozycji uzytkownika
+			if(location.getProvider() == ProviderType.GPS){
+				user.setLastGpsLocation(location);
+			}else if(location.getProvider() == ProviderType.NETWORK){
+				user.setLastNetworkLocation(location);
+			}else if(location.getProvider() == ProviderType.OWN){
+				user.setLastOwnProviderLocation(location);
+			}
+			
 			session.setUser( userRepository.save(user) );
 			
-			//Persist location
-			location.setUser(user);
-			locationRepository.add( location );
-			
 		}catch(Exception e){
-			e.printStackTrace();
+			
+			log.error("nie ulado sie zapisac lokalizacji..." + e);
 			return Response.status( Response.Status.EXPECTATION_FAILED )
 					.build();
 		}

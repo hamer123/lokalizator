@@ -1,10 +1,12 @@
 package com.pw.lokalizator.controller;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
@@ -14,6 +16,7 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.NoResultException;
+
 import org.jboss.resteasy.logging.Logger;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.map.OverlaySelectEvent;
@@ -22,13 +25,14 @@ import org.primefaces.model.map.DefaultMapModel;
 import org.primefaces.model.map.LatLng;
 import org.primefaces.model.map.MapModel;
 import org.primefaces.model.map.Marker;
-import com.pw.lokalizator.model.Friend;
+
 import com.pw.lokalizator.model.FriendInvitation;
 import com.pw.lokalizator.model.Location;
+import com.pw.lokalizator.model.ProviderType;
 import com.pw.lokalizator.model.User;
 import com.pw.lokalizator.repository.FriendInvitationRepository;
-import com.pw.lokalizator.repository.FriendRepository;
 import com.pw.lokalizator.repository.LocationRepository;
+import com.pw.lokalizator.repository.UserRepository;
 import com.pw.lokalizator.service.FriendService;
 
 @Named(value="location")
@@ -42,13 +46,16 @@ public class LocationView implements Serializable{
 	@EJB
 	private LocationRepository locationRepository;
 	@EJB
-	private FriendRepository friendRepository;
-	@EJB
 	private FriendInvitationRepository friendInvitationRepository;
 	@EJB
 	private FriendService friendService;
-
-
+	@EJB
+	private UserRepository userRepository;
+	
+	private static final String BLUE_MARKER = "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+	private static final String RED_MARKER = "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
+	private static final String GREEN_MARKER = "http://maps.google.com/mapfiles/ms/icons/green-dot.png";
+	private static final String YELLOW_MARKER = "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
 	
 	Logger log = Logger.getLogger(LocationView.class);
 	
@@ -56,35 +63,68 @@ public class LocationView implements Serializable{
     private Date fromDate;
     private Date endDate;
     private Date maxDate;
-    private Marker oldMarker;
-    private Marker currentMarker;
     private String friendNick;
     private Location selectedLocation;
+    
+    private boolean gpsVisible;
+    private boolean networkVisible;
+    private boolean ownVisible;
+    
+    private Marker oldLocationMarker;
     private List<Location>locations;
-    private List<Friend>friends;
-    private Map<Long, Marker>friendsMarker;
+    private Map<Long, Marker>gpsMarkers;
+    private Map<Long, Marker>networkMarkers;
+    private Map<Long, Marker>ownMarkers;
+    private Map<Long, User>users;
     private List<FriendInvitation>friendInvitations;
     
 	@PostConstruct
 	private void postConstruct(){
-		Location currentLocation = new Location(session.getCurrentUser().getDate() , session.getCurrentUser().getLatitude(), session.getCurrentUser().getLongitude()); 
-		setting.setCenter(new LatLng( currentLocation.getLatitude(), currentLocation.getLongitude() ));
-		currentMarker = new Marker( new LatLng( currentLocation.getLatitude(), currentLocation.getLongitude() ), "Twoja pozycja [ " + currentLocation.getDate() + " ]");
+		User user = session.getCurrentUser();
+		gpsMarkers = new HashMap<Long, Marker>();
+		networkMarkers = new HashMap<Long, Marker>();
+		ownMarkers = new HashMap<Long, Marker>();
 		
-		map = new DefaultMapModel();
-		map.addOverlay(currentMarker);
-		maxDate = new Date();
+		gpsVisible = true;
+		networkVisible = true;
+		ownVisible = true;
 		
-		friendsMarker = new HashMap<Long, Marker>();
-		friends = friendRepository.findByUserId( session.getCurrentUser().getId() );
-		for(Friend f : friends){
-			Marker m = new Marker( new LatLng( f.getFriend().getLatitude(), f.getFriend().getLongitude()),
-					               f.getFriend().getLogin() + " [ " + f.getFriend().getDate() + " ]");
-			friendsMarker.put(f.getFriend().getId() , m);
-			map.addOverlay(m);
+		List<User>fList = userRepository.findFriendsById(user.getId());
+		users = new HashMap<Long, User>();
+		for(User u : fList){
+			users.put(u.getId(), u);
+			
+			if(u.getLastGpsLocation() != null)
+				gpsMarkers.put(u.getId(), createMarker(u.getLastGpsLocation(), u.getLogin()));
+			
+			if(u.getLastNetworkLocation() != null)
+			    networkMarkers.put(u.getId(), createMarker(u.getLastNetworkLocation(), u.getLogin()));
+			
+			if(u.getLastOwnProviderLocation() != null)
+			    ownMarkers.put(u.getId(), createMarker(u.getLastOwnProviderLocation(), u.getLogin()));
 		}
 		
-		friendInvitations = friendInvitationRepository.getByByNadawcaId( session.getCurrentUser().getId() );
+		if(user.getLastGpsLocation() != null)
+			gpsMarkers.put(user.getId(), createMarker(user.getLastGpsLocation(), user.getLogin()));
+		
+		if(user.getLastNetworkLocation() != null)
+		    networkMarkers.put(user.getId(), createMarker(user.getLastNetworkLocation(), user.getLogin()));
+		
+		if(user.getLastOwnProviderLocation() != null)
+		    ownMarkers.put(user.getId(), createMarker(user.getLastOwnProviderLocation(), user.getLogin()));
+		
+		//TODO
+		maxDate = new Date();
+		
+		map = new DefaultMapModel();
+		for(Marker m : gpsMarkers.values())
+			map.addOverlay(m);
+		for(Marker m : networkMarkers.values())
+			map.addOverlay(m);
+		for(Marker m : ownMarkers.values())
+			map.addOverlay(m);
+		
+		log.info("size of marker " + map.getMarkers().size());
 	}
 	
 	/*
@@ -124,27 +164,23 @@ public class LocationView implements Serializable{
 	 */
 	public void onPoll(){
 		log.info("update current locations is about to start");
-		try{
+		//try{
 			//set your current location
-			User user = session.getCurrentUser();
-			Location location = locationRepository.getFromUser( user.getId() );
-			currentMarker.setLatlng( new LatLng( location.getLatitude(), location.getLongitude() ));
+			//User user = session.getCurrentUser();
+			//Location location = locationRepository.getFromUser( user.getId() );
+			//currentMarker.setLatlng( new LatLng( location.getLatitude(), location.getLongitude() ));
 			
-			//set location for JSF session 
-			user.setDate(location.getDate());
-			user.setLatitude(location.getLatitude());
-			user.setLongitude(location.getLongitude());
 			
 			//set your friends location
-			friends = friendRepository.findByUserId( user.getId() );
-			for(Friend friend : friends){
-				friendsMarker.get( friend.getFriend().getId() ).setLatlng( new LatLng( friend.getFriend().getLatitude(), friend.getFriend().getLongitude() ));
-				friendsMarker.get( friend.getFriend().getId() ).setTitle( friend.getFriend().getLogin() + " [ " + friend.getFriend().getDate() + " ]");
-			}
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		log.info("after update current locations");
+			//friends = friendRepository.findByUserId( user.getId() );
+			//for(Friend friend : friends){
+			//	friendsMarker.get( friend.getFriend().getId() ).setLatlng( new LatLng( friend.getFriend().getLatitude(), friend.getFriend().getLongitude() ));
+			//	friendsMarker.get( friend.getFriend().getId() ).setTitle( friend.getFriend().getLogin() + " [ " + friend.getFriend().getDate() + " ]");
+		//	}
+		//}catch(Exception e){
+		//	e.printStackTrace();
+	//	}
+	//	log.info("after update current locations");
 	}
 	
 	/*
@@ -152,13 +188,13 @@ public class LocationView implements Serializable{
 	 */
 	public void onSendInvitation(ActionEvent event){
 		try{
-			for(Friend f : friends){
-				if(f.getFriend().getLogin().equalsIgnoreCase(friendNick)){
-			        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, friendNick + " jest juz na twoiej liscie przyjaciol ",  null);
-			        FacesContext.getCurrentInstance().addMessage(null, message);
-			        return;
-				}
-			}
+		//	for(Friend f : friends){
+		//		if(f.getFriend().getLogin().equalsIgnoreCase(friendNick)){
+		//	        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, friendNick + " jest juz na twoiej liscie przyjaciol ",  null);
+		//	        FacesContext.getCurrentInstance().addMessage(null, message);
+		//	        return;
+		//		}
+		//	}
 			//do siebie ?
 			if(friendNick.equals( session.getUserLogin() )){
 		        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Nie mozna wyslac zaproszenia do siebie " + friendNick,  null);
@@ -193,12 +229,13 @@ public class LocationView implements Serializable{
 	public void onRowSelect(SelectEvent event){
 		Location location = (Location)event.getObject();
 		
-		if(oldMarker == null){
-			oldMarker = new Marker(new LatLng( location.getLatitude(), location.getLongitude() ), "Twoja stara pozycja [ " + location.getDate() + " ]");
+		if(oldLocationMarker == null){
+			oldLocationMarker = new Marker(new LatLng( location.getLatitude(), location.getLongitude() ), location.getProvider() + " [ " + session.getUserLogin() +  " ][ "+ location.getDate() + " ]",
+					                       null, YELLOW_MARKER);
 			setting.setCenter(new LatLng( location.getLatitude(), location.getLongitude() ));
-			map.addOverlay(oldMarker);
+			map.addOverlay(oldLocationMarker);
 		}else{
-			oldMarker.setLatlng(new LatLng( location.getLatitude(), location.getLongitude() ));
+			oldLocationMarker.setLatlng(new LatLng( location.getLatitude(), location.getLongitude() ));
 			setting.setCenter(new LatLng( location.getLatitude(), location.getLongitude() ));
 		}
 	}
@@ -207,8 +244,8 @@ public class LocationView implements Serializable{
 	 * Display friend location
 	 */
 	public void onRowSelectFriend(SelectEvent event){
-		Friend f = (Friend)event.getObject();
-		setting.setCenter(new LatLng(f.getFriend().getLatitude(), f.getFriend().getLongitude()));
+	//	Friend f = (Friend)event.getObject();
+	//	setting.setCenter(new LatLng(f.getFriend().getLatitude(), f.getFriend().getLongitude()));
 	}
 	
 	/*
@@ -218,6 +255,34 @@ public class LocationView implements Serializable{
     	if(event.getOverlay() instanceof Marker){
             Marker marker = (Marker) event.getOverlay();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Marker Selected", marker.getTitle()));
+    	}
+    }
+    
+    /*
+     * Create marker
+     */
+    private Marker createMarker(Location location, String login){
+    	if(location.getProvider() == ProviderType.GPS){
+    		return  new Marker(
+        			    new LatLng(location.getLatitude(), location.getLongitude()),
+        			    location.getProvider() + " [ " + login + " ] DATE [ " + location.getDate() + " ]" ,
+        			    null,
+        			    BLUE_MARKER
+        			    );
+    	}else if(location.getProvider() == ProviderType.NETWORK){
+    		return  new Marker(
+    			        new LatLng(location.getLatitude(), location.getLongitude()),
+    			        location.getProvider() + " [ " + login + " ] DATE [ " + location.getDate() + " ]" ,
+    			        null,
+    			        GREEN_MARKER
+    			        );
+    	}else{
+    		return  new Marker(
+			            new LatLng(location.getLatitude(), location.getLongitude()),
+			            location.getProvider() + " [ " + login + " ] DATE [ " + location.getDate() + " ]" ,
+			            null,
+			            RED_MARKER
+			            );
     	}
     }
 	
@@ -287,20 +352,44 @@ public class LocationView implements Serializable{
 		this.selectedLocation = selectedLocation;
 	}
 
-	public List<Friend> getFriends() {
-		return friends;
-	}
-
-	public void setFriends(List<Friend> friends) {
-		this.friends = friends;
-	}
-
 	public List<FriendInvitation> getFriendInvitations() {
 		return friendInvitations;
 	}
 
 	public void setFriendInvitations(List<FriendInvitation> friendInvitations) {
 		this.friendInvitations = friendInvitations;
+	}
+
+	public boolean isGpsVisible() {
+		return gpsVisible;
+	}
+
+	public void setGpsVisible(boolean gpsVisible) {
+		this.gpsVisible = gpsVisible;
+	}
+
+	public boolean isNetworkVisible() {
+		return networkVisible;
+	}
+
+	public void setNetworkVisible(boolean networkVisible) {
+		this.networkVisible = networkVisible;
+	}
+
+	public boolean isOwnVisible() {
+		return ownVisible;
+	}
+
+	public void setOwnVisible(boolean ownVisible) {
+		this.ownVisible = ownVisible;
+	}
+
+	public Map<Long, User> getUsers() {
+		return users;
+	}
+
+	public void setUsers(Map<Long, User> users) {
+		this.users = users;
 	}
 	
 }

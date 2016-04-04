@@ -3,7 +3,6 @@ package com.pw.lokalizator.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -11,14 +10,15 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.NamedNativeQueries;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -30,10 +30,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 		value = {
 		  @NamedQuery(name="USER.findAll", query = "SELECT u FROM User u"),
 		  @NamedQuery(name="USER.deleteByID", query="DELETE FROM User u WHERE u.id = :id"),
-		  @NamedQuery(name="USER.findByLoginAndPassword", query="SELECT u FROM User u WHERE u.login = :login AND u.password = :password"),
+		  @NamedQuery(name="USER.findByLoginAndPassword", query="SELECT u FROM User u WHERE u.login =:login AND u.password =:password"),
+		  /*query="SELECT new com.pw.lokalizator.model.User(u.id, u.login, u.password, u.email, u.enable, u.userSecurity.id,  u.userSecurity.serviceKey, u.userSecurity.rola) "
+		  		         + "FROM User u WHERE u.login = :login AND u.password = :password"),*/
 		  @NamedQuery(name="USER.findByLogin", query="SELECT u FROM User u WHERE u.login = :login")
 		})
+@NamedNativeQueries(value = {
 
+})
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
 public class User implements Serializable {
@@ -62,22 +66,21 @@ public class User implements Serializable {
 	@Column(nullable=false)
 	private boolean enable;
 	
-	@Column(nullable=false)
-	private double latitude;
-	
-	@Column(nullable=false)
-	private double longitude;
-	
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(nullable=false)
-	private Date date;
-	
 	/*
 	 * Feach default EAGER
 	 */
 	
 	@OneToOne(cascade=CascadeType.ALL, mappedBy="user",  orphanRemoval = true)
 	private UserSecurity userSecurity;
+	
+	@OneToOne
+	private Location lastGpsLocation;
+	
+	@OneToOne
+	private Location lastNetworkLocation;
+	
+	@OneToOne
+	private Location lastOwnProviderLocation;
 	
 	/*
 	 * Feach default LAZY
@@ -88,21 +91,26 @@ public class User implements Serializable {
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "provider", orphanRemoval = true)
 	private List<Polygon>polygons;
 	
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
-	private List<Friend>friends;
+	@ManyToMany
+    @JoinTable(name="FRIENDS")
+	private List<User>friends;
 	
 	@OneToMany(cascade = CascadeType.ALL, mappedBy="from", orphanRemoval = true)
 	private List<FriendInvitation>friendInvitations;
-	
 
-	public void addLocation(Location location){
-		locations.add(location);
-		location.setUser(this);
-	}
+	public User(){}
 	
-	public void removeLocation(Location location){
-		locations.remove(location);
-		location.setUser(null);
+	public User(long id, String login, String password, String email, boolean enable,
+			    long secId, String serviceKey, Role rola){
+		this.id = id;
+		this.login = login;
+		this.password = password;
+		this.email = email;
+		this.enable = enable;
+		this.userSecurity = new UserSecurity();
+		this.userSecurity.setId(secId);
+		this.userSecurity.setServiceKey(serviceKey);
+		this.userSecurity.setRola(rola);
 	}
 	
 	public long getId() {
@@ -156,43 +164,43 @@ public class User implements Serializable {
 		this.polygons = polygons;
 	}
 
-	public double getLatitude() {
-		return latitude;
-	}
-
-	public void setLatitude(double latitude) {
-		this.latitude = latitude;
-	}
-
-	public double getLongitude() {
-		return longitude;
-	}
-
-	public void setLongitude(double longitude) {
-		this.longitude = longitude;
-	}
-
-	public Date getDate() {
-		return date;
-	}
-
-	public void setDate(Date date) {
-		this.date = date;
-	}
-
-	public List<Friend> getFriends() {
-		return friends;
-	}
-
-	public void setFriends(List<Friend> friends) {
-		this.friends = friends;
-	}
-
 	public List<FriendInvitation> getFriendInvitations() {
 		return friendInvitations;
 	}
 
 	public void setFriendInvitations(List<FriendInvitation> friendInvitations) {
 		this.friendInvitations = friendInvitations;
+	}
+
+	public Location getLastGpsLocation() {
+		return lastGpsLocation;
+	}
+
+	public void setLastGpsLocation(Location lastGpsLocation) {
+		this.lastGpsLocation = lastGpsLocation;
+	}
+
+	public Location getLastNetworkLocation() {
+		return lastNetworkLocation;
+	}
+
+	public void setLastNetworkLocation(Location lastNetworkLocation) {
+		this.lastNetworkLocation = lastNetworkLocation;
+	}
+
+	public Location getLastOwnProviderLocation() {
+		return lastOwnProviderLocation;
+	}
+
+	public void setLastOwnProviderLocation(Location lastOwnProviderLocation) {
+		this.lastOwnProviderLocation = lastOwnProviderLocation;
+	}
+
+	public List<User> getFriends() {
+		return friends;
+	}
+
+	public void setFriends(List<User> friends) {
+		this.friends = friends;
 	}
 }
