@@ -174,32 +174,39 @@ public class LocationView implements Serializable{
 			Map<Long, Location>locations = null;
 			
 			//update GPS locations
-			locations = locationRepository.getGpsByUserId( gpsMarkers.keySet() );
-			for( Entry<Long,Location>entry : locations.entrySet() ){
-				Location location = entry.getValue();
-				Marker marker = gpsMarkers.get(entry.getKey());
-				marker.setLatlng( new LatLng( location.getLatitude(), location.getLongitude()) );
-				marker.setData( "GPS " + " [ " + users.get(entry.getKey()) + " ] DATE [ " +  location.getDate() + " ]");
+			if(!gpsMarkers.isEmpty()){
+				locations = locationRepository.getGpsByUserId( gpsMarkers.keySet() );
+				for( Entry<Long,Location>entry : locations.entrySet() ){
+					Location location = entry.getValue();
+					Marker marker = gpsMarkers.get(entry.getKey());
+					marker.setLatlng( new LatLng( location.getLatitude(), location.getLongitude()) );
+					marker.setData( "GPS " + " [ " + users.get(entry.getKey()) + " ] DATE [ " +  location.getDate() + " ]");
+				}
 			}
+
 			
 			//update NETWORK locations
-			locations = locationRepository.getNetworkByUserId( networkMarkers.keySet() );
-			for( Entry<Long,Location>entry : locations.entrySet() ){
-				Location location = entry.getValue();
-				Marker marker = networkMarkers.get(entry.getKey());
-				marker.setLatlng( new LatLng( location.getLatitude(), location.getLongitude()) );
-				marker.setData( "NETWORK " + " [ " + users.get(entry.getKey()) + " ] DATE [ " +  location.getDate() + " ]");
+			if(!networkMarkers.isEmpty()){
+				locations = locationRepository.getNetworkByUserId( networkMarkers.keySet() );
+				for( Entry<Long,Location>entry : locations.entrySet() ){
+					Location location = entry.getValue();
+					Marker marker = networkMarkers.get(entry.getKey());
+					marker.setLatlng( new LatLng( location.getLatitude(), location.getLongitude()) );
+					marker.setData( "NETWORK " + " [ " + users.get(entry.getKey()) + " ] DATE [ " +  location.getDate() + " ]");
+				}
 			}
 			
 			//update OWN locations
-			locations = locationRepository.getOwnByUserId( ownMarkers.keySet() );
-			for( Entry<Long,Location>entry : locations.entrySet() ){
-				Location location = entry.getValue();
-				Marker marker = ownMarkers.get(entry.getKey());
-				marker.setLatlng( new LatLng( location.getLatitude(), location.getLongitude()) );
-				marker.setData( "OWN " + " [ " + users.get(entry.getKey()) + " ] DATE [ " +  location.getDate() + " ]");
+			if(!ownMarkers.isEmpty()){
+				locations = locationRepository.getOwnByUserId( ownMarkers.keySet() );
+				for( Entry<Long,Location>entry : locations.entrySet() ){
+					Location location = entry.getValue();
+					Marker marker = ownMarkers.get(entry.getKey());
+					marker.setLatlng( new LatLng( location.getLatitude(), location.getLongitude()) );
+					marker.setData( "OWN " + " [ " + users.get(entry.getKey()) + " ] DATE [ " +  location.getDate() + " ]");
+				}
 			}
-			
+
 		}catch(Exception e){
 			log.error("Exception podczas pollingu", e);
 		}
