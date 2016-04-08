@@ -39,7 +39,7 @@ public class UpdateLocationWorker {
 	
 	private String GOOGLE_MAP_GEO_URL = "https://maps.googleapis.com/maps/api/geocode/json";
 	
-	@Schedule(second="*/10", minute="*", hour="*")
+	@Schedule(minute="*/10", hour="*")
 	public void work(){
 		log.info("UpdateLocationWorker has started");
 		long time = System.currentTimeMillis();
@@ -48,36 +48,40 @@ public class UpdateLocationWorker {
 			
 			Set<Location>locations = new HashSet<Location>( locationRepository.findWhereCityIsNull() );
 			
-			log.info("All unique records lat lon " + locations.size());
-			
-			List<Callable<Location>>tasks = new ArrayList<Callable<Location>>();
-			
-			for(Location location : locations)
-				tasks.add(new GeocodeCallable(location));
-			
+			if(locations.size() > 0){
+				log.info("All unique records " + locations.size());
+				
+				List<Callable<Location>>tasks = new ArrayList<Callable<Location>>();
+				
+				for(Location location : locations)
+					tasks.add(new GeocodeCallable(location));
+				
 
-			//Max 25 threads
-			ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool( locations.size() < 25 ? locations.size() : 25 );
-			
-			log.info("Executing GeocodeCallable tasks has began");
-			
-			long executingTasktime = System.currentTimeMillis();
-			List<Future<Location>>futures = scheduledExecutorService.invokeAll(tasks, 1, TimeUnit.MINUTES);
-			
-			log.info("Executing GeocodeCallable  has ended after " + (System.currentTimeMillis() - executingTasktime) + "ms");
-			
-			Iterator<Future<Location>> it = futures.iterator();
-			while(it.hasNext()){
-				try{
-					Future<Location> future = it.next();
-					Location location = future.get();
-					locationRepository.save(location);
-					
-				}catch(Exception e){
-					//TODO 
-					e.printStackTrace();
+				//Max 25 threads
+				ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool( locations.size() < 25 ? locations.size() : 25 );
+				
+				log.info("Executing GeocodeCallable tasks has began");
+				
+				long executingTasktime = System.currentTimeMillis();
+				List<Future<Location>>futures = scheduledExecutorService.invokeAll(tasks, 1, TimeUnit.MINUTES);
+				
+				log.info("Executing GeocodeCallable  has ended after " + (System.currentTimeMillis() - executingTasktime) + "ms");
+				
+				Iterator<Future<Location>> it = futures.iterator();
+				while(it.hasNext()){
+					try{
+						Future<Location> future = it.next();
+						Location location = future.get();
+						locationRepository.save(location);
+						
+					}catch(Exception e){
+						//TODO 
+						e.printStackTrace();
+					}
+
 				}
-
+			} else {
+				log.info("No unique records");
 			}
 			
 		}catch(Exception e){
