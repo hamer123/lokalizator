@@ -104,7 +104,7 @@ public class User implements Serializable {
 	private List<Polygon>polygons;
 	
 	@ManyToMany
-    @JoinTable(name="FRIENDS")
+    @JoinTable(name="friends")
 	private List<User>friends;
 	
 	@OneToMany(cascade = CascadeType.ALL, mappedBy="from", orphanRemoval = true)
