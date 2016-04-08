@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -31,12 +33,22 @@ import javax.xml.bind.annotation.XmlRootElement;
 		  @NamedQuery(name="USER.findAll", query = "SELECT u FROM User u"),
 		  @NamedQuery(name="USER.deleteByID", query="DELETE FROM User u WHERE u.id = :id"),
 		  @NamedQuery(name="USER.findByLoginAndPassword", query="SELECT u FROM User u WHERE u.login =:login AND u.password =:password"),
-		  /*query="SELECT new com.pw.lokalizator.model.User(u.id, u.login, u.password, u.email, u.enable, u.userSecurity.id,  u.userSecurity.serviceKey, u.userSecurity.rola) "
-		  		         + "FROM User u WHERE u.login = :login AND u.password = :password"),*/
+		  /*
+		  query="SELECT new com.pw.lokalizator.model.User"
+		  	  + "(u.id, u.login, u.enable, (SELECT s FROM UserSecurity s WHERE s.user.login =:login)) FROM User u WHERE u.login =:login AND u.password =:password"),
+		  query="SELECT u.id, u.login, u.password, u.email, u.enable, u.userSecurity.id,  u.userSecurity.serviceKey, u.userSecurity.rola "
+		  	  + "FROM User u WHERE u.login = :login AND u.password = :password"), 
+		  */
 		  @NamedQuery(name="USER.findByLogin", query="SELECT u FROM User u WHERE u.login = :login")
 		})
 @NamedNativeQueries(value = {
-
+		@NamedNativeQuery(name="USER.Native.findUserByLoginAndPassword",
+				          query="SELECT users.id, users.login, users.enable, usersecurity.rola, usersecurity.servicekey "
+				          	  + "FROM users INNER JOIN usersecurity "
+				          	  + "ON users.id = usersecurity.user_id "
+				        	  + "WHERE users.login =:login AND users.password =:password"),
+	    @NamedNativeQuery(name="USER.Native.updateGpsLocation",
+	                      query="UPDATE users SET lastGpsLocation_id = :id")
 })
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
@@ -98,20 +110,17 @@ public class User implements Serializable {
 	@OneToMany(cascade = CascadeType.ALL, mappedBy="from", orphanRemoval = true)
 	private List<FriendInvitation>friendInvitations;
 
-	public User(){}
 	
-	public User(long id, String login, String password, String email, boolean enable,
-			    long secId, String serviceKey, Role rola){
+	public User(long id, String login, boolean enable, Role rola, String serviceKey){
 		this.id = id;
 		this.login = login;
-		this.password = password;
-		this.email = email;
 		this.enable = enable;
 		this.userSecurity = new UserSecurity();
-		this.userSecurity.setId(secId);
-		this.userSecurity.setServiceKey(serviceKey);
 		this.userSecurity.setRola(rola);
+		this.userSecurity.setServiceKey(serviceKey);
 	}
+	
+	public User(){}
 	
 	public long getId() {
 		return id;

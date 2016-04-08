@@ -2,11 +2,14 @@ package com.pw.lokalizator.rest;
 import javax.ejb.EJB;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+
 import org.jboss.logging.Logger;
+
 import com.pw.lokalizator.model.Location;
 import com.pw.lokalizator.model.ProviderType;
 import com.pw.lokalizator.model.RestSession;
@@ -35,8 +38,7 @@ public class RestLocation {
 					+ "  [ " + location.getLatitude() + ", " + location.getLongitude() + " ] " + location.getDate() 
 					+ " : " + location.getProvider());
 			
-			User user = session.getUser();
-			
+			User user = userRepository.findById( session.getUser().getId() );
 			//zapisanie nowej lokalizacji
 			location.setUser(user);
 			location = locationRepository.add( location );
@@ -61,5 +63,11 @@ public class RestLocation {
 		
 		return Response.status( Response.Status.CREATED )
 				.build();
+	}
+	
+	@GET
+	@Path("/test")
+	public String test(){
+		return "test :)_";
 	}
 }

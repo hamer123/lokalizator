@@ -67,7 +67,7 @@ public class FriendInvitationRepositoryImpl implements FriendInvitationRepositor
 	}
 
 	@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
-	public List<FriendInvitation> getByByNadawcaId(long id) {
+	public List<FriendInvitation> getByOdbiorcaId(long id) {
 		return em.createNamedQuery("FriendInvitation.findInvitationBySenderId", FriendInvitation.class)
 				 .setParameter("id", id)
 				 .getResultList();

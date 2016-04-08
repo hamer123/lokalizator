@@ -44,7 +44,7 @@ public class UserSecurity implements Serializable{
 	private String serviceKey;
 	@OneToOne
 	private User user;
-	@Enumerated(EnumType.ORDINAL)
+	@Enumerated(EnumType.STRING)
 	private Role rola;
 	
 	public long getId() {

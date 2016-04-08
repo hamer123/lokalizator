@@ -40,17 +40,22 @@ public class SecurityService {
 		log.info("Trying to create SecurityContext [ service : " + serviceKey + " ] [ token : " + authToken + " ]");
 		
 		try{
+			
 			RestSession session = restSessionSimulator.getRestSession(serviceKey);
 			
-			if(!session.getAuthToken().equals(authToken)){
-				throw new SecurityException("Bledny token dla uzytkowniak " + serviceKey);
+			if(session == null || !session.getAuthToken().equals(authToken)){
+				throw new SecurityException("Nie poprawny token lub service");
 			}
 			request.getSession().setAttribute(RestSession.REST_SESSION_ATR , session);
 
 			return new SecurityContext() {
 				
 				public boolean isUserInRole(String role){
-					return session.getUser().getUserSecurity().getRola().toString().equalsIgnoreCase(role);
+					return session.getUser()
+							.getUserSecurity()
+							.getRola()
+							.toString()
+							.equalsIgnoreCase(role);
 				}
 				
 				public boolean isSecure() {
@@ -66,7 +71,10 @@ public class SecurityService {
 			    }
 				
 				public String getAuthenticationScheme() {
-					return session.getUser().getUserSecurity().getRola().toString();
+					return session.getUser()
+							.getUserSecurity()
+							.getRola()
+							.toString();
 				}
 			};
 		}catch(PersistenceException pe){

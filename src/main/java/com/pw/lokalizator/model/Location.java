@@ -7,10 +7,13 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.SequenceGenerator;
@@ -33,10 +36,23 @@ import javax.xml.bind.annotation.XmlRootElement;
 		@NamedQuery(name="Location.deleteYoungerThan", query="DELETE FROM Location l WHERE l.user = :user AND l.date > :date"),
 		@NamedQuery(name="Location.count", query="SELECT COUNT(l) FROM Location l where l.user = :user"),
 		@NamedQuery(name="Location.findOlderThanAndYoungerThan", query="SELECT l FROM Location l WHERE l.date > :younger AND l.date < :older"),
+		@NamedQuery(name="Location.findGps", query="SELECT l FROM Location l WHERE l.id IN (:id)"),
+		@NamedQuery(name="Location.findToUpdateAddress", query="SELECT l FROM Location l WHERE l.address is null")
 		/*
 		@NamedQuery(name="Location.findFromUser", query="SELECT new com.pw.lokalizator.model.Location(u.date, u.latitude, u.longitude) FROM User u WHERE u.id =:id"),
 		@NamedQuery(name="Location.findFromUsers", query="SELECT new com.pw.lokalizator.model.Location(u.date, u.latitude, u.longitude) FROM User u WHERE u.id IN (:ids)")
         */
+})
+@NamedNativeQueries(value={
+		@NamedNativeQuery(name="Location.Native.findGps",
+						  query="SELECT date,latitude,longitude,user_id FROM location "
+						  	  + "WHERE id IN (SELECT lastGpsLocation_id FROM users WHERE id IN (:id))"), 
+		@NamedNativeQuery(name="Location.Native.findNetwork",
+						  query="SELECT date,latitude,longitude,user_id FROM location "
+						  	  + "WHERE id IN (SELECT lastNetworkLocation_id FROM users WHERE id IN (:id))"),
+		@NamedNativeQuery(name="Location.Native.findOwn", 
+		                  query="SELECT date,latitude,longitude,user_id FROM location "
+			  	              + "WHERE id IN (SELECT lastOwnProviderLocation_id FROM users WHERE id IN (:id))")
 })
 public class Location implements Serializable{
     @TableGenerator(
@@ -68,7 +84,9 @@ public class Location implements Serializable{
 	@Column(nullable=false)
 	private ProviderType provider;
 	
-	@ManyToOne
+	private String address;
+	
+	@ManyToOne(fetch=FetchType.LAZY)
 	private User user;
 	
 	public Location(){}
@@ -117,4 +135,13 @@ public class Location implements Serializable{
 	public void setProvider(ProviderType provider) {
 		this.provider = provider;
 	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	
 }

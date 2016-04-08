@@ -59,6 +59,10 @@
             <p:column headerText="longitude">
               <h:outputText value="#{loc.longitude}" />
             </p:column>
+            
+            <p:column headerText="provider">
+              <h:outputText value="#{loc.provider}" />
+            </p:column>
 
           </p:dataTable>
            
@@ -107,7 +111,7 @@
            <h:form>
             <p:dataTable var="inv" value="#{location.friendInvitations}">
              <p:column headerText="Login">
-               <h:outputText value="#{inv.to.login}" />
+               <h:outputText value="#{inv.from.login}" />
              </p:column>
            
              <p:column headerText="Data">

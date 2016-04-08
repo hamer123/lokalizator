@@ -21,7 +21,7 @@ import javax.persistence.Transient;
 		@NamedQuery(name="FriendInvitation.findInvitationByUsersId", query="SELECT fi FROM FriendInvitation fi "
 				+ "WHERE ( fi.from.id =:id AND fi.to.id =:id2 ) OR ( fi.to.id =:id AND fi.from.id =:id2)"),
 		@NamedQuery(name="FriendInvitation.findInvitationBySenderId", query="SELECT new com.pw.lokalizator.model.FriendInvitation("
-			    + " fi.id, fi.date, fi.to.login) FROM FriendInvitation fi WHERE fi.from.id =:id"),
+			    + " fi.id, fi.date, fi.from.login) FROM FriendInvitation fi WHERE fi.to.id =:id"),
 })
 @NamedNativeQueries(value={
 })
@@ -50,8 +50,8 @@ public class FriendInvitation implements Serializable{
 	public FriendInvitation(long id, Date date, String login){
 		this.id = id;
 		this.date = date;
-		this.to = new User();
-		to.setLogin(login);
+		this.from = new User();
+		from.setLogin(login);
 	}
 
 	public long getId() {

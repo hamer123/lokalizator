@@ -35,8 +35,7 @@ public class RESTRequestFilter implements ContainerRequestFilter{
 	public void filter(ContainerRequestContext requestCtx) throws IOException {
 
         String path = requestCtx.getUriInfo().getPath();
-		log.info("INFO FROM REST REQUEST FILTER -> " + requestCtx.getRequest().getMethod() + " PATH-> " + path );
-		System.err.println("INFO FROM REST REQUEST FILTER -> " + requestCtx.getRequest().getMethod() + " PATH-> " + path );
+		log.info("RESt request" + requestCtx.getRequest().getMethod() + " path " + path );
           
         // IMPORTANT!!! First, Acknowledge any pre-flight test from browsers for this case before validating the headers (CORS stuff)
         if ( requestCtx.getRequest().getMethod().equals( "OPTIONS" ) ) {
@@ -50,7 +49,6 @@ public class RESTRequestFilter implements ContainerRequestFilter{
             String serviceKey = requestCtx.getHeaderString( HTTPHeaderNames.SERVICE_KEY );
             String authToken = requestCtx.getHeaderString( HTTPHeaderNames.AUTH_TOKEN );
             
-            log.info("TOKENS -> " + serviceKey + ", " + authToken);
             
             if(authToken != null && serviceKey != null){
                 try{

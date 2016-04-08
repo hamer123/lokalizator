@@ -46,6 +46,7 @@
 		<scope>provided</scope>
 	</dependency>
 
+
 	<dependency>
 	   <groupId>org.jboss.resteasy</groupId>
 	   <artifactId>resteasy-jackson-provider</artifactId>
@@ -53,6 +54,30 @@
 	   <scope>provided</scope>
     </dependency>
 
+<!-- JACKSON -->
+
+<dependency>
+	<groupId>com.fasterxml.jackson.core</groupId>
+	<artifactId>jackson-core</artifactId>
+	<version>2.7.3</version>
+</dependency>
+
+<dependency>
+	<groupId>com.fasterxml.jackson.core</groupId>
+	<artifactId>jackson-databind</artifactId>
+	<version>2.7.3</version>
+</dependency>
+
+
+<!-- APACHE COMMON LANG -->
+<dependency>
+	<groupId>commons-lang</groupId>
+	<artifactId>commons-lang</artifactId>
+	<version>2.6</version>
+</dependency>
+
+
+<!--  -->
 <dependency>
 	<groupId>org.jboss.logging</groupId>
 	<artifactId>jboss-logging</artifactId>

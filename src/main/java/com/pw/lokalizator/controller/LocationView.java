@@ -1,11 +1,13 @@
 package com.pw.lokalizator.controller;
 
 import java.io.Serializable;
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -72,6 +74,7 @@ public class LocationView implements Serializable{
     
     private Marker oldLocationMarker;
     private List<Location>locations;
+    //Klucz to id usera
     private Map<Long, Marker>gpsMarkers;
     private Map<Long, Marker>networkMarkers;
     private Map<Long, Marker>ownMarkers;
@@ -80,7 +83,7 @@ public class LocationView implements Serializable{
     
 	@PostConstruct
 	private void postConstruct(){
-		User user = session.getCurrentUser();
+		User user = userRepository.findById( session.getCurrentUser().getId() );
 		gpsMarkers = new HashMap<Long, Marker>();
 		networkMarkers = new HashMap<Long, Marker>();
 		ownMarkers = new HashMap<Long, Marker>();
@@ -88,6 +91,8 @@ public class LocationView implements Serializable{
 		gpsVisible = true;
 		networkVisible = true;
 		ownVisible = true;
+		
+		friendInvitations = friendInvitationRepository.getByOdbiorcaId( user.getId() );
 		
 		List<User>fList = userRepository.findFriendsById(user.getId());
 		users = new HashMap<Long, User>();
@@ -163,24 +168,41 @@ public class LocationView implements Serializable{
 	 * Update current location of yours and your friends
 	 */
 	public void onPoll(){
-		log.info("update current locations is about to start");
-		//try{
-			//set your current location
-			//User user = session.getCurrentUser();
-			//Location location = locationRepository.getFromUser( user.getId() );
-			//currentMarker.setLatlng( new LatLng( location.getLatitude(), location.getLongitude() ));
+		log.info("poll is about to start for " + session.getUserLogin());
+		
+		try{
+			Map<Long, Location>locations = null;
 			
+			//update GPS locations
+			locations = locationRepository.getGpsByUserId( gpsMarkers.keySet() );
+			for( Entry<Long,Location>entry : locations.entrySet() ){
+				Location location = entry.getValue();
+				Marker marker = gpsMarkers.get(entry.getKey());
+				marker.setLatlng( new LatLng( location.getLatitude(), location.getLongitude()) );
+				marker.setData( "GPS " + " [ " + users.get(entry.getKey()) + " ] DATE [ " +  location.getDate() + " ]");
+			}
 			
-			//set your friends location
-			//friends = friendRepository.findByUserId( user.getId() );
-			//for(Friend friend : friends){
-			//	friendsMarker.get( friend.getFriend().getId() ).setLatlng( new LatLng( friend.getFriend().getLatitude(), friend.getFriend().getLongitude() ));
-			//	friendsMarker.get( friend.getFriend().getId() ).setTitle( friend.getFriend().getLogin() + " [ " + friend.getFriend().getDate() + " ]");
-		//	}
-		//}catch(Exception e){
-		//	e.printStackTrace();
-	//	}
-	//	log.info("after update current locations");
+			//update NETWORK locations
+			locations = locationRepository.getNetworkByUserId( networkMarkers.keySet() );
+			for( Entry<Long,Location>entry : locations.entrySet() ){
+				Location location = entry.getValue();
+				Marker marker = networkMarkers.get(entry.getKey());
+				marker.setLatlng( new LatLng( location.getLatitude(), location.getLongitude()) );
+				marker.setData( "NETWORK " + " [ " + users.get(entry.getKey()) + " ] DATE [ " +  location.getDate() + " ]");
+			}
+			
+			//update OWN locations
+			locations = locationRepository.getOwnByUserId( ownMarkers.keySet() );
+			for( Entry<Long,Location>entry : locations.entrySet() ){
+				Location location = entry.getValue();
+				Marker marker = ownMarkers.get(entry.getKey());
+				marker.setLatlng( new LatLng( location.getLatitude(), location.getLongitude()) );
+				marker.setData( "OWN " + " [ " + users.get(entry.getKey()) + " ] DATE [ " +  location.getDate() + " ]");
+			}
+			
+		}catch(Exception e){
+			log.error("Exception podczas pollingu", e);
+		}
 	}
 	
 	/*
@@ -188,23 +210,25 @@ public class LocationView implements Serializable{
 	 */
 	public void onSendInvitation(ActionEvent event){
 		try{
-		//	for(Friend f : friends){
-		//		if(f.getFriend().getLogin().equalsIgnoreCase(friendNick)){
-		//	        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, friendNick + " jest juz na twoiej liscie przyjaciol ",  null);
-		//	        FacesContext.getCurrentInstance().addMessage(null, message);
-		//	        return;
-		//		}
-		//	}
+			//check if u are arleady friends
+			for(User u : users.values()){
+				if(u.getLogin().equalsIgnoreCase(friendNick)){
+			        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, friendNick + " jest juz na twoiej liscie przyjaciol",  null);
+			        FacesContext.getCurrentInstance().addMessage(null, message);
+			        return;
+				}
+			}
+			
 			//do siebie ?
 			if(friendNick.equals( session.getUserLogin() )){
-		        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Nie mozna wyslac zaproszenia do siebie " + friendNick,  null);
+		        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Nie mozna wyslac zaproszenia do siebie",  null);
 		        FacesContext.getCurrentInstance().addMessage(null, message);
 		        return;
 			}
 			// go ahead !
 			friendService.sendInvitation(session.getCurrentUser(), friendNick);
 			// send message
-	        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Zaproszenie zostalo wyslane do " + friendNick,  null);
+	        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Zaproszenie zostalo wyslane do" + friendNick,  null);
 	        FacesContext.getCurrentInstance().addMessage(null, message);
 	        //try to handle exceptions
 		}catch(Throwable ejbException){
@@ -214,7 +238,7 @@ public class LocationView implements Serializable{
 			        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Zaproszenie juz istnieje",  null);
 			        FacesContext.getCurrentInstance().addMessage(null, message);
 			    }catch(NoResultException lnre){
-			        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, friendNick + "nie znaleziono uzytkownika o nicku " + friendNick,  null);
+			        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "nie znaleziono uzytkownika o nicku " + friendNick,  null);
 			        FacesContext.getCurrentInstance().addMessage(null, message);
 				}catch(Throwable e){
 			        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Nie udalo sie wyslac zaproszenia",  null);
@@ -230,7 +254,7 @@ public class LocationView implements Serializable{
 		Location location = (Location)event.getObject();
 		
 		if(oldLocationMarker == null){
-			oldLocationMarker = new Marker(new LatLng( location.getLatitude(), location.getLongitude() ), location.getProvider() + " [ " + session.getUserLogin() +  " ][ "+ location.getDate() + " ]",
+			oldLocationMarker = new Marker(new LatLng( location.getLatitude(), location.getLongitude() ), location.getProvider() + " [ " + session.getUserLogin() +  " ] DATE [ "+ location.getDate() + " ]",
 					                       null, YELLOW_MARKER);
 			setting.setCenter(new LatLng( location.getLatitude(), location.getLongitude() ));
 			map.addOverlay(oldLocationMarker);
