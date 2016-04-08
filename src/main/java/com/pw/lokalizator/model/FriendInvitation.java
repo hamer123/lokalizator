@@ -11,6 +11,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedNativeQueries;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -25,6 +26,7 @@ import javax.persistence.Transient;
 })
 @NamedNativeQueries(value={
 })
+@Table(name="friendinvitation")
 public class FriendInvitation implements Serializable{
 	@Id
     @TableGenerator(

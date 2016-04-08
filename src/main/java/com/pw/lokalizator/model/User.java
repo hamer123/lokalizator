@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
-@Table(name ="USERS")
+@Table(name ="user")
 @NamedQueries(
 		value = {
 		  @NamedQuery(name="USER.findAll", query = "SELECT u FROM User u"),
@@ -43,12 +43,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 		})
 @NamedNativeQueries(value = {
 		@NamedNativeQuery(name="USER.Native.findUserByLoginAndPassword",
-				          query="SELECT users.id, users.login, users.enable, usersecurity.rola, usersecurity.servicekey "
-				          	  + "FROM users INNER JOIN usersecurity "
-				          	  + "ON users.id = usersecurity.user_id "
-				        	  + "WHERE users.login =:login AND users.password =:password"),
+				          query="SELECT user.id, user.login, user.enable, usersecurity.rola, usersecurity.servicekey "
+				          	  + "FROM user INNER JOIN usersecurity "
+				          	  + "ON user.id = usersecurity.user_id "
+				        	  + "WHERE user.login =:login AND user.password =:password"),
 	    @NamedNativeQuery(name="USER.Native.updateGpsLocation",
-	                      query="UPDATE users SET lastGpsLocation_id = :id")
+	                      query="UPDATE user SET lastGpsLocation_id = :id")
 })
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)

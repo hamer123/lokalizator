@@ -17,6 +17,7 @@ import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -46,14 +47,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedNativeQueries(value={
 		@NamedNativeQuery(name="Location.Native.findGps",
 						  query="SELECT date,latitude,longitude,user_id FROM location "
-						  	  + "WHERE id IN (SELECT lastGpsLocation_id FROM users WHERE id IN (:id))"), 
+						  	  + "WHERE id IN (SELECT lastGpsLocation_id FROM user WHERE id IN (:id))"), 
 		@NamedNativeQuery(name="Location.Native.findNetwork",
 						  query="SELECT date,latitude,longitude,user_id FROM location "
-						  	  + "WHERE id IN (SELECT lastNetworkLocation_id FROM users WHERE id IN (:id))"),
+						  	  + "WHERE id IN (SELECT lastNetworkLocation_id FROM user WHERE id IN (:id))"),
 		@NamedNativeQuery(name="Location.Native.findOwn", 
 		                  query="SELECT date,latitude,longitude,user_id FROM location "
-			  	              + "WHERE id IN (SELECT lastOwnProviderLocation_id FROM users WHERE id IN (:id))")
+			  	              + "WHERE id IN (SELECT lastOwnProviderLocation_id FROM user WHERE id IN (:id))")
 })
+@Table(name="location")
 public class Location implements Serializable{
     @TableGenerator(
             name="locationGen", 

@@ -15,6 +15,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -29,6 +30,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 				//@NamedQuery(name="findByTokenAndService", query="SELECT s FROM UserSecurity s WHERE s.serviceKey = :skey AND s.tokenKey = :tkey")
 		}
 		)
+@Table(name="usersecurity")
 public class UserSecurity implements Serializable{
 	@Id
     @TableGenerator(
