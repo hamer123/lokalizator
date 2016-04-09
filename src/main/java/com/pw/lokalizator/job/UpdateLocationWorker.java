@@ -86,7 +86,7 @@ public class UpdateLocationWorker {
 					//jesli nie minela sekunda
 					long timeToSleep = System.currentTimeMillis() - executingPackTaskTime;
 					if(timeToSleep < 1000){
-						Thread.sleep(1000 - timeToSleep);
+						Thread.currentThread().sleep(1000 - timeToSleep);
 					}
 					tasksToExecute.clear();
 				}
