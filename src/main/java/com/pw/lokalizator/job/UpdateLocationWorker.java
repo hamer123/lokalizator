@@ -45,7 +45,7 @@ public class UpdateLocationWorker {
 	
 	private String GOOGLE_MAP_GEO_URL = "https://maps.googleapis.com/maps/api/geocode/json";
 	
-	@Schedule(minute="*/1", hour="*")
+	@Schedule(second="*", minute="*", hour="*/1")
 	@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 	public void work(){
 		log.info("UpdateLocationWorker has started");
