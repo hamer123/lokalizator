@@ -87,6 +87,7 @@ public class UpdateLocationWorker {
 						Thread.sleep(1000 - timeToSleep);
 					}
 					
+					scheduledExecutorService.shutdown();
 					tasksToExecute.clear();
 				}
 

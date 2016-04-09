@@ -318,7 +318,7 @@ public class LocationView implements Serializable{
     }
     
     public void onFreindAccept(ActionEvent actionEvent){
-    	//actionEvent.get
+    	System.out.println ( actionEvent.getSource() );
     }
 	
 	//////////////////////////////////////////////////// GET AND SET ///////////////////////////////////////////////////////////////////
