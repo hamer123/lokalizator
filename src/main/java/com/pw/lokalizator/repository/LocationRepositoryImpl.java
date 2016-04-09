@@ -189,4 +189,20 @@ public class LocationRepositoryImpl implements LocationRepository{
 		return locations;
 	}
 
+	@Override
+	public int updateCity(double lat, double lon, String address) {
+		int count = 0;
+		try{
+			count += em
+					   .createNamedQuery("Location.Native.updateCity")
+					   .setParameter("address", address)
+					   .setParameter("lat", lat)
+					   .setParameter("lon", lon)
+					   .executeUpdate();
+		} catch(Exception e){
+			log.error("Update nie udal sie ", e);
+		}
+		return count;
+	}
+
 }

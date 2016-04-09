@@ -53,7 +53,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 						  	  + "WHERE id IN (SELECT lastNetworkLocation_id FROM user WHERE id IN (:id))"),
 		@NamedNativeQuery(name="Location.Native.findOwn", 
 		                  query="SELECT date,latitude,longitude,user_id FROM location "
-			  	              + "WHERE id IN (SELECT lastOwnProviderLocation_id FROM user WHERE id IN (:id))")
+			  	              + "WHERE id IN (SELECT lastOwnProviderLocation_id FROM user WHERE id IN (:id))"),
+		@NamedNativeQuery(name="Location.Native.updateCity", 
+			              query="UPDATE location SET address =:address "
+				  	          + "WHERE lat =:latitude AND lon =:longitude")
 })
 @Table(name="location")
 public class Location implements Serializable{
@@ -95,6 +98,11 @@ public class Location implements Serializable{
 	
 	public Location(Date date, double lat, double lon){
 		this.date = date;
+		this.latitude = lat;
+		this.longitude = lon;
+	}
+	
+	public Location(double lat, double lon){
 		this.latitude = lat;
 		this.longitude = lon;
 	}

@@ -39,7 +39,7 @@ public class UpdateLocationWorker {
 	
 	private String GOOGLE_MAP_GEO_URL = "https://maps.googleapis.com/maps/api/geocode/json";
 	
-	@Schedule(minute="*/10", hour="*")
+	@Schedule(minute="*/5", hour="*")
 	public void work(){
 		log.info("UpdateLocationWorker has started");
 		long time = System.currentTimeMillis();
@@ -72,7 +72,7 @@ public class UpdateLocationWorker {
 					try{
 						Future<Location> future = it.next();
 						Location location = future.get();
-						locationRepository.save(location);
+						locationRepository.updateCity(location.getLatitude(), location.getLongitude(), location.getAddress());
 						
 					}catch(Exception e){
 						//TODO 

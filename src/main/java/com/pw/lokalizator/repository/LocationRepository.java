@@ -21,4 +21,5 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
 	Map<Long,Location> getNetworkByUserId(Set<Long>gps);
 	Map<Long,Location> getOwnByUserId(Set<Long>gps);
 	List<Location> findWhereCityIsNull();
+	int updateCity(double lat, double lon, String address);
 }
