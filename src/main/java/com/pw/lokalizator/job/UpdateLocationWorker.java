@@ -75,15 +75,16 @@ public class UpdateLocationWorker {
 					}
 					
 					scheduledExecutorService = Executors.newScheduledThreadPool( locations.size() < 5 ? locations.size() : 5);
-					
-					log.info("Executing geocodecallable " + tasksToExecute.size() + " tasks has began");
 					long executingPackTaskTime = System.currentTimeMillis();
-					futures.addAll(scheduledExecutorService.invokeAll(tasksToExecute, 1, TimeUnit.MINUTES));
-					log.info("Executing geocodecallable " + tasksToExecute.size() + " tasks has ended after " + (System.currentTimeMillis() - executingPackTaskTime) + "ms");
 					
-					scheduledExecutorService.shutdown();
+					try{
+						log.info("Executing geocodecallable " + tasksToExecute.size() + " tasks has began");
+						futures.addAll(scheduledExecutorService.invokeAll(tasksToExecute, 1, TimeUnit.MINUTES));
+						log.info("Executing geocodecallable " + tasksToExecute.size() + " tasks has ended after " + (System.currentTimeMillis() - executingPackTaskTime) + "ms");
+					}finally{
+						scheduledExecutorService.shutdown();
+					}
 					
-					//jesli nie minela sekunda
 					long timeToSleep = System.currentTimeMillis() - executingPackTaskTime;
 					if(timeToSleep < 1000){
 						Thread.currentThread().sleep(1000 - timeToSleep);
