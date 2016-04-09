@@ -81,13 +81,13 @@ public class UpdateLocationWorker {
 					futures.addAll(scheduledExecutorService.invokeAll(tasksToExecute, 1, TimeUnit.MINUTES));
 					log.info("Executing geocodecallable " + tasksToExecute.size() + " tasks has ended after " + (System.currentTimeMillis() - executingPackTaskTime) + "ms");
 					
+					scheduledExecutorService.shutdown();
+					
 					//jesli nie minela sekunda
 					long timeToSleep = System.currentTimeMillis() - executingPackTaskTime;
 					if(timeToSleep < 1000){
 						Thread.sleep(1000 - timeToSleep);
 					}
-					
-					scheduledExecutorService.shutdown();
 					tasksToExecute.clear();
 				}
 
