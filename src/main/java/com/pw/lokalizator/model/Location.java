@@ -56,7 +56,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 			  	              + "WHERE id IN (SELECT lastOwnProviderLocation_id FROM user WHERE id IN (:id))"),
 		@NamedNativeQuery(name="Location.Native.updateCity", 
 			              query="UPDATE location SET address =:address "
-				  	          + "WHERE lat =:latitude AND lon =:longitude")
+				  	          + "WHERE latitude =:lat AND longitude =:lon")
 })
 @Table(name="location")
 public class Location implements Serializable{

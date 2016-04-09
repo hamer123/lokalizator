@@ -3,9 +3,12 @@ package com.pw.lokalizator.job;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
@@ -16,6 +19,8 @@ import java.util.concurrent.TimeUnit;
 import javax.ejb.EJB;
 import javax.ejb.Schedule;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -24,6 +29,7 @@ import javax.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pw.lokalizator.exception.GeocodeResponseException;
 import com.pw.lokalizator.google.AddressComponent;
 import com.pw.lokalizator.google.Geocode;
 import com.pw.lokalizator.google.Result;
@@ -39,57 +45,87 @@ public class UpdateLocationWorker {
 	
 	private String GOOGLE_MAP_GEO_URL = "https://maps.googleapis.com/maps/api/geocode/json";
 	
-	@Schedule(minute="*/5", hour="*")
+	@Schedule(minute="*/1", hour="*")
+	@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 	public void work(){
 		log.info("UpdateLocationWorker has started");
-		long time = System.currentTimeMillis();
-		
 		try{
 			
-			Set<Location>locations = new HashSet<Location>( locationRepository.findWhereCityIsNull() );
+			Set<Location>locations = new LinkedHashSet<Location>( locationRepository.findWhereCityIsNull() );
 			
 			if(locations.size() > 0){
+				
 				log.info("All unique records " + locations.size());
 				
-				List<Callable<Location>>tasks = new ArrayList<Callable<Location>>();
-				
-				for(Location location : locations)
+				Queue<Callable<Location>>tasks = new LinkedList<Callable<Location>>();
+				for(Location location : locations){
 					tasks.add(new GeocodeCallable(location));
+				}
 				
-
-				//Max 25 threads
-				ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool( locations.size() < 25 ? locations.size() : 25 );
+				ScheduledExecutorService scheduledExecutorService = null;
+				List<Future<Location>>futures = new ArrayList<Future<Location>>();
+				Queue<Callable<Location>>tasksToExecute = new LinkedList<Callable<Location>>();
 				
-				log.info("Executing GeocodeCallable tasks has began");
-				
+				log.info("Executing geocodecallable all tasks has began");
 				long executingTasktime = System.currentTimeMillis();
-				List<Future<Location>>futures = scheduledExecutorService.invokeAll(tasks, 1, TimeUnit.MINUTES);
 				
+				while(!tasks.isEmpty()){
+					for(int i = 0; i<5 && !tasks.isEmpty(); i++){
+						 tasksToExecute.add(tasks.poll());
+					}
+					
+					scheduledExecutorService = Executors.newScheduledThreadPool( locations.size() < 5 ? locations.size() : 5);
+					
+					log.info("Executing geocodecallable " + tasksToExecute.size() + " tasks has began");
+					long executingPackTaskTime = System.currentTimeMillis();
+					futures.addAll(scheduledExecutorService.invokeAll(tasksToExecute, 1, TimeUnit.MINUTES));
+					log.info("Executing geocodecallable " + tasksToExecute.size() + " tasks has ended after " + (System.currentTimeMillis() - executingPackTaskTime) + "ms");
+					
+					//jesli nie minela sekunda
+					long timeToSleep = System.currentTimeMillis() - executingPackTaskTime;
+					if(timeToSleep < 1000){
+						Thread.sleep(1000 - timeToSleep);
+					}
+					
+					tasksToExecute.clear();
+				}
+
 				log.info("Executing GeocodeCallable  has ended after " + (System.currentTimeMillis() - executingTasktime) + "ms");
 				
-				Iterator<Future<Location>> it = futures.iterator();
-				while(it.hasNext()){
-					try{
-						Future<Location> future = it.next();
-						Location location = future.get();
-						locationRepository.updateCity(location.getLatitude(), location.getLongitude(), location.getAddress());
-						
-					}catch(Exception e){
-						//TODO 
-						e.printStackTrace();
-					}
-
-				}
+				updateCitys(futures);
 			} else {
 				log.info("No unique records");
 			}
 			
 		}catch(Exception e){
-			//TODO
 			e.printStackTrace();
 		}
 		
-		log.info("UpdateLocationWorker finished after " + (System.currentTimeMillis() - time) + "ms");
+	}
+	
+	/*
+	 * TRansacional method to update locations
+	 */
+	
+	private void updateCitys(List<Future<Location>>futures){
+		
+		Iterator<Future<Location>> it = futures.iterator();
+		Future<Location> future = null;
+		Location location = null;
+		while(it.hasNext()){
+			try{
+				if((future = it.next()) != null){
+					if((location = future.get()) != null)
+					  locationRepository.updateCity(location.getLatitude(), location.getLongitude(), location.getAddress());
+				}
+				
+			}catch(GeocodeResponseException gre){
+				log.error(gre.getMessage());
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+
+		}
 	}
 	
 	/*
@@ -111,7 +147,12 @@ public class UpdateLocationWorker {
 		  //Send request at endpoint to get geolocation
           Client client = ClientBuilder.newBuilder().build();
           WebTarget target = client.target(GOOGLE_MAP_GEO_URL + "?&latlng=" + param);
-          Response response = target.request().get();
+          
+          Response response = target
+        		                    .request()
+        		                    .header("Accept-Language", "pl,en-US;q=0.7,en;q=0.3")
+        		                    .header("Accept-Charset", "UTF-8")
+        		                    .get();
           String value = response.readEntity(String.class);
           
           //Parse result to AddressComponent
@@ -120,19 +161,14 @@ public class UpdateLocationWorker {
           
           if(geocode.getStatus().equalsIgnoreCase("OK")){
         	  
-        	  for(Result result : geocode.getResults()){
-        		  System.out.println(result.getFormattedAddress());
-        	  }
-        	  
         	  location.setAddress(geocode
         			               .getResults()
         			               .get(0)
         			               .getFormattedAddress());
         	  return location;
-          } else {
-              throw new RuntimeException("Blad response z geocode " + geocode.getStatus());
-          }
+          } 
           
+          throw new GeocodeResponseException("Blad geocode response :" + geocode.getStatus() + " , Url :" + target.getUri().toString());
 	  }
 	}
 }

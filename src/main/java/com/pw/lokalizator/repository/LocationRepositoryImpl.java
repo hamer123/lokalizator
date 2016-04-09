@@ -180,6 +180,7 @@ public class LocationRepositoryImpl implements LocationRepository{
 		try{
 			locations = em
 					    .createNamedQuery("Location.findToUpdateAddress", Location.class)
+					    .setMaxResults(250)  
 			            .getResultList();
 		}catch(Exception e){
 			log.error("Exception podczac selecta location dla pustych adresow", e);

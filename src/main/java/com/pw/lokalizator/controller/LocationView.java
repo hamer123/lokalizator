@@ -316,6 +316,10 @@ public class LocationView implements Serializable{
 			            );
     	}
     }
+    
+    public void onFreindAccept(ActionEvent actionEvent){
+    	//actionEvent.get
+    }
 	
 	//////////////////////////////////////////////////// GET AND SET ///////////////////////////////////////////////////////////////////
 
