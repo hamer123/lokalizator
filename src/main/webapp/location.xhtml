@@ -123,7 +123,8 @@
              </p:column>
              
              <p:column headerText="Akceptacja">
-               <p:commandButton value="Akceptuj" update=":fform:ftable" actionListener="#{location.onFreindAccept}"/>
+               <p:commandButton value="Akceptuj" update=":tabView:fform:ftable" actionListener="#{location.onFreindAccept( inv.from.login )}">
+               </p:commandButton>
              </p:column>
              
              <p:column headerText="Usun">

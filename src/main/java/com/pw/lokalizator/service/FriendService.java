@@ -51,7 +51,7 @@ public class FriendService {
 		}
 	}
 	
-	public void acceptInvitation(){
+	public void acceptInvitation(String sender, String reciver){
 		
 	}
 	
