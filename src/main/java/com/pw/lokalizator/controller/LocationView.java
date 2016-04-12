@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -317,8 +318,27 @@ public class LocationView implements Serializable{
     	}
     }
     
-    public void onFreindAccept(String login){
-    	System.out.println ( login );
+    public void onFreindAccept(String id){
+    	long senderId = Long.parseLong(id);
+    	friendService.acceptInvitation(senderId, 
+    			                       session.getCurrentUser().getId());
+    	/*
+    	for(FriendInvitation invitation : friendInvitations)
+    		if(invitation.getFrom().getId() == Long.parseLong(id))
+    			friendInvitations.remove(invitation);
+    	*/
+    	
+    	Iterator<FriendInvitation> it = friendInvitations.iterator();
+    	while(it.hasNext()){
+    		FriendInvitation invitation = it.next();
+    		if(invitation.getFrom().getId() == senderId){
+    			it.remove();
+    			break;
+    		}
+    	}
+    	
+    	User newFriend = userRepository.findById(senderId);
+    	users.put(senderId, newFriend);
     }
 	
 	//////////////////////////////////////////////////// GET AND SET ///////////////////////////////////////////////////////////////////

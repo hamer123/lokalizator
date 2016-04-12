@@ -48,7 +48,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 				          	  + "ON user.id = usersecurity.user_id "
 				        	  + "WHERE user.login =:login AND user.password =:password"),
 	    @NamedNativeQuery(name="USER.Native.updateGpsLocation",
-	                      query="UPDATE user SET lastGpsLocation_id = :id")
+	                      query="UPDATE user SET lastGpsLocation_id = :id"),
+	    @NamedNativeQuery(name="User.Native.createFriend",
+	                      query="INSERT INTO friends VALUES (:user_id, :friends_id)")     
 })
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)

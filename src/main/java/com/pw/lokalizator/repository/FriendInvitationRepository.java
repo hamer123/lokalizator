@@ -10,4 +10,5 @@ import com.pw.lokalizator.model.FriendInvitation;
 public interface FriendInvitationRepository extends JpaRepository<FriendInvitation, Long> {
 	FriendInvitation getByUsersId(long nadawcaID , long odbiorcaID);
 	List<FriendInvitation> getByOdbiorcaId(long id);
+	int remove(long senderId, long reciverId);
 }

@@ -73,4 +73,12 @@ public class FriendInvitationRepositoryImpl implements FriendInvitationRepositor
 				 .getResultList();
 	}
 
+	@Override
+	public int remove(long senderId, long reciverId) {
+		return em.createNamedQuery("FriendInvitation.Native.removeByUsersId")
+				 .setParameter("from_id", senderId)
+				 .setParameter("to_id", reciverId)
+				 .executeUpdate();
+	}
+
 }

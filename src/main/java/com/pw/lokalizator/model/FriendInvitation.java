@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -22,9 +23,12 @@ import javax.persistence.Transient;
 		@NamedQuery(name="FriendInvitation.findInvitationByUsersId", query="SELECT fi FROM FriendInvitation fi "
 				+ "WHERE ( fi.from.id =:id AND fi.to.id =:id2 ) OR ( fi.to.id =:id AND fi.from.id =:id2)"),
 		@NamedQuery(name="FriendInvitation.findInvitationBySenderId", query="SELECT new com.pw.lokalizator.model.FriendInvitation("
-			    + " fi.id, fi.date, fi.from.login) FROM FriendInvitation fi WHERE fi.to.id =:id"),
+			    + " fi.id, fi.date, fi.from.login, fi.from.id) FROM FriendInvitation fi WHERE fi.to.id =:id"),
 })
 @NamedNativeQueries(value={
+		@NamedNativeQuery(name="FriendInvitation.Native.removeByUsersId",
+				          query="REMOVE FROM friendinvitation WHERE from_id =:from_id AND to_id =:to_id")
+		
 })
 @Table(name="friendinvitation")
 public class FriendInvitation implements Serializable{
@@ -49,11 +53,12 @@ public class FriendInvitation implements Serializable{
 	
 	public FriendInvitation(){}
 	
-	public FriendInvitation(long id, Date date, String login){
+	public FriendInvitation(long id, Date date, String login, long senderId){
 		this.id = id;
 		this.date = date;
 		this.from = new User();
 		from.setLogin(login);
+		from.setId(senderId);
 	}
 
 	public long getId() {

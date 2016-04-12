@@ -7,6 +7,8 @@ import java.util.Date;
 import javax.ejb.EJB;
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
@@ -51,8 +53,20 @@ public class FriendService {
 		}
 	}
 	
-	public void acceptInvitation(String sender, String reciver){
+	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+	public void acceptInvitation(long senderId, long reciverId){
 		
+		try{
+			//Persist 
+			userRepository.persistFriend(reciverId, senderId);
+			userRepository.persistFriend(senderId, reciverId);
+			//Delete
+			throw new RuntimeException();
+			//friendInvitationRepository.remove(senderId, reciverId);
+		}catch(Exception e){
+			throw new RuntimeException(e);
+		}
+
 	}
 	
 	public void rejectionInvitation(){

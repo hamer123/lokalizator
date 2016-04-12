@@ -92,4 +92,12 @@ public class UserRepositoryImpl implements UserRepository{
 		return friends;
 	}
 
+	@Override
+	public int persistFriend(long reciverId, long senderId) {
+		return em.createNamedQuery("User.Native.createFriend")
+				 .setParameter("user_id", reciverId)
+				 .setParameter("friends_id", senderId)
+				 .executeUpdate();
+	}
+
 }
