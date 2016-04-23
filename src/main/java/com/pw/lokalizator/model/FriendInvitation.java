@@ -27,7 +27,7 @@ import javax.persistence.Transient;
 })
 @NamedNativeQueries(value={
 		@NamedNativeQuery(name="FriendInvitation.Native.removeByUsersId",
-				          query="REMOVE FROM friendinvitation WHERE from_id =:from_id AND to_id =:to_id")
+				          query="DELETE FROM friendinvitation WHERE from_id =:from_id AND to_id =:to_id")
 		
 })
 @Table(name="friendinvitation")

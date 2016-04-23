@@ -318,27 +318,63 @@ public class LocationView implements Serializable{
     	}
     }
     
+    /*
+     * Friend invitation accepted
+     */
     public void onFreindAccept(String id){
     	long senderId = Long.parseLong(id);
-    	friendService.acceptInvitation(senderId, 
-    			                       session.getCurrentUser().getId());
-    	/*
-    	for(FriendInvitation invitation : friendInvitations)
-    		if(invitation.getFrom().getId() == Long.parseLong(id))
-    			friendInvitations.remove(invitation);
-    	*/
     	
-    	Iterator<FriendInvitation> it = friendInvitations.iterator();
-    	while(it.hasNext()){
-    		FriendInvitation invitation = it.next();
-    		if(invitation.getFrom().getId() == senderId){
-    			it.remove();
-    			break;
-    		}
+    	try{
+        	friendService.acceptInvitation(senderId, 
+                    session.getCurrentUser().getId());
+
+            Iterator<FriendInvitation> it = friendInvitations.iterator();
+            while(it.hasNext()){
+               FriendInvitation invitation = it.next();
+               if(invitation.getFrom().getId() == senderId){
+                  it.remove();
+                  break;
+               }
+            }
+
+            User newFriend = userRepository.findById(senderId);
+            users.put(senderId, newFriend);
+            
+            //jesli wszystko poszlo po mysli
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Zaproszenie", "Zaproszenie zakceptowane"));
+    	}catch(Exception e){
+    		log.error("Nie udalo sie zakceptiowac zaproszenia: " + e.getMessage());
+    		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Zaproszenie", "Blad akceptacji zaproszenia"));
     	}
+    }
+    
+    /*
+     * Freind invitation rejected
+     */
+    public void onFriendInvitationReject(String id){
+    	long senderId = Long.parseLong(id);
     	
-    	User newFriend = userRepository.findById(senderId);
-    	users.put(senderId, newFriend);
+    	try{
+    		//remove from the database
+        	friendService.rejectionInvitation(senderId, 
+        			                          session.getCurrentUser().getId());
+        	
+        	//remove from the list
+        	Iterator<FriendInvitation> it = friendInvitations.iterator();
+        	while(it.hasNext()){
+        		FriendInvitation invitation = it.next();
+        		if(invitation.getFrom().getId() == senderId){
+        			it.remove();
+        			break;
+        		}
+        	}
+        	
+            //jesli wszystko poszlo po mysli
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Zaproszenie", "Zaproszenie odzucone"));
+    	}catch(Exception e){
+    		log.error("Nie udalo sie odzucic zaproszenia: " + e.getMessage());
+    		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Zaproszenie", "Blad odzucenia zaproszenia"));
+    	}
     }
 	
 	//////////////////////////////////////////////////// GET AND SET ///////////////////////////////////////////////////////////////////

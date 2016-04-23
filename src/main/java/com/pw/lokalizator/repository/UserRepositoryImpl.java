@@ -21,6 +21,7 @@ public class UserRepositoryImpl implements UserRepository{
 	
 	public User add(User entity) {
 		em.persist(entity);
+		remove(999L);
 		return entity;
 	}
 	

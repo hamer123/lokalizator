@@ -29,6 +29,7 @@ public class UserService implements Serializable{
 		user.setUserSecurity(security);
 		user.setEnable(true);
 		userRepository.add(user);
+		
 	}
 	
 	public String serviceKeyGenerator(int hash){

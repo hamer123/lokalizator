@@ -52,7 +52,6 @@ public class FriendInvitationRepositoryImpl implements FriendInvitationRepositor
 		return null;
 	}
 
-	@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 	public FriendInvitation getByUsersId(long nadawcaID, long odbiorcaID) {
 		FriendInvitation invitation = null;
 		try{
@@ -66,7 +65,6 @@ public class FriendInvitationRepositoryImpl implements FriendInvitationRepositor
 		return invitation;
 	}
 
-	@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 	public List<FriendInvitation> getByOdbiorcaId(long id) {
 		return em.createNamedQuery("FriendInvitation.findInvitationBySenderId", FriendInvitation.class)
 				 .setParameter("id", id)

@@ -1,19 +1,21 @@
 package com.pw.lokalizator.service;
 
-
-
 import java.util.Date;
 
 import javax.ejb.EJB;
+import javax.ejb.EJBTransactionRolledbackException;
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 
+import com.pw.lokalizator.exception.FriendArleadyExist;
 import com.pw.lokalizator.model.FriendInvitation;
 import com.pw.lokalizator.model.User;
 import com.pw.lokalizator.repository.FriendInvitationRepository;
@@ -21,6 +23,7 @@ import com.pw.lokalizator.repository.UserRepository;
 
 @Stateless
 @LocalBean
+@TransactionManagement(TransactionManagementType.CONTAINER)
 public class FriendService {
 	@EJB
 	private UserRepository userRepository;
@@ -53,23 +56,28 @@ public class FriendService {
 		}
 	}
 	
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
+
+	/*
+	 * @param senderId Id of the sender
+	 * @param reciverId Id of the reciver
+	 * 
+	 * accept invitation, persist 2 records and remove invitation record
+	 */
 	public void acceptInvitation(long senderId, long reciverId){
-		
-		try{
-			//Persist 
+			//persist records for sender and reciver
 			userRepository.persistFriend(reciverId, senderId);
 			userRepository.persistFriend(senderId, reciverId);
-			//Delete
-			throw new RuntimeException();
-			//friendInvitationRepository.remove(senderId, reciverId);
-		}catch(Exception e){
-			throw new RuntimeException(e);
-		}
-
+			//remove invitation record
+			friendInvitationRepository.remove(senderId, reciverId);
 	}
 	
-	public void rejectionInvitation(){
-		
+	/*
+	 * @param senderId Id of the sender
+	 * @param reciverId Id of the reciver
+	 * 
+	 * remove invitation record
+	 */
+	public void rejectionInvitation(long senderId, long reciverId){
+		friendInvitationRepository.remove(senderId, reciverId);
 	}
 }

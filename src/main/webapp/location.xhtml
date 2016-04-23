@@ -20,7 +20,7 @@
         <p:growl id="growl" showDetail="true" />
       </h:form>
        
-      <p:gmap id="gmap" center="#{location.setting.center}" zoom="#{location.setting.zoom}" type="#{location.setting.googleMapType}" style="width:100%;height:600px" model="#{location.map}">
+      <p:gmap id="gmap" center="#{location.setting.center}" zoom="#{location.setting.zoom}" type="#{location.setting.googleMapType}" style="width:100%;height:500px" model="#{location.map}">
         <p:ajax event="stateChange" listener="#{location.onStateChanged}" update="gmap" />
         <p:ajax event="overlaySelect" listener="#{location.onMarkerSelect}" update="fgrowl:growl" />
       </p:gmap>
@@ -112,8 +112,8 @@
          
          <p:panel header="Zaproszenia">
           <h:panelGrid columns="2" >
-           <h:form>
-            <p:dataTable var="inv" value="#{location.friendInvitations}">
+           <h:form id="akceptacjaZaproszenia">
+            <p:dataTable id="tabelaZaproszen" var="inv" value="#{location.friendInvitations}">
              <p:column headerText="Login">
                <h:outputText value="#{inv.from.login}" />
              </p:column>
@@ -123,12 +123,11 @@
              </p:column>
              
              <p:column headerText="Akceptacja">
-               <p:commandButton value="Akceptuj" update=":tabView:fform:ftable" actionListener="#{location.onFreindAccept( inv.from.id)}">
-               </p:commandButton>
+               <p:commandButton value="Akceptuj" update=":tabView:fform:ftable :tabView:akceptacjaZaproszenia:tabelaZaproszen :fgrowl" actionListener="#{location.onFreindAccept( inv.from.id)}"/>
              </p:column>
              
              <p:column headerText="Usun">
-             
+               <p:commandButton value="Odrzuc" update=":tabView:akceptacjaZaproszenia:tabelaZaproszen :fgrowl" actionListener="#{location.onFriendInvitationReject(inv.from.id)}"/>
              </p:column>
             </p:dataTable>
            </h:form>
