@@ -21,6 +21,9 @@ import org.primefaces.model.map.LatLng;
 import org.primefaces.model.map.MapModel;
 import org.primefaces.model.map.Polygon;
 
+import com.pw.lokalizator.model.User;
+import com.pw.lokalizator.repository.UserRepository;
+
 @Named(value="polyglon")
 @ViewScoped
 public class PolygonView implements Serializable{
@@ -28,9 +31,13 @@ public class PolygonView implements Serializable{
 	private LokalizatorSession lokalizatorSession;
 	@Inject
 	private GoogleMapSetting googleMapSetting;
+	@Inject
+	private UserRepository userRepository;
 	
 	private MapModel polygonModel;
 	private List<LatLng>points;
+	private List<User>listFriends;
+	private List<String>listTargetsId;
 	
 	@PostConstruct
 	private void postConstruct(){
@@ -44,6 +51,8 @@ public class PolygonView implements Serializable{
         polygon.setFillOpacity(0.7);
         
         polygonModel.addOverlay(polygon);
+        
+        listFriends = userRepository.findFriendsById( lokalizatorSession.getCurrentUser().getId() );
 	}
 	
 	public void onStateChanged(StateChangeEvent event){
@@ -92,6 +101,22 @@ public class PolygonView implements Serializable{
 
 	public void setGoogleMapSetting(GoogleMapSetting googleMapSetting) {
 		this.googleMapSetting = googleMapSetting;
+	}
+
+	public List<User> getListFriends() {
+		return listFriends;
+	}
+
+	public void setListFriends(List<User> listFriends) {
+		this.listFriends = listFriends;
+	}
+
+	public List<String> getListTargetsId() {
+		return listTargetsId;
+	}
+
+	public void setListTargetsId(List<String> listTargetsId) {
+		this.listTargetsId = listTargetsId;
 	}
 
 }

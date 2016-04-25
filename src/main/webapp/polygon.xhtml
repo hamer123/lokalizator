@@ -31,7 +31,13 @@
        <p:panelGrid columns="3">
          <p:outputLabel value="Save polygon"/>
          <p:inputText placeholder="name"/>
-         <p:commandButton value="Save"/>
+         
+        <p:selectOneMenu id="targets" value="#{polyglon.listTargetsId}" style="width:300px">
+           <f:selectItems value="#{polyglon.listFriends}" var="target" itemLabel="#{target.login}" itemValue="#{target.id}"/>
+        </p:selectOneMenu>
+        
+        <p:commandButton value="Save"/>
+        
        </p:panelGrid>
      
        <!-- TABLE WITH POINTS -->
