@@ -44,7 +44,7 @@
                        <p:autoComplete id="findUserToFollow" value="#{location.selectedUserToFollow}" completeMethod="#{location.onAutoCompleteUser}"
                                        forceSelection="true" styleClass="components" required="true"/>
                        <p:commandButton value="#{msg['location.button.addUserToFollow']}" styleClass="components" actionListener="#{location.onUserSelectToFollow}" 
-                                        update=":#{p:component('fgrowl')} :#{p:component('followUsers')}"/>
+                                        update=":#{p:component('fgrowl')} :#{p:component('followUsers')} :#{p:component('gmap')}"/>
                     </p:panelGrid>
                     <p:dataTable id="followUsers" var="user" value="#{googleMapController.usersToFollow}" style="margin-top: 15px">
                        <p:column headerText="login">
