@@ -70,6 +70,9 @@ public class LocationViewController implements Serializable{
 		if(!isUserFollow(selectedUserToFollow)){
 			User user = userRepository.findByLogin(selectedUserToFollow);
 			googleMapController.addUser(user);
+			
+			//TEST
+			googleMapController.update();
 		} else {
 			JsfMessageBuilder.errorMessageFromProperties("userArleadyFollowed");
 		}

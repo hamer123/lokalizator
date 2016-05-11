@@ -109,11 +109,11 @@ public class GoogleMapController implements Serializable{
 
 		googleMapModel = new DefaultMapModel();
 		
-		//TEST
-		User user = new User();
-		user.setId(1L);
-		user.setLogin("hamer123");
-		followUsers.add(user);
+//		//TEST
+//		User user = new User();
+//		user.setId(1L);
+//		user.setLogin("hamer123");
+//		followUsers.add(user);
 
 	}
 	
