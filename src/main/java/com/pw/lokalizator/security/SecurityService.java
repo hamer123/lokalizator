@@ -7,6 +7,7 @@ import java.security.SecureRandom;
 import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -24,7 +25,7 @@ import com.pw.lokalizator.singleton.RestSessionSimulator;
 @Local
 @Stateless
 public class SecurityService {
-	@EJB
+	@Inject
 	private UserRepository userRepository;
 	@EJB
 	private RestSessionSimulator restSessionSimulator;

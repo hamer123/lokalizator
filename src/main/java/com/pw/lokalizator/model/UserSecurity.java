@@ -47,7 +47,7 @@ public class UserSecurity implements Serializable{
 	@OneToOne
 	private User user;
 	@Enumerated(EnumType.STRING)
-	private Role rola;
+	private Roles rola;
 	
 	public long getId() {
 		return id;
@@ -67,10 +67,10 @@ public class UserSecurity implements Serializable{
 	public void setUser(User user) {
 		this.user = user;
 	}
-	public Role getRola() {
+	public Roles getRola() {
 		return rola;
 	}
-	public void setRola(Role rola) {
+	public void setRola(Roles rola) {
 		this.rola = rola;
 	}
 	

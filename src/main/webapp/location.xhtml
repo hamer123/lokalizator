@@ -7,6 +7,7 @@
 
     <h:head>  
       <script src="https://maps.googleapis.com/maps/api/js"/>
+      <h:outputStylesheet library="css" name="locationView.css"/>
     </h:head>  
       
     <h:body> 
@@ -16,13 +17,14 @@
 	  </ui:insert>
 	  
 	  <h:form id="fgrowl">
-        <p:poll interval="60" listener="#{location.onPoll}" update="gmap tabView:fform:ftable" />
+        <p:poll interval="60" listener="#{location.onPoll}" update="gmap" />
         <p:growl id="growl" showDetail="true" />
       </h:form>
        
-      <p:gmap id="gmap" center="#{location.setting.center}" zoom="#{location.setting.zoom}" type="#{location.setting.googleMapType}" style="width:100%;height:500px" model="#{location.map}">
-        <p:ajax event="stateChange" listener="#{location.onStateChanged}" update="gmap" />
-        <p:ajax event="overlaySelect" listener="#{location.onMarkerSelect}" update="fgrowl:growl" />
+      <p:gmap id="gmap" center="#{googleMapController.center}" zoom="#{googleMapController.zoom}" type="#{googleMapController.googleMapType}" model="#{googleMapController.googleMapModel}"
+              rendered="#{googleMapController.mode == 'FOLLOW_USERS'}" style="width:100%;height:500px">
+        <p:ajax event="stateChange" listener="#{googleMapController.onGoogleMapStateChange}" />
+        <!--  <p:ajax event="overlaySelect" listener="#{googleMapController.onGoogleMapStateChange}" update=":#{p:component('fgrowl')}" />  -->
       </p:gmap>
    
       <p:separator/>
@@ -30,117 +32,50 @@
       <p:messages id="messages" showDetail="false" />
        
       <p:tabView id="tabView">
-        
-        <p:tab title="Twoje dane" id="twojeDane">
-          <h:form>
-            <p:panelGrid columns="5" >
-              <p:outputLabel for="fromDate" value="Od kiedy" />
-              <p:calendar id="fromDate" value="#{location.fromDate}" pattern="MM/dd/yyyy HH:mm:ss" required="true" maxdate="#{location.maxDate}"/>
-        
-              <p:outputLabel for="endDate" value="Do kiedy" />
-              <p:calendar id="endDate" value="#{location.endDate}" pattern="MM/dd/yyyy HH:mm:ss" required="true" maxdate="#{location.maxDate}"/>
-           
-              <p:commandButton id="find" actionListener="#{location.findLocations}" value="Find" update=":tabView:locations  :messages" />
-            </p:panelGrid>
-          </h:form>
-  
-          <p:dataTable var="loc" value="#{location.locations}" style="margin-top: 20px" id="locations" reflow="true" rows="25" paginator="true" 
-                       selectionMode="single" rowKey="#{loc.id}"  selection="#{location.selectedLocation}">
-            <p:ajax event="rowSelect" listener="#{location.onRowSelect}" update=":gmap" />           
-            
-            <p:column headerText="date">
-              <h:outputText value="#{loc.date}" />
-            </p:column>
- 
-            <p:column headerText="latitude">
-              <h:outputText value="#{loc.latitude}" />
-            </p:column>
- 
-            <p:column headerText="longitude">
-              <h:outputText value="#{loc.longitude}" />
-            </p:column>
-            
-            <p:column headerText="address">
-              <h:outputText value="#{loc.address}" />
-            </p:column>
-            
-            <p:column headerText="provider">
-              <h:outputText value="#{loc.provider}" />
-            </p:column>
+         <p:ajax event="tabChange" listener="#{location.onTabChange}"/>
+         
+         <p:tab title="#{msg['location.title.currentLocation']}">
 
-          </p:dataTable>
-           
-        </p:tab>
-          
-        <p:tab title="Przyjaciele">
+           <p:panelGrid columns="2" layout="grid">
+              <p:panel header="#{msg['location.header.trackingUsers']}">
+                 <h:form>
+                    <p:panelGrid columns="3">
+                       <p:outputLabel for="findUserToFollow" value="#{msg['location.label.findUser']}" styleClass="components"/>
+                       <p:autoComplete id="findUserToFollow" value="#{location.selectedUserToFollow}" completeMethod="#{location.onAutoCompleteUser}"
+                                       forceSelection="true" styleClass="components" required="true"/>
+                       <p:commandButton value="#{msg['location.button.addUserToFollow']}" styleClass="components" actionListener="#{location.onUserSelectToFollow}" 
+                                        update=":#{p:component('fgrowl')} :#{p:component('followUsers')}"/>
+                    </p:panelGrid>
+                    <p:dataTable id="followUsers" var="user" value="#{googleMapController.usersToFollow}" style="margin-top: 15px">
+                       <p:column headerText="login">
+                           <h:outputText value="#{user.login}" />
+                       </p:column>
+                       <p:column headerText="Pokaz lokacje">
+                           <p:commandButton icon="ui-icon-search" title="Pokaz" onclick="PF('showLocations').show();"/>
+                       </p:column>
+                       <p:column headerText="#{msg['location.header.deleteUserToFollow']}">
+                          <p:commandButton  icon="fa fa-fw fa-remove" title="#{msg['location.button.deleteUserToFollow']}"/>
+                       </p:column>
+                    </p:dataTable>
+                 </h:form>
+              </p:panel>
+              <p:panel header="#{msg['location.header.usersOnline']}">
+                 <p:dataList>
+                 </p:dataList>
+              </p:panel>
+           </p:panelGrid>
+
+         </p:tab>
+  
+         <p:tab title="Historia Lokacji">
          
-         <p:panel header="Dodaj Przyjaciela">
-          <h:form>
-            <p:messages id="msg_przyjeaciele" showDetail="false"/>
-            <h:panelGrid columns="3" >
-              <p:outputLabel for="nick" value="Dodaj przyjaciela"/>
-              <p:inputText id="nick"  value="#{location.friendNick}" required="true">
-                <f:validateLength minimum="6"/>
-              </p:inputText>
-              <p:commandButton value="Invite" actionListener="#{location.onSendInvitation}" update="msg_przyjeaciele"/>
-            </h:panelGrid>
-          </h:form>
-         </p:panel>
-          
-         <p:panel header="Lista Przyjaciol"> 
-          <h:panelGrid columns="1" style="margin-top: 10px;">
-           <h:form id="fform">
-            <p:dataTable id="ftable" var="f" value="#{location.users.values()}" selectionMode="single" rowKey="#{f.id}" >
-              <p:ajax event="rowSelect" listener="#{location.onRowSelectFriend}" update=":gmap"/>
-            
-              <p:column headerText="Login">
-                <h:outputText value="#{f.login}" />
-              </p:column>
-              
-              <p:column headerText="Last date">
-                
-              </p:column>
-              
-              <p:column headerText="Remove friend">
-                  <p:commandButton value="Remove" update=":gmap ftable"/>
-              </p:column>
-           
-            </p:dataTable>
-           </h:form>
-          </h:panelGrid>
-         </p:panel>
-         
-         <p:panel header="Zaproszenia">
-          <h:panelGrid columns="2" >
-           <h:form id="akceptacjaZaproszenia">
-            <p:dataTable id="tabelaZaproszen" var="inv" value="#{location.friendInvitations}">
-             <p:column headerText="Login">
-               <h:outputText value="#{inv.from.login}" />
-             </p:column>
-           
-             <p:column headerText="Data">
-               <h:outputText value="#{inv.date}" />
-             </p:column>
-             
-             <p:column headerText="Akceptacja">
-               <p:commandButton value="Akceptuj" update=":tabView:fform:ftable :tabView:akceptacjaZaproszenia:tabelaZaproszen :fgrowl" actionListener="#{location.onFreindAccept( inv.from.id)}"/>
-             </p:column>
-             
-             <p:column headerText="Usun">
-               <p:commandButton value="Odrzuc" update=":tabView:akceptacjaZaproszenia:tabelaZaproszen :fgrowl" actionListener="#{location.onFriendInvitationReject(inv.from.id)}"/>
-             </p:column>
-            </p:dataTable>
-           </h:form>
-          </h:panelGrid>
-         </p:panel>
-        </p:tab>
-          
+         </p:tab>
         <p:tab title="Ustawienia">
           <h:form>
             <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
               
               <p:outputLabel for="console" value="Typ mapy" />
-              <p:selectOneMenu id="console" value="#{location.setting.googleMapType}" style="width:125px">
+              <p:selectOneMenu id="console" value="#{googleMapController.googleMapType}" style="width:125px">
                 <p:ajax update=":gmap" />
                 
                 <f:selectItem itemLabel="Hybrid"   itemValue="HYBRID" />
@@ -150,7 +85,7 @@
               </p:selectOneMenu>
               
               <p:outputLabel for="check" value="Pokaz ulice" />
-              <p:selectBooleanCheckbox id="check" value="#{location.setting.streetView}">
+              <p:selectBooleanCheckbox id="check" value="#{googleMapController.streetView}">
                 <p:ajax update=":gmap" />
               </p:selectBooleanCheckbox>
              
@@ -158,5 +93,14 @@
           </h:form>
         </p:tab>
       </p:tabView>
+ 
+      <p:dialog header="Wybierz providera" widgetVar="showLocations" modal="true">
+         <h:form>
+            <p:commandButton value="GPS" actionListener="#{location.findLocations}" onclick="PF('showLocations').hide();"/>
+            <p:commandButton value="Network" actionListener="#{location.findLocations}" onclick="PF('showLocations').hide();"/>
+            <p:commandButton value="Own" actionListener="#{location.findLocations}" onclick="PF('showLocations').hide();"/>
+         </h:form>
+      </p:dialog>
     </h:body>  
 </html>
+

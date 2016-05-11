@@ -33,14 +33,19 @@ import javax.xml.bind.annotation.XmlRootElement;
 		  @NamedQuery(name="USER.findAll", query = "SELECT u FROM User u"),
 		  @NamedQuery(name="USER.deleteByID", query="DELETE FROM User u WHERE u.id = :id"),
 		  @NamedQuery(name="USER.findByLoginAndPassword", query="SELECT u FROM User u WHERE u.login =:login AND u.password =:password"),
-		  /*
-		  query="SELECT new com.pw.lokalizator.model.User"
-		  	  + "(u.id, u.login, u.enable, (SELECT s FROM UserSecurity s WHERE s.user.login =:login)) FROM User u WHERE u.login =:login AND u.password =:password"),
-		  query="SELECT u.id, u.login, u.password, u.email, u.enable, u.userSecurity.id,  u.userSecurity.serviceKey, u.userSecurity.rola "
-		  	  + "FROM User u WHERE u.login = :login AND u.password = :password"), 
-		  */
-		  @NamedQuery(name="USER.findByLogin", query="SELECT u FROM User u WHERE u.login = :login")
+		  @NamedQuery(name="USER.findByLogin", query="SELECT u FROM User u WHERE u.login = :login"),
+		  @NamedQuery(name="USER.findByLoginLike", query="SELECT new com.pw.lokalizator.model.User(u.id, u.login) FROM User u WHERE u.login LIKE :loginLike"),
+
+	      @NamedQuery(name="USER.findByIdsGetIdAndLoginAndCurrentLocationsForAllProviders", 
+	                  query="SELECT new com.pw.lokalizator.model.User(u.id, u.login) "
+	                       + "FROM User u "
+	                	   + "INNER JOIN u.lastGpsLocation lg "
+	                       + "INNER JOIN u.lastNetworkLocation ln "
+	                	   + "INNER JOIN u.lastOwnProviderLocation lo "
+	                       + "WHERE u.id = :id"),
+	                   
 		})
+
 @NamedNativeQueries(value = {
 		@NamedNativeQuery(name="USER.Native.findUserByLoginAndPassword",
 				          query="SELECT user.id, user.login, user.enable, usersecurity.rola, usersecurity.servicekey "
@@ -50,7 +55,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 	    @NamedNativeQuery(name="USER.Native.updateGpsLocation",
 	                      query="UPDATE user SET lastGpsLocation_id = :id"),
 	    @NamedNativeQuery(name="User.Native.createFriend",
-	                      query="INSERT INTO friends VALUES (:user_id, :friends_id)")     
+	                      query="INSERT INTO friends VALUES (:user_id, :friends_id)")
 })
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
@@ -80,10 +85,6 @@ public class User implements Serializable {
 	@Column(nullable=false)
 	private boolean enable;
 	
-	/*
-	 * Feach default EAGER
-	 */
-	
 	@OneToOne(cascade=CascadeType.ALL, mappedBy="user",  orphanRemoval = true)
 	private UserSecurity userSecurity;
 	
@@ -95,31 +96,25 @@ public class User implements Serializable {
 	
 	@OneToOne
 	private Location lastOwnProviderLocation;
-	
-	/*
-	 * Feach default LAZY
-	 */
+
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
-	private Collection<Location>locations = new ArrayList<Location>();
+	private List<Location>locations;
 	
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "provider", orphanRemoval = true)
-	private List<Polygon>polygons;
+	private List<PolygonModel>polygons;
 	
-	@ManyToMany
-    @JoinTable(name="friends")
-	private List<User>friends;
-	
-	@OneToMany(cascade = CascadeType.ALL, mappedBy="from", orphanRemoval = true)
-	private List<FriendInvitation>friendInvitations;
-
-	
-	public User(long id, String login, boolean enable, Role rola, String serviceKey){
+	public User(long id, String login, boolean enable, Roles rola, String serviceKey){
 		this.id = id;
 		this.login = login;
 		this.enable = enable;
 		this.userSecurity = new UserSecurity();
 		this.userSecurity.setRola(rola);
 		this.userSecurity.setServiceKey(serviceKey);
+	}
+	
+	public User(long id, String login){
+		this.id = id;
+		this.login = login;
 	}
 	
 	public User(){}
@@ -160,27 +155,16 @@ public class User implements Serializable {
 	public void setUserSecurity(UserSecurity userSecurity) {
 		this.userSecurity = userSecurity;
 	}
-	public Collection<Location> getLocations() {
+	public List<Location> getLocations() {
 		return locations;
 	}
-	public void setLocations(Collection<Location> locations) {
-		this.locations = locations;
-	}
 
-	public List<Polygon> getPolygons() {
+	public List<PolygonModel> getPolygons() {
 		return polygons;
 	}
 
-	public void setPolygons(List<Polygon> polygons) {
+	public void setPolygons(List<PolygonModel> polygons) {
 		this.polygons = polygons;
-	}
-
-	public List<FriendInvitation> getFriendInvitations() {
-		return friendInvitations;
-	}
-
-	public void setFriendInvitations(List<FriendInvitation> friendInvitations) {
-		this.friendInvitations = friendInvitations;
 	}
 
 	public Location getLastGpsLocation() {
@@ -207,11 +191,20 @@ public class User implements Serializable {
 		this.lastOwnProviderLocation = lastOwnProviderLocation;
 	}
 
-	public List<User> getFriends() {
-		return friends;
+	public void setLocations(List<Location> locations) {
+		this.locations = locations;
 	}
 
-	public void setFriends(List<User> friends) {
-		this.friends = friends;
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", login=" + login + ", password=" + password
+				+ ", email=" + email + ", enable=" + enable + ", userSecurity="
+				+ userSecurity + ", lastGpsLocation=" + lastGpsLocation
+				+ ", lastNetworkLocation=" + lastNetworkLocation
+				+ ", lastOwnProviderLocation=" + lastOwnProviderLocation
+				+ ", locations=" + locations + ", polygons=" + polygons
+			    + "]";
 	}
+	
+	
 }

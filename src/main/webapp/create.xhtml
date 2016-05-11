@@ -9,12 +9,15 @@
   <title>Create account</title>
 </h:head> 
 
-<h:body> 
-   	
+<h:body styleClass="body"> 
+  
+  <h:outputStylesheet library="css" name="default.css"/> 
+  <h:outputStylesheet library="css" name="login.css"/>	
+ 
   <h:form>
     <p:messages id="messages" showDetail="false" />
     
-    <p:panel id="panel" header="create account">
+    <p:panel id="panel" header="create account" styleClass="panel">
     
       <h:panelGrid columns="3" cellpadding="5">
         
@@ -36,9 +39,11 @@
         </p:inputText>
         <p:message for="email"/>
         
+        <p:commandButton action="#{account.createAccount()}" value="Create" update="messages panel"/>
+        <p:button value="Login" outcome="login" styleClass="button"/>
       </h:panelGrid>
       
-      <p:commandButton action="#{account.createAccount()}" value="Create" update="messages panel"/>
+
     </p:panel>
   </h:form>
 </h:body> 

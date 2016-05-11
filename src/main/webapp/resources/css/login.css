@@ -1,0 +1,21 @@
+@CHARSET "UTF-8";
+
+
+.panel{  
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  /* bring your own prefixes */
+  transform: translate(-50%, -75%);
+
+}
+
+.body{
+	
+	background-image: url("../images/loginBackground.png");
+	background-size: 100% auto;
+}
+
+.button{
+	float: right;
+}

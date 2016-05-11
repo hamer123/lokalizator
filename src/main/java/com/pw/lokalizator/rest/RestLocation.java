@@ -1,5 +1,6 @@
 package com.pw.lokalizator.rest;
 import javax.ejb.EJB;
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -11,7 +12,7 @@ import javax.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 
 import com.pw.lokalizator.model.Location;
-import com.pw.lokalizator.model.ProviderType;
+import com.pw.lokalizator.model.Providers;
 import com.pw.lokalizator.model.RestSession;
 import com.pw.lokalizator.model.User;
 import com.pw.lokalizator.repository.LocationRepository;
@@ -20,7 +21,7 @@ import com.pw.lokalizator.repository.UserRepository;
 
 @Path("/location")
 public class RestLocation {
-	@EJB
+	@Inject
 	UserRepository userRepository;
 	@EJB
 	LocationRepository locationRepository;
@@ -44,11 +45,11 @@ public class RestLocation {
 			location = locationRepository.add( location );
 			
 			//zaktualizowanie obecnej pozycji uzytkownika
-			if(location.getProvider() == ProviderType.GPS){
+			if(location.getProvider() == Providers.GPS){
 				user.setLastGpsLocation(location);
-			}else if(location.getProvider() == ProviderType.NETWORK){
+			}else if(location.getProvider() == Providers.NETWORK){
 				user.setLastNetworkLocation(location);
-			}else if(location.getProvider() == ProviderType.OWN){
+			}else if(location.getProvider() == Providers.OWN){
 				user.setLastOwnProviderLocation(location);
 			}
 			

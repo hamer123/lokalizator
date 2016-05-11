@@ -8,7 +8,9 @@ import java.util.Date;
 import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Stateless;
-import com.pw.lokalizator.model.Role;
+import javax.inject.Inject;
+
+import com.pw.lokalizator.model.Roles;
 import com.pw.lokalizator.model.User;
 import com.pw.lokalizator.model.UserSecurity;
 import com.pw.lokalizator.repository.UserRepository;
@@ -16,14 +18,14 @@ import com.pw.lokalizator.repository.UserRepository;
 @Stateless
 public class UserService implements Serializable{
 	private static final long serialVersionUID = 1L;
-	@EJB
+	@Inject
 	UserRepository userRepository;
 	private SecureRandom random; 
 	
 	public void createAccount(User user){
 		
 		UserSecurity security = new UserSecurity();
-		security.setRola(Role.USER);
+		security.setRola(Roles.USER);
 		security.setServiceKey(serviceKeyGenerator(user.getLogin().hashCode()));
 		security.setUser(user);
 		user.setUserSecurity(security);

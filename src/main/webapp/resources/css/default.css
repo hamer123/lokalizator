@@ -1,0 +1,9 @@
+@CHARSET "UTF-8";
+
+.ui-widget, .ui-widget .ui-widget {
+    font-size: 100%;
+}
+
+.ui-panel{
+    padding: 0.8em !important;
+}

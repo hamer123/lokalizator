@@ -7,19 +7,21 @@
 
 <h:head>
   <title>Login</title>
+  <h:outputStylesheet library="css" name="login.css"/>
   <f:metadata>
     <f:event listener="#{lokalizatorSession.checkIsLogged}" type="preRenderView"/>
   </f:metadata>
 </h:head> 
 
-<h:body>
-  
+<h:body styleClass="body">
+    
+    <h:outputStylesheet library="css" name="default.css"/>
     <h:form>
+
         <p:messages id="messages" showDetail="false" />
-
-        <p:panel id="panel" header="Login" >
-
-            <h:panelGrid columns="3" cellpadding="5">
+        <p:panel id="panel" header="Login" styleClass="panel">
+            
+            <h:panelGrid columns="3" cellpadding="5" styleClass="table" >
                 <p:outputLabel for="userName" value="User Name:" />
                 <p:inputText id="userName" value="#{lokalizatorSession.userLogin}"
                     required="true" label="User name">
@@ -34,12 +36,10 @@
                     <f:validateLength minimum="6" />
                 </p:password>
                 <p:message for="password" display="icon" />
+                
+                <p:commandButton value="Login" update="panel messages" action="#{lokalizatorSession.login()}" />
+                <p:button value="Create" outcome="create" styleClass="button"/>
             </h:panelGrid>
-
-            <p:commandButton value="Login" update="panel messages"
-                action="#{lokalizatorSession.login()}" />
-              
-            <p:button value="Create" outcome="create" style="margin-left: 180px"/>
         </p:panel>
         
     </h:form>

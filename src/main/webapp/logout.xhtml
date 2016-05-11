@@ -8,7 +8,9 @@
 <h:head>
   <title>Logout</title>
 </h:head> 
-<body> 
+<h:body styleClass="body">
+      <h:outputStylesheet library="css" name="default.css"/> 
+      <h:outputStylesheet library="css" name="login.css"/>	 
       <h:form>
         <p:panel header="Logout" rendered="#{!lokalizatorSession.logged}">
             <p>You are logged out.</p>
@@ -21,5 +23,5 @@
                 action="#{lokalizatorSession.logout()}" />
         </p:panel>
     </h:form>
-</body> 
+</h:body> 
 </html>

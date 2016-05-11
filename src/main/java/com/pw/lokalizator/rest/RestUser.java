@@ -21,7 +21,7 @@ import org.jboss.resteasy.logging.Logger;
 
 import com.pw.lokalizator.model.RestSecurityKeys;
 import com.pw.lokalizator.model.RestSession;
-import com.pw.lokalizator.model.Role;
+import com.pw.lokalizator.model.Roles;
 import com.pw.lokalizator.model.User;
 import com.pw.lokalizator.model.UserSecurity;
 import com.pw.lokalizator.repository.UserRepository;

@@ -26,7 +26,7 @@ public class PolygonPoint {
 	private double lng;
 	
 	@ManyToOne
-	private Polygon polygon;
+	private PolygonModel polygon;
 	
 	public long getId() {
 		return id;

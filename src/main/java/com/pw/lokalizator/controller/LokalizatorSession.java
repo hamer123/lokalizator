@@ -2,12 +2,16 @@ package com.pw.lokalizator.controller;
 
 import java.io.IOException;
 import java.io.Serializable;
+
 import javax.ejb.EJB;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.inject.Inject;
 import javax.inject.Named;
+
 import org.jboss.logging.Logger;
+
 import com.pw.lokalizator.model.User;
 import com.pw.lokalizator.repository.UserRepository;
 
@@ -16,7 +20,7 @@ import com.pw.lokalizator.repository.UserRepository;
 public class LokalizatorSession implements Serializable{
 	private static final long serialVersionUID = 1L;
 	Logger log = Logger.getLogger(LokalizatorSession.class);
-	@EJB
+	@Inject
 	private UserRepository userRepository;
 	
 	private boolean isLogged;
