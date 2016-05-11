@@ -151,6 +151,7 @@ public class GoogleMapController implements Serializable{
 	
 	public void addUser(User user){
 		newUsers.add(user);
+		followUsers.add(user);
 	}
 	
 	public void setSingleUser(User user){
@@ -176,7 +177,6 @@ public class GoogleMapController implements Serializable{
 	
 	private void updateGoogleMapFollowUserMode(){
 		if(isNewUsers()){
-			followUsers.addAll(newUsers);
 			updateNewFollowUsersPolygons();
 			newUsers.clear();
 		}
