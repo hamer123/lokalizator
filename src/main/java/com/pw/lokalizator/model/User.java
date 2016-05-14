@@ -8,6 +8,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -32,10 +33,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 		value = {
 		  @NamedQuery(name="USER.findAll", query = "SELECT u FROM User u"),
 		  @NamedQuery(name="USER.deleteByID", query="DELETE FROM User u WHERE u.id = :id"),
-		  @NamedQuery(name="USER.findByLoginAndPassword", query="SELECT u FROM User u WHERE u.login =:login AND u.password =:password"),
 		  @NamedQuery(name="USER.findByLogin", query="SELECT u FROM User u WHERE u.login = :login"),
-		  @NamedQuery(name="USER.findByLoginLike", query="SELECT new com.pw.lokalizator.model.User(u.id, u.login) FROM User u WHERE u.login LIKE :loginLike"),
-
+		  @NamedQuery(name="USER.findLoginByLoginLike", query="SELECT u.login FROM User u WHERE u.login LIKE :login"),
+		  @NamedQuery(name="USER.findUserWithPolygonsByLogin", query="SELECT u FROM User u INNER JOIN FETCH u.polygons WHERE u.login =:login"),
+		  @NamedQuery(name="USER.findUserWithSecurityByLoginAndPassword", query="SELECT u FROM User u INNER JOIN FETCH u.userSecurity WHERE u.login = :login AND u.password = :password"),
 	      @NamedQuery(name="USER.findByIdsGetIdAndLoginAndCurrentLocationsForAllProviders", 
 	                  query="SELECT new com.pw.lokalizator.model.User(u.id, u.login) "
 	                       + "FROM User u "
@@ -85,7 +86,7 @@ public class User implements Serializable {
 	@Column(nullable=false)
 	private boolean enable;
 	
-	@OneToOne(cascade=CascadeType.ALL, mappedBy="user",  orphanRemoval = true)
+	@OneToOne(optional=false, fetch=FetchType.LAZY, cascade=CascadeType.ALL, mappedBy="user",  orphanRemoval = true)
 	private UserSecurity userSecurity;
 	
 	@OneToOne

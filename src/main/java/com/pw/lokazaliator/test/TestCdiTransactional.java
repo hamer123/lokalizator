@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.view.ViewScoped;
@@ -28,10 +29,11 @@ import com.pw.lokalizator.model.GoogleMapModel;
 import com.pw.lokalizator.model.Location;
 import com.pw.lokalizator.model.Providers;
 import com.pw.lokalizator.model.User;
+import com.pw.lokalizator.repository.UserRepository;
 
 @Named
 @ViewScoped
-@Transactional
+//@Transactional
 public class TestCdiTransactional implements Serializable{
 
 	@PersistenceContext
@@ -40,10 +42,20 @@ public class TestCdiTransactional implements Serializable{
 	@Inject
 	GoogleMapController controller;
 	
+	@EJB
+	UserRepository repository;
+	
 	
 	public void doTestTransaction(){
-		System.out.println("update");
-		controller.update();
+//		System.out.println("update");
+//		controller.update();
+		
+		//User user2 = em.find(User.class, 1L);
+		User user = repository.findByLogin("hamer123");
+//		Location location = user.getLastGpsLocation();
+		System.out.println(user.getLastGpsLocation().getUser().getLogin());
+		System.out.println(user.getUserSecurity().getServiceKey());
+		
 	}
 	
 	public void findUserOnline(){
@@ -126,7 +138,7 @@ public class TestCdiTransactional implements Serializable{
         
         simpleModel.addOverlay(MarkerBuilder.createMarker(location));
         
-		controller.addUser(user);
+		controller.addUser(user.getLogin());
 		controller.update();
     }
   

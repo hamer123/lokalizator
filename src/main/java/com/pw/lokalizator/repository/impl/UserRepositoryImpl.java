@@ -41,11 +41,9 @@ public class UserRepositoryImpl implements UserRepository{
 	}
 	
 	public void remove(Long id) {
-		int result = em.createNamedQuery("USER.deleteByID")
+		em.createNamedQuery("USER.deleteByID")
 		   .setParameter("id", id)
 		   .executeUpdate();
-		if(result == 0)
-		  throw new IllegalArgumentException("nie mozna usunac User o id = " + id + ", brak takiej encji");
 	}
 	
 	public User findById(Long id) {
@@ -57,17 +55,11 @@ public class UserRepositoryImpl implements UserRepository{
 				 .getResultList();
 	}
 
-	public User findByLoginAndPassword(String login, String password) {
-		Object[] result = (Object[]) em.createNamedQuery("USER.Native.findUserByLoginAndPassword")
-				 .setParameter("login", login)
-				 .setParameter("password", password)
-				 .getSingleResult();
-		
-		return new User(((BigInteger)result[0]).longValue(),
-				        (String)result[1], 
-				        (boolean)result[2], 
-				        Roles.valueOf((String)result[3]), 
-				        (String)result[4]);
+	public User findUserWithSecurityByLoginAndPassword(String login, String password) {
+		return em.createNamedQuery("USER.findUserWithSecurityByLoginAndPassword", User.class)
+		         .setParameter("login", login)
+		         .setParameter("password", password)
+		         .getSingleResult();
 	}
 
 	public User findByLogin(String login) {
@@ -76,9 +68,9 @@ public class UserRepositoryImpl implements UserRepository{
 				 .getSingleResult();
 	}
 
-	public List<User> findByLoginLike(String loginLike) {
-		return em.createNamedQuery("USER.findByLoginLike", User.class)
-				 .setParameter("loginLike", loginLike + "%")
+	public List<String> findLoginByLoginLike(String loginLike) {
+		return em.createNamedQuery("USER.findLoginByLoginLike", String.class)
+				 .setParameter("login", loginLike + "%")
 				 .getResultList();
 	}
 
@@ -87,6 +79,15 @@ public class UserRepositoryImpl implements UserRepository{
 		return em.createNamedQuery("USER.findByIdsGetIdAndLoginAndCurrentLocationsForAllProviders", User.class)
 		  .setParameter("id", id)
 		  .getSingleResult();
+	}
+
+	@Override
+	public User findUserWithPolygonsByLogin(String login) {
+		User user =  em.createNamedQuery("USER.findByLogin", User.class)
+				       .setParameter("login", login)
+				       .getSingleResult();
+		user.getPolygons().size();
+		return user;
 	}
 
 }

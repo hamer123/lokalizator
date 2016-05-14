@@ -30,7 +30,7 @@ public class LokalizatorSession implements Serializable{
 	
 	public String login(){
 		try{
-			currentUser = userRepository.findByLoginAndPassword(userLogin,userPassword);
+			currentUser = userRepository.findUserWithSecurityByLoginAndPassword(userLogin,userPassword);
 		}catch(Exception e){
 			e.printStackTrace();
 			//TODO

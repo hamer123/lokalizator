@@ -71,17 +71,14 @@ public class GoogleMapController implements Serializable{
 	private OverlayVisibility gpsVisibility;
 	private OverlayVisibility networkVisibilty;
 	private OverlayVisibility ownVisibility;
+	private boolean polygonVisible;
 	private Set<User>followUsers;
-	private List<User>newUsers;
-	
-	private boolean isNewSingleUser;
 	private User singleUser;
 	private Date locationFromDate;
 	private Date locationToDate;
 	
 	private GoogleMapControllerModes mode;
 	
-	private boolean isPolygonVisibility; 
 	private GoogleMapTypes googleMapType;
 	private boolean streetView;
 	private String center;
@@ -90,39 +87,33 @@ public class GoogleMapController implements Serializable{
 
 	@PostConstruct
 	private void init(){
-		googleMapModel = new DefaultMapModel();
+		googleMapModel = new GoogleMapModel();
 		mode = GoogleMapControllerModes.FOLLOW_USERS;
 		
 		gpsVisibility = new OverlayVisibility();
 		networkVisibilty = new OverlayVisibility();
 		ownVisibility = new OverlayVisibility();
-		
+		polygonVisible = true;
+	
 		followUsers = new HashSet<User>();
-		newUsers = new ArrayList<User>();	
-		
-		isPolygonVisibility = true;
 		
 		googleMapType = GoogleMapTypes.HYBRID;
 		streetView = true;
 		center = "51.6014053, 18.9724216";
 		zoom = 10;
-
-		googleMapModel = new DefaultMapModel();
-		
-//		//TEST
-//		User user = new User();
-//		user.setId(1L);
-//		user.setLogin("hamer123");
-//		followUsers.add(user);
-
 	}
 	
 	public void onGoogleMapStateChange(StateChangeEvent event){
-		center = event.getCenter().getLat() 
-			   + ", " 
-			   + event.getCenter().getLng();
+		center = createCenter(event.getCenter().getLat(), 
+				              event.getCenter().getLng());
 		
 		zoom = event.getZoomLevel();
+	}
+	
+	public String createCenter(double lat, double lon){
+		return    lat 
+				+ ", "
+				+ lon;
 	}
 	
 	public void update(){
@@ -140,7 +131,6 @@ public class GoogleMapController implements Serializable{
 		return googleMapModel;
 	}
 	
-	
 	public User getUser(String login){
 		for(User user : followUsers){
 			if(user.getLogin().equals(login))
@@ -149,17 +139,33 @@ public class GoogleMapController implements Serializable{
 		throw new NotFoundException("Nie znaleziono na liscie do sledzenia uzytkownika " + login);
 	}
 	
-	public void addUser(User user){
-		newUsers.add(user);
+	public void addUser(String login){
+		User user = userRepository.findUserWithPolygonsByLogin(login);
 		followUsers.add(user);
+		googleMapModel = createGoogleMapFollowUsers();
 	}
 	
-	public void setSingleUser(User user){
-		singleUser = user;
-		isNewSingleUser = isNewUser(user.getLogin());
+	public void setSingleUser(String login){
+		singleUser = userRepository.findUserWithPolygonsByLogin(login);
+		googleMapModel = createGoogleMapSingleUser();
+	}
+	
+	public User getSingleUser(){
+		return singleUser;
 	}
 	
 	public void removeUser(String login){
+		removeUserFromFollowSet(login);
+		removeUserFromGoogleMap(login);
+		//todo
+		googleMapModel = createGoogleMapFollowUsers();
+	}
+	
+	public void removeUserFromGoogleMap(String login){
+		
+	}
+	
+	public void removeUserFromFollowSet(String login){
 		Iterator<User>iterator = followUsers.iterator();
 		
 		while(iterator.hasNext()){
@@ -171,38 +177,14 @@ public class GoogleMapController implements Serializable{
 		}
 	}
 	
-	private boolean isNewUser(String login){
-		return login.equals(singleUser.getLogin());
-	}
-	
 	private void updateGoogleMapFollowUserMode(){
-		if(isNewUsers()){
-			updateNewFollowUsersPolygons();
-			newUsers.clear();
-		}
-		
 		updateFollowUsers();
 		googleMapModel = createGoogleMapFollowUsers();
 	}
 	
 	private void updateGoogleMapSingleUserMode(){
-		if(isNewSingleUser){
-			singleUser.setPolygons(findUserPolygonsModel(singleUser.getId()));
-			isNewSingleUser = false;
-		}
-		
 		updateSingleUser();
 		googleMapModel = createGoogleMapSingleUser();
-	}
-	
-	private Set<Long>getUsersId(Collection<User>users){
-		Set<Long>usersIdList = new HashSet<Long>();
-		
-		for(User user : users){
-			usersIdList.add(user.getId());
-		}
-		
-		return usersIdList;
 	}
 	
 	private void updateFollowUsers(){
@@ -223,12 +205,10 @@ public class GoogleMapController implements Serializable{
 	}
 	
 	private void updateFollowUsersCurrentLocations(){
-		Set<Long>usersIdList = getUsersId(followUsers);
 		List<User>usersList = new ArrayList<User>();
 		
 		for(User user : followUsers){
 		   usersList.add( userRepository.findById(user.getId()) );
-		   //userRepository.findByIdGetIdAndLoginAndCurrentLocationsForAllProviders(user.getId()) 
 		}
 		
 		for(User user : usersList){
@@ -238,21 +218,7 @@ public class GoogleMapController implements Serializable{
 			userToUpdate.setLastOwnProviderLocation(user.getLastOwnProviderLocation());
 		}
 	}
-	
-	private void updateNewFollowUsersPolygons(){
-		for(User user : newUsers){
-			user.setPolygons( findUserPolygonsModel(user.getId()) );
-		}
-	}
-	
-	private List<PolygonModel>findUserPolygonsModel(Long id){
-		return polygonModelRepository.getPolygonsByTargetId(id);
-	}
-	
-	private boolean isNewUsers(){
-		return newUsers.size() > 0;
-	}
-	
+
 	private MapModel createGoogleMapFollowUsers(){
 		List<Location>locations = getCurrentLocationsFromUsers();
 		List<PolygonModel>polygonsModel = getPolygonModelFromUsers();
@@ -260,10 +226,6 @@ public class GoogleMapController implements Serializable{
 		List<Circle>circles = createCircles(locations);
 		List<Marker>markers = createMarkers(locations);
 		List<Polygon>polygons = createPolygons(polygonsModel);
-		
-		
-		MapModel model = new DefaultMapModel();
-		
 
 		return new GoogleMapModelBuilder()
 		              .circles(circles)
@@ -339,7 +301,7 @@ public class GoogleMapController implements Serializable{
 		List<Polygon>polygons = new ArrayList<>();
 		
 		for(PolygonModel polygonModel : polygonsModel){
-			if(isPolygonVisibility){
+			if(polygonVisible){
 				polygons.add( PolygonBuilder.create(polygonModel) );
 			}
 		}
@@ -375,7 +337,7 @@ public class GoogleMapController implements Serializable{
 		case MARKER:
 			return overlayVisibility.isMarkerVisible();
 		case POLYGON:
-			return isPolygonVisibility;
+			throw new NotSupportedException("Ten overlay nie jest dzielony miedzy providerow " + overlay);
 		case POLYLINE:
 			return overlayVisibility.isPolylineVisible();
 		case RECTANGLE:
@@ -436,5 +398,5 @@ public class GoogleMapController implements Serializable{
 	public void setUsersToFollow(Set<User> usersToFollow) {
 		this.followUsers = usersToFollow;
 	}
-	
+
 }

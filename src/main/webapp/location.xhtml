@@ -11,65 +11,32 @@
     </h:head>  
       
     <h:body> 
-     
       <ui:insert name="menu" >
-	    <ui:include src="/WEB-INF/menu_templete.xhtml" />
+	    <ui:include src="/WEB-INF/views/menu_templete.xhtml" />
 	  </ui:insert>
 	  
 	  <h:form id="fgrowl">
-        <p:poll interval="60" listener="#{location.onPoll}" update="gmap" />
+        <p:poll interval="60" listener="#{location.onPoll}" update=":#{p:component('ostatnieLokacje')} :#{p:component('gmap')} :#{p:component('userOnline')}" />
         <p:growl id="growl" showDetail="true" />
       </h:form>
-       
+      
       <p:gmap id="gmap" center="#{googleMapController.center}" zoom="#{googleMapController.zoom}" type="#{googleMapController.googleMapType}" model="#{googleMapController.googleMapModel}"
               rendered="#{googleMapController.mode == 'FOLLOW_USERS'}" style="width:100%;height:500px">
         <p:ajax event="stateChange" listener="#{googleMapController.onGoogleMapStateChange}" />
-        <!--  <p:ajax event="overlaySelect" listener="#{googleMapController.onGoogleMapStateChange}" update=":#{p:component('fgrowl')}" />  -->
       </p:gmap>
-   
-      <p:separator/>
-       
-      <p:messages id="messages" showDetail="false" />
        
       <p:tabView id="tabView">
          <p:ajax event="tabChange" listener="#{location.onTabChange}"/>
          
-         <p:tab title="#{msg['location.title.currentLocation']}">
-
-           <p:panelGrid columns="2" layout="grid">
-              <p:panel header="#{msg['location.header.trackingUsers']}">
-                 <h:form>
-                    <p:panelGrid columns="3">
-                       <p:outputLabel for="findUserToFollow" value="#{msg['location.label.findUser']}" styleClass="components"/>
-                       <p:autoComplete id="findUserToFollow" value="#{location.selectedUserToFollow}" completeMethod="#{location.onAutoCompleteUser}"
-                                       forceSelection="true" styleClass="components" required="true"/>
-                       <p:commandButton value="#{msg['location.button.addUserToFollow']}" styleClass="components" actionListener="#{location.onUserSelectToFollow}" 
-                                        update=":#{p:component('fgrowl')} :#{p:component('followUsers')} :#{p:component('gmap')}"/>
-                    </p:panelGrid>
-                    <p:dataTable id="followUsers" var="user" value="#{googleMapController.usersToFollow}" style="margin-top: 15px">
-                       <p:column headerText="login">
-                           <h:outputText value="#{user.login}" />
-                       </p:column>
-                       <p:column headerText="Pokaz lokacje">
-                           <p:commandButton icon="ui-icon-search" title="Pokaz" onclick="PF('showLocations').show();"/>
-                       </p:column>
-                       <p:column headerText="#{msg['location.header.deleteUserToFollow']}">
-                          <p:commandButton  icon="fa fa-fw fa-remove" title="#{msg['location.button.deleteUserToFollow']}"/>
-                       </p:column>
-                    </p:dataTable>
-                 </h:form>
-              </p:panel>
-              <p:panel header="#{msg['location.header.usersOnline']}">
-                 <p:dataList>
-                 </p:dataList>
-              </p:panel>
-           </p:panelGrid>
-
-         </p:tab>
+         <ui:include src="/WEB-INF/views/location_aktualneLokacje.xhtml" /> 
+  
+  
+  
   
          <p:tab title="Historia Lokacji">
-         
          </p:tab>
+         
+         
         <p:tab title="Ustawienia">
           <h:form>
             <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
@@ -93,14 +60,10 @@
           </h:form>
         </p:tab>
       </p:tabView>
- 
-      <p:dialog header="Wybierz providera" widgetVar="showLocations" modal="true">
-         <h:form>
-            <p:commandButton value="GPS" actionListener="#{location.findLocations}" onclick="PF('showLocations').hide();"/>
-            <p:commandButton value="Network" actionListener="#{location.findLocations}" onclick="PF('showLocations').hide();"/>
-            <p:commandButton value="Own" actionListener="#{location.findLocations}" onclick="PF('showLocations').hide();"/>
-         </h:form>
-      </p:dialog>
+      
+      
+      
+     <ui:include src="/WEB-INF/views/cellInfoDialog.xhtml" /> 
     </h:body>  
 </html>
 

@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<ui:composition  xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"> 
+      
+          <p:tab title="#{msg['location.title.currentLocation']}">
+           <p:outputPanel id="daneUser">
+             <p:panel header="Dane" rendered="#{location.panelDaneVisible}" closable="true">
+              <p:panelGrid columns="2" layout="grid">
+               <p:panel header="Ostatnie lokacje">
+                 <p:dataTable id="ostatnieLokacje" var="cur_location" value="#{location.selectedUserToShowDataCurrentLocations}" 
+                              selectionMode="single" selection="#{location.selectedUserToShowDataLocation}" rowKey="#{cur_location.id}">
+                   <p:ajax event="rowSelect" listener="#{location.onRowSelectedOstatnieLokacje}" update=":#{p:component('gmap')}" />
+                   <p:column headerText="Provider">
+                     <h:outputText value="#{cur_location.provider}"/>
+                   </p:column>
+                   <p:column headerText="Data">
+                     <h:outputText value="#{cur_location.date}" />
+                   </p:column>
+                   <p:column headerText="latitude">
+                     <h:outputText value="#{cur_location.latitude}" />
+                   </p:column>
+                   <p:column headerText="longitude">
+                     <h:outputText value="#{cur_location.longitude}" />
+                   </p:column>
+                   <p:column headerText="Miasto">
+                     <h:outputText value="#{cur_location.address.city}" />
+                   </p:column>
+                   <p:column headerText="Ulica">
+                     <h:outputText value="#{cur_location.address.street}" />
+                   </p:column>
+                   <p:column headerText="Cell Info">
+                     <h:form>
+                       <p:commandButton icon="ui-icon-search" value="Pokaz" onclick="PF('showLocations').show();" 
+                                        disabled="#{cur_location.provider != 'NETWORK'}"/>
+                     </h:form>
+                   </p:column>
+                 </p:dataTable>
+               </p:panel>
+               <p:panel header="Obszary sledzenia">
+                 <p:dataTable var="user_polygon" value="#{location.selectedUserToShowData.polygons}">
+                   <p:column headerText="Nazwa">
+                     <h:outputText value="#{user_polygon.name}" />
+                   </p:column>
+                   <p:column headerText="Typ sledzenia">
+                     <h:outputText value="#{user_polygon.polygonFollowType}" />
+                   </p:column>
+                   <p:column headerText="Tworca polgyona">
+                     <h:outputText value="#{user_polygon.provider.login}" />
+                   </p:column>
+                   <p:column headerText="Sledzony uzytkownik">
+                     <h:outputText value="#{user_polygon.target.login}" />
+                   </p:column>
+                 </p:dataTable>
+               </p:panel>
+              </p:panelGrid>
+             </p:panel>
+           </p:outputPanel>
+
+           <p:panelGrid columns="2" layout="grid">
+              <p:panel header="#{msg['location.header.trackingUsers']}">
+                 <h:form>
+                    <p:row>
+                       <p:outputLabel for="findUserToFollow" value="#{msg['location.label.findUser']}" styleClass="components"/>
+                       <p:autoComplete id="findUserToFollow" value="#{location.selectedLoginToFollow}" completeMethod="#{location.onAutoCompleteUser}"
+                                       forceSelection="true" styleClass="components" required="true"/>
+                       <p:commandButton value="#{msg['location.button.addUserToFollow']}" styleClass="components" actionListener="#{location.onUserSelectToFollow}" 
+                                        update=":#{p:component('fgrowl')} :#{p:component('followUsers')} :#{p:component('gmap')}"/>
+                    </p:row>
+                    <p:dataTable id="followUsers" var="user" value="#{googleMapController.usersToFollow}" style="margin-top: 15px">
+                       <p:column headerText="login">
+                           <h:outputText value="#{user.login}" />
+                       </p:column>
+                       <p:column headerText="Pokaz lokacje">
+                           <p:commandButton icon="ui-icon-search" title="Pokaz" actionListener="#{location.onPokazDane(user.login)}" update=":#{p:component('daneUser')}"/>
+                       </p:column>
+                       <p:column headerText="#{msg['location.header.deleteUserToFollow']}">
+                          <p:commandButton  icon="fa fa-fw fa-remove" actionListener="#{location.onUserRemove(user.login)}" title="#{msg['location.button.deleteUserToFollow']}"
+                                            update=":#{p:component('followUsers')} :#{p:component('daneUser')} :#{p:component('gmap')}"/>
+                       </p:column>
+                    </p:dataTable>
+                 </h:form>
+              </p:panel>
+              <p:panel header="#{msg['location.header.usersOnline']}">
+                 <p:dataList id="userOnline" var="login" value="#{location.userLoginOnline}">
+                   <p:column headerText="Login">
+                     <h:outputText value="#{login}" />
+                   </p:column>
+                 </p:dataList>
+              </p:panel>
+           </p:panelGrid>
+
+         </p:tab>
+      
+</ui:composition>

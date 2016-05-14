@@ -58,8 +58,8 @@ public class CircleBuilder {
        circle.setStrokeOpacity(CIRCLE_STROKE_OPACITY);
 
 
-       OverlayIdentyfikator identyfikator = new OverlayIdentyfikator(location, Overlays.CIRCLE);
-       circle.setId(identyfikator.createIdentyfikator());
+//       OverlayIdentyfikator identyfikator = new OverlayIdentyfikator(location, Overlays.CIRCLE);
+//       circle.setId(identyfikator.createIdentyfikator());
        
        return circle;
 	}

@@ -20,7 +20,7 @@ import com.pw.lokalizator.model.RestSession;
 import com.pw.lokalizator.model.User;
 import com.pw.lokalizator.model.UserSecurity;
 import com.pw.lokalizator.repository.UserRepository;
-import com.pw.lokalizator.singleton.RestSessionSimulator;
+import com.pw.lokalizator.singleton.RestSessionManager;
 
 @Local
 @Stateless
@@ -28,7 +28,7 @@ public class SecurityService {
 	@Inject
 	private UserRepository userRepository;
 	@EJB
-	private RestSessionSimulator restSessionSimulator;
+	private RestSessionManager restSessionSimulator;
 	private static final SecureRandom random = new SecureRandom();
 	
 	private Logger log = Logger.getLogger(SecurityService.class);
@@ -94,7 +94,7 @@ public class SecurityService {
 		User user = null;
 		
 		try{
-			user = userRepository.findByLoginAndPassword(login, password);
+			user = userRepository.findUserWithSecurityByLoginAndPassword(login, password);
 		} catch(Exception e){
 			log.warn("Nie udana pruba logowania dla " + login);
 			throw new RuntimeException(e);

@@ -18,7 +18,7 @@ import com.pw.lokalizator.model.RestSession;
 @Singleton
 public class InvalidateRestSession {
 	@EJB
-	private RestSessionSimulator restSessionSimulator;
+	private RestSessionManager restSessionSimulator;
 	Logger log = Logger.getLogger(InvalidateRestSession.class);
 	
 	@Schedule(minute="*/30",hour="*", persistent=false)

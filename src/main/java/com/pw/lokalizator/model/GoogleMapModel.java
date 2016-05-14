@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,126 +20,111 @@ import org.primefaces.model.map.Polyline;
 import org.primefaces.model.map.Rectangle;
 
 public class GoogleMapModel implements MapModel, Serializable{
-	private static Logger LOG = Logger.getLogger(GoogleMapModel.class);
-	private List<Circle>circleList = new ArrayList<Circle>();
-	private List<Marker>markerList = new ArrayList<Marker>();
-	private List<Polygon>polygonList = new ArrayList<Polygon>();
-	private List<Polyline>polylineList = new ArrayList<Polyline>();
-	private List<Rectangle>rectangleList = new ArrayList<Rectangle>();
-		
-	public GoogleMapModel() {}
+
+	private List<Marker> markers;
 	
-	public GoogleMapModel(List<Circle> circleList, List<Marker> markerList,
-			List<Polygon> polygonList, List<Polyline> polylineList,
-			List<Rectangle> rectangleList) {
-		this.circleList = circleList;
-		this.markerList = markerList;
-		this.polygonList = polygonList;
-		this.polylineList = polylineList;
-		this.rectangleList = rectangleList;
+	private List<Polyline> polylines;
+	
+	private List<Polygon> polygons;
+        
+    private List<Circle> circles;
+        
+    private List<Rectangle> rectangles;
+	
+	private final static String MARKER_ID_PREFIX = "marker";
+	
+	private final static String POLYLINE_ID_PREFIX = "polyline_";
+	
+	private final static String POLYGON_ID_PREFIX = "polygon_";
+        
+	private final static String CIRCLE_ID_PREFIX = "circle_";
+	
+    private final static String RECTANGLE_ID_PREFIX = "rectangle_";
+
+	public GoogleMapModel(List<Marker> markers, List<Polyline> polylines,
+			List<Polygon> polygons, List<Circle> circles,
+			List<Rectangle> rectangles) {
+		this.markers = markers;
+		this.polylines = polylines;
+		this.polygons = polygons;
+		this.circles = circles;
+		this.rectangles = rectangles;
 	}
 
-	@Override
+	public GoogleMapModel() {
+		markers = new ArrayList<Marker>();
+		polylines = new ArrayList<Polyline>();
+		polygons = new ArrayList<Polygon>();
+		circles = new ArrayList<Circle>();
+		rectangles = new ArrayList<Rectangle>();
+	}
+
+	public List<Marker> getMarkers() {
+		return markers;
+	}
+
+	public List<Polyline> getPolylines() {
+		return polylines;
+	}
+
+	public List<Polygon> getPolygons() {
+		return polygons;
+	}
+	
+    public List<Circle> getCircles() {
+		return circles;
+	}
+        
+    public List<Rectangle> getRectangles() {
+		return rectangles;
+	}
+
 	public void addOverlay(Overlay overlay) {
-		Class overlayType = overlay.getClass();
-		
-		 if     (overlayType == Circle.class)
-			circleList.add((Circle) overlay);
-		 else if(overlayType == Marker.class) 
-			markerList.add((Marker)overlay);
-		 else if(overlayType == Polygon.class) 
-			polygonList.add((Polygon)overlay);
-		 else if(overlayType == Polyline.class) 
-			polylineList.add((Polyline)overlay);
-		 else if(overlayType == Rectangle.class) 
-			rectangleList.add((Rectangle)overlay);
-		 else 
-			throw new IllegalArgumentException("[GoogleMapModel] Objekt nie implementuje interfejsu org.primefaces.model.map.Overlay");
-
+		if(overlay instanceof Marker) {
+			overlay.setId(MARKER_ID_PREFIX + UUID.randomUUID().toString());
+			markers.add((Marker) overlay);
+		}
+		else if(overlay instanceof Polyline) {
+			overlay.setId(POLYLINE_ID_PREFIX + UUID.randomUUID().toString());
+			polylines.add((Polyline) overlay);
+		}
+		else if(overlay instanceof Polygon) {
+			overlay.setId(POLYGON_ID_PREFIX + UUID.randomUUID().toString());
+			polygons.add((Polygon) overlay);
+		}
+		else if(overlay instanceof Circle) {
+			overlay.setId(CIRCLE_ID_PREFIX + UUID.randomUUID().toString());
+			circles.add((Circle) overlay);
+		}
+		else if(overlay instanceof Rectangle) {
+			overlay.setId(RECTANGLE_ID_PREFIX + UUID.randomUUID().toString());
+			rectangles.add((Rectangle) overlay);
+		}
 	}
 
-	@Override
+	@SuppressWarnings("unchecked")
 	public Overlay findOverlay(String id) {
-		Overlays overlayType = getOverlayTypeFromId(id);
+		List list = null;
 		
-		switch(overlayType){
-		case CIRCLE:
-			for(Overlay overlay : circleList){
-				if(overlay.getId().equals(id))
-					return overlay;
-			}
-			break;
+		if(id.startsWith(MARKER_ID_PREFIX))
+			list = markers;
+		else if(id.startsWith(POLYLINE_ID_PREFIX))
+			list = polylines;
+		else if(id.startsWith(POLYGON_ID_PREFIX))
+			list = polygons;
+		else if(id.startsWith(CIRCLE_ID_PREFIX))
+			list = circles;
+		else if(id.startsWith(RECTANGLE_ID_PREFIX))
+			list = rectangles;
+		
+		for(Iterator iterator = list.iterator(); iterator.hasNext();) {
+			Overlay overlay = (Overlay) iterator.next();
 			
-		case MARKER:
-			for(Overlay overlay : markerList){
-				if(overlay.getId().equals(id))
-					return overlay;
-			}
-			break;
-			
-		case POLYGON:
-			for(Overlay overlay : polygonList){
-				if(overlay.getId().equals(id))
-					return overlay;
-			}
-			break;
-			
-		case POLYLINE:
-			for(Overlay overlay : polylineList){
-				if(overlay.getId().equals(id))
-					return overlay;
-			}
-			break;
-		case RECTANGLE:
-			for(Overlay overlay : markerList){
-				if(overlay.getId().equals(id))
-					return overlay;
-			}
-			break;
-		default:
-			throw new IllegalArgumentException("[GoogleMapModel] Nie obslugiwany OverlayType: " + overlayType);
+			if(overlay.getId().equals(id))
+				return overlay;
 		}
 		
-		throw new NotFoundException();
-	}
-	
-	private Overlays getOverlayTypeFromId(String id){
-		String overlayType;
-		overlayType = id.substring(0, id.indexOf("_"));
-		return Overlays.valueOf(overlayType);
-	}
-	
-	@Override
-	public List<Circle> getCircles() {
-		return circleList;
-	}
-
-	@Override
-	public List<Marker> getMarkers() {
-		return markerList;
-	}
-
-	@Override
-	public List<Polygon> getPolygons() {
-		return polygonList;
-	}
-
-	@Override
-	public List<Polyline> getPolylines() {
-		return polylineList;
-	}
-
-	@Override
-	public List<Rectangle> getRectangles() {
-		return rectangleList;
-	}
-	
-	public void clear(){
-		circleList = new ArrayList<Circle>();
-		markerList = new ArrayList<Marker>();
-		polygonList = new ArrayList<Polygon>();
-		polylineList = new ArrayList<Polyline>();
-		rectangleList = new ArrayList<Rectangle>();
+		return null;
 	}
 	
 	public static class GoogleMapModelBuilder{
@@ -177,10 +163,10 @@ public class GoogleMapModel implements MapModel, Serializable{
 		
 		public GoogleMapModel build(){
 			return new GoogleMapModel(
-					circleList,
 					markerList,
-					polygonList,
 					polylineList,
+					polygonList,
+					circleList,
 					rectangleList
 					);
 		}

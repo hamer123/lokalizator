@@ -9,9 +9,10 @@ import com.pw.lokalizator.model.Location;
 import com.pw.lokalizator.model.User;
 @Local
 public interface UserRepository extends JpaRepository<User, Long> {
-	User findByLoginAndPassword(String login, String password);
+	User findUserWithSecurityByLoginAndPassword(String login, String password);
 	User findByLogin(String login);
-    List<User> findByLoginLike(String loginLike);
+    List<String> findLoginByLoginLike(String loginLike);
     
     User findByIdGetIdAndLoginAndCurrentLocationsForAllProviders(Long id);
+    User findUserWithPolygonsByLogin(String login);
 }
