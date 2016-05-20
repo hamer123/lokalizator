@@ -4,7 +4,6 @@
 	  <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 	  <jta-data-source>java:jboss/datasources/MySQLDS</jta-data-source>
 
-	  
 	  <class>com.pw.lokalizator.model.entity.User</class>
 	  <class>com.pw.lokalizator.model.entity.UserSecurity</class>
 	  <class>com.pw.lokalizator.model.entity.Location</class>
