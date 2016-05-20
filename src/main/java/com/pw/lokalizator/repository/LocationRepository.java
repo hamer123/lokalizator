@@ -7,7 +7,7 @@ import java.util.Set;
 
 import javax.ejb.Local;
 
-import com.pw.lokalizator.model.Location;
+import com.pw.lokalizator.model.entity.Location;
 
 @Local
 public interface LocationRepository extends JpaRepository<Location, Long> {

@@ -43,6 +43,14 @@ public class OverlayVisibility {
 		this.rectangleVisibel = rectangleVisibel;
 	}
 	
+	@Override
+	public String toString() {
+		return "OverlayVisibility [circleVisible=" + circleVisible
+				+ ", markerVisible=" + markerVisible + ", polylineVisible="
+				+ polylineVisible + ", rectangleVisibel=" + rectangleVisibel
+				+ "]";
+	}
+
 	public static class OverlayVisibilityBuilder{
 		private boolean circleVisible;
 		private boolean markerVisible;

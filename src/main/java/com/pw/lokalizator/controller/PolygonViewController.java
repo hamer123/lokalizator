@@ -21,7 +21,7 @@ import org.primefaces.model.map.LatLng;
 import org.primefaces.model.map.MapModel;
 import org.primefaces.model.map.Polygon;
 
-import com.pw.lokalizator.model.User;
+import com.pw.lokalizator.model.entity.User;
 import com.pw.lokalizator.repository.UserRepository;
 
 @Named(value="polyglon")

@@ -33,7 +33,7 @@ import com.pw.lokalizator.exception.GeocodeResponseException;
 import com.pw.lokalizator.google.json.AddressComponent;
 import com.pw.lokalizator.google.json.Geocode;
 import com.pw.lokalizator.google.json.Result;
-import com.pw.lokalizator.model.Location;
+import com.pw.lokalizator.model.entity.Location;
 import com.pw.lokalizator.repository.LocationRepository;
 
 @Stateless

@@ -19,7 +19,7 @@ import org.apache.http.HttpServerConnection;
 import org.jboss.logging.Logger;
 import org.omg.CORBA.CTX_RESTRICT_SCOPE;
 
-import com.pw.lokalizator.model.User;
+import com.pw.lokalizator.model.entity.User;
 
 @Provider
 @PreMatching
@@ -29,13 +29,13 @@ public class RESTRequestFilter implements ContainerRequestFilter{
 	@Context 
 	private HttpServletRequest request;
 	
-	private Logger log = Logger.getLogger(RESTRequestFilter.class);
+	private Logger logger = Logger.getLogger(RESTRequestFilter.class);
 	
 	@Override
 	public void filter(ContainerRequestContext requestCtx) throws IOException {
 
         String path = requestCtx.getUriInfo().getPath();
-		log.info("RESt request" + requestCtx.getRequest().getMethod() + " path " + path );
+		logger.info("RESt request " + requestCtx.getRequest().getMethod() + " path " + path );
           
         // IMPORTANT!!! First, Acknowledge any pre-flight test from browsers for this case before validating the headers (CORS stuff)
         if ( requestCtx.getRequest().getMethod().equals( "OPTIONS" ) ) {
@@ -45,24 +45,27 @@ public class RESTRequestFilter implements ContainerRequestFilter{
         }  
         
         // Then check are tokens exist and are valid.    
+       validateTokens(requestCtx);
+	}
+	
+	private void validateTokens(ContainerRequestContext requestCtx){
+		String path = requestCtx.getUriInfo().getPath();
+		
         if( !path.startsWith("/user/login") ){
-            String serviceKey = requestCtx.getHeaderString( HTTPHeaderNames.SERVICE_KEY );
-            String authToken = requestCtx.getHeaderString( HTTPHeaderNames.AUTH_TOKEN );
-            
-            
-            if(authToken != null && serviceKey != null){
+            String token = requestCtx.getHeaderString( HTTPHeaderNames.AUTH_TOKEN);
+     
+            if(token != null){
                 try{
-                	SecurityContext sc = securityService.createSecurityContext ( serviceKey, authToken, request );
+                	SecurityContext sc = securityService.createSecurityContext ( token, request );
                 	requestCtx.setSecurityContext(sc);
                 }catch(Exception e){
                 	requestCtx.abortWith( Response.status( Response.Status.UNAUTHORIZED ).build() );
-                	log.error(e);
+                	logger.error(e);
                 }
             }else{
             	requestCtx.abortWith( Response.status( Response.Status.UNAUTHORIZED ).build() );
             }
         }
-       
 	}
 
 }

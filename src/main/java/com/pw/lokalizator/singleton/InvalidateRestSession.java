@@ -19,17 +19,23 @@ import com.pw.lokalizator.model.RestSession;
 public class InvalidateRestSession {
 	@EJB
 	private RestSessionManager restSessionSimulator;
-	Logger log = Logger.getLogger(InvalidateRestSession.class);
+	Logger logger = Logger.getLogger(InvalidateRestSession.class);
 	
-	@Schedule(minute="*/30",hour="*", persistent=false)
+	@Schedule(minute="*/10",hour="*", persistent=false)
 	public void timeoutRestSession(){
-		log.info("Timer is starting to work");
+		logger.info("[InvalidateRestSession] InvalidateRestSession job has started");
 		
+		for(String token : restSessionSimulator.tokens()){
+			RestSession restSession = restSessionSimulator.getRestSession(token);
+			if(isPassedTime(restSession.getLastUsed()))
+				restSessionSimulator.invalidationRestSession(token);
+		}
+	}
+	
+	public boolean isPassedTime(Date date){
 		final long timeout = 10 * 60 * 1000; // 10min
 		long currentTime = new Date().getTime();
-		for(RestSession session : restSessionSimulator.getRestSessionsCollection())
-			if(currentTime - timeout > session.getLastUsed().getTime()){
-				restSessionSimulator.invalidationRestSession(session.getUser().getUserSecurity().getServiceKey());
-			}
+		
+		return currentTime - timeout > date.getTime();
 	}
 }

@@ -5,8 +5,8 @@ import java.util.Set;
 
 import javax.ejb.Local;
 
-import com.pw.lokalizator.model.Location;
-import com.pw.lokalizator.model.User;
+import com.pw.lokalizator.model.entity.Location;
+import com.pw.lokalizator.model.entity.User;
 @Local
 public interface UserRepository extends JpaRepository<User, Long> {
 	User findUserWithSecurityByLoginAndPassword(String login, String password);

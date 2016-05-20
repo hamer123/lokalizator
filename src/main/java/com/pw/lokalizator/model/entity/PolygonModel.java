@@ -1,4 +1,4 @@
-package com.pw.lokalizator.model;
+package com.pw.lokalizator.model.entity;
 
 import java.util.Collection;
 import java.util.List;
@@ -20,6 +20,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
+
+import com.pw.lokalizator.model.enums.PolygonFollows;
 
 @Entity
 @Table(name="polygon")
@@ -51,7 +53,7 @@ public class PolygonModel {
 	@OneToOne
 	private User provider;
 	@Enumerated(EnumType.STRING)
-	private PolygonFollowType polygonFollowType;
+	private PolygonFollows polygonFollowType;
 	
 	public PolygonModel(){}
 	
@@ -87,10 +89,10 @@ public class PolygonModel {
 	public void setProvider(User provider) {
 		this.provider = provider;
 	}
-	public PolygonFollowType getPolygonFollowType() {
+	public PolygonFollows getPolygonFollowType() {
 		return polygonFollowType;
 	}
-	public void setPolygonFollowType(PolygonFollowType polygonFollowType) {
+	public void setPolygonFollowType(PolygonFollows polygonFollowType) {
 		this.polygonFollowType = polygonFollowType;
 	}
 }

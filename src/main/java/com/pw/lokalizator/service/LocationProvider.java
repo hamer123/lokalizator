@@ -1,6 +1,6 @@
 package com.pw.lokalizator.service;
 
-import com.pw.lokalizator.model.Location;
+import com.pw.lokalizator.model.entity.Location;
 
 public interface LocationProvider {
 

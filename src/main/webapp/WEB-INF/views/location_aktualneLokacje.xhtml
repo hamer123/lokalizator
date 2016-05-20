@@ -3,38 +3,49 @@
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:p="http://primefaces.org/ui"> 
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"> 
       
-          <p:tab title="#{msg['location.title.currentLocation']}">
            <p:outputPanel id="daneUser">
              <p:panel header="Dane" rendered="#{location.panelDaneVisible}" closable="true">
               <p:panelGrid columns="2" layout="grid">
                <p:panel header="Ostatnie lokacje">
                  <p:dataTable id="ostatnieLokacje" var="cur_location" value="#{location.selectedUserToShowDataCurrentLocations}" 
-                              selectionMode="single" selection="#{location.selectedUserToShowDataLocation}" rowKey="#{cur_location.id}">
+                              selectionMode="single" selection="#{location.selectedUserToShowDataLocation}" rowKey="#{cur_location.providerType} #{cur_location.id}">
                    <p:ajax event="rowSelect" listener="#{location.onRowSelectedOstatnieLokacje}" update=":#{p:component('gmap')}" />
+                   
                    <p:column headerText="Provider">
-                     <h:outputText value="#{cur_location.provider}"/>
+                     <h:outputText value="#{cur_location.providerType}"/>
                    </p:column>
+                   
+                   <p:column headerText="Usluga lokalizacji">
+                     <h:outputText value="#{location.getLocalizationServices(cur_location)}" rendered="#{cur_location.providerType == 'NETWORK'}"/>
+                   </p:column>
+                   
                    <p:column headerText="Data">
                      <h:outputText value="#{cur_location.date}" />
                    </p:column>
+                   
                    <p:column headerText="latitude">
                      <h:outputText value="#{cur_location.latitude}" />
                    </p:column>
+                   
                    <p:column headerText="longitude">
                      <h:outputText value="#{cur_location.longitude}" />
                    </p:column>
+                   
                    <p:column headerText="Miasto">
                      <h:outputText value="#{cur_location.address.city}" />
                    </p:column>
+                   
                    <p:column headerText="Ulica">
                      <h:outputText value="#{cur_location.address.street}" />
                    </p:column>
-                   <p:column headerText="Cell Info">
+                   
+                   <p:column headerText="Szczegoly">
                      <h:form>
-                       <p:commandButton icon="ui-icon-search" value="Pokaz" onclick="PF('showLocations').show();" 
-                                        disabled="#{cur_location.provider != 'NETWORK'}"/>
+                       <p:commandButton icon="ui-icon-search" value="Pokaz" actionListener="#{location.onShowSzczegoly(cur_location)}" 
+                                        oncomplete="PF('showSzczegoly').show();" update=":#{p:component('Szczegoly')}" rendered="#{cur_location.providerType != 'GPS'}"/>
                      </h:form>
                    </p:column>
                  </p:dataTable>
@@ -69,7 +80,7 @@
                        <p:commandButton value="#{msg['location.button.addUserToFollow']}" styleClass="components" actionListener="#{location.onUserSelectToFollow}" 
                                         update=":#{p:component('fgrowl')} :#{p:component('followUsers')} :#{p:component('gmap')}"/>
                     </p:row>
-                    <p:dataTable id="followUsers" var="user" value="#{googleMapController.usersToFollow}" style="margin-top: 15px">
+                    <p:dataTable id="followUsers" var="user" value="#{googleMapControllerFollowMode.usersToFollow}" style="margin-top: 15px">
                        <p:column headerText="login">
                            <h:outputText value="#{user.login}" />
                        </p:column>
@@ -91,7 +102,5 @@
                  </p:dataList>
               </p:panel>
            </p:panelGrid>
-
-         </p:tab>
-      
+   
 </ui:composition>

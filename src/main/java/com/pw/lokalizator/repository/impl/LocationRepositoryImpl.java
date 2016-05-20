@@ -16,9 +16,9 @@ import javax.persistence.TemporalType;
 
 import org.jboss.logging.Logger;
 
-import com.pw.lokalizator.model.Location;
-import com.pw.lokalizator.model.Providers;
-import com.pw.lokalizator.model.User;
+import com.pw.lokalizator.model.entity.Location;
+import com.pw.lokalizator.model.entity.User;
+import com.pw.lokalizator.model.enums.Providers;
 import com.pw.lokalizator.repository.LocationRepository;
 
 

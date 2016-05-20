@@ -7,7 +7,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import com.pw.lokalizator.model.PolygonModel;
+import com.pw.lokalizator.model.entity.PolygonModel;
 import com.pw.lokalizator.repository.PolygonModelRepository;
 
 @Stateless

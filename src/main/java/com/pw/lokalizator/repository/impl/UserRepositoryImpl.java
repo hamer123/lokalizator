@@ -17,9 +17,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
-import com.pw.lokalizator.model.Location;
-import com.pw.lokalizator.model.Roles;
-import com.pw.lokalizator.model.User;
+import com.pw.lokalizator.model.entity.Location;
+import com.pw.lokalizator.model.entity.User;
+import com.pw.lokalizator.model.enums.Roles;
 import com.pw.lokalizator.repository.UserRepository;
 
 @Stateless

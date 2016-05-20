@@ -9,7 +9,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
-import com.pw.lokalizator.model.User;
+import com.pw.lokalizator.model.entity.User;
 import com.pw.lokalizator.service.UserService;
 
 @Named(value="account")
@@ -33,6 +33,10 @@ public class CreateAccountController implements Serializable{
 		try{
 			userService.createAccount(user);
 			
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO,
+							"Create account",
+							"Account has been created"));
 		}catch(Exception e){
 			e.printStackTrace();
 			
@@ -41,12 +45,7 @@ public class CreateAccountController implements Serializable{
 							"Create account failed",
 							"Login lub email jest juz zajety"));
 		}
-		
-		FacesContext.getCurrentInstance().addMessage(null,
-				new FacesMessage(FacesMessage.SEVERITY_INFO,
-						"Create account",
-						"Account has been created"));
-		
+
 	}
 	
 	public String getLogin() {

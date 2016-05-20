@@ -11,10 +11,10 @@ import javax.ws.rs.core.Response;
 
 import org.jboss.logging.Logger;
 
-import com.pw.lokalizator.model.Location;
-import com.pw.lokalizator.model.Providers;
 import com.pw.lokalizator.model.RestSession;
-import com.pw.lokalizator.model.User;
+import com.pw.lokalizator.model.entity.Location;
+import com.pw.lokalizator.model.entity.User;
+import com.pw.lokalizator.model.enums.Providers;
 import com.pw.lokalizator.repository.LocationRepository;
 import com.pw.lokalizator.repository.UserRepository;
 
@@ -37,7 +37,7 @@ public class RestLocation {
 		try{
 			log.info("zapisywanie lokalizacji dla " + session.getUser().getLogin() 
 					+ "  [ " + location.getLatitude() + ", " + location.getLongitude() + " ] " + location.getDate() 
-					+ " : " + location.getProvider());
+					+ " : " + location.getProviderType());
 			
 			User user = userRepository.findById( session.getUser().getId() );
 			//zapisanie nowej lokalizacji
@@ -45,13 +45,14 @@ public class RestLocation {
 			location = locationRepository.add( location );
 			
 			//zaktualizowanie obecnej pozycji uzytkownika
-			if(location.getProvider() == Providers.GPS){
-				user.setLastGpsLocation(location);
-			}else if(location.getProvider() == Providers.NETWORK){
-				user.setLastNetworkLocation(location);
-			}else if(location.getProvider() == Providers.OWN){
-				user.setLastOwnProviderLocation(location);
-			}
+			//TODO
+//			if(location.getProvider() == Providers.GPS){
+//				user.setLastGpsLocation(location);
+//			}else if(location.getProvider() == Providers.NETWORK){
+//				user.setLastNetworkLocation(location);
+//			}else if(location.getProvider() == Providers.OWN){
+//				user.setLastOwnProviderLocation(location);
+//			}
 			
 			session.setUser( userRepository.save(user) );
 			

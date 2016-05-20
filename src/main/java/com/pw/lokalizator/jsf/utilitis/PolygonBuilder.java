@@ -11,8 +11,8 @@ import org.jboss.resteasy.logging.Logger;
 import org.primefaces.model.map.LatLng;
 import org.primefaces.model.map.Polygon;
 
-import com.pw.lokalizator.model.PolygonModel;
-import com.pw.lokalizator.model.PolygonPoint;
+import com.pw.lokalizator.model.entity.PolygonModel;
+import com.pw.lokalizator.model.entity.PolygonPoint;
 import com.pw.lokalizator.utilitis.PropertiesReader;
 
 public class PolygonBuilder {
@@ -20,8 +20,8 @@ public class PolygonBuilder {
 	
 	private static String POLYGON_STROKE_COLOR;
 	private static String POLYGON_FILL_COLOR;
-	private static int POLYGON_FILL_OPACITY;
-	private static int POLYGON_STROKE_OPACITY;
+	private static double POLYGON_FILL_OPACITY;
+	private static double POLYGON_STROKE_OPACITY;
 	
 	static{
 		PropertiesReader propertiesReader = new PropertiesReader("lokalizator");
@@ -89,7 +89,7 @@ public class PolygonBuilder {
 	}
 	
 	private static void findStrokeColorAndOpacity(PropertiesReader propertiesReader){
-		POLYGON_FILL_OPACITY = Integer.valueOf( propertiesReader.findPropertyByName("POLYGON_FILL_OPACITY") );
-		POLYGON_STROKE_OPACITY = Integer.valueOf( propertiesReader.findPropertyByName("POLYGON_STROKE_OPACITY") );
+		POLYGON_FILL_OPACITY = Double.valueOf( propertiesReader.findPropertyByName("POLYGON_FILL_OPACITY") );
+		POLYGON_STROKE_OPACITY = Double.valueOf( propertiesReader.findPropertyByName("POLYGON_STROKE_OPACITY") );
 	}
 }

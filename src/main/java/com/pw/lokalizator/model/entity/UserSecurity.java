@@ -1,8 +1,9 @@
-package com.pw.lokalizator.model;
+package com.pw.lokalizator.model.entity;
 
 import java.io.Serializable;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -21,6 +22,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import com.pw.lokalizator.model.enums.Roles;
 
 @Entity
 @XmlRootElement
@@ -42,12 +45,15 @@ public class UserSecurity implements Serializable{
             )
 	@GeneratedValue(strategy=GenerationType.TABLE, generator="userSecGen")
 	private long id;
-	@XmlElement
-	private String serviceKey;
-	@OneToOne
-	private User user;
+	
+	@Column(nullable=false)
+	private boolean enable;
+
 	@Enumerated(EnumType.STRING)
 	private Roles rola;
+	
+	@OneToOne
+	private User user;
 	
 	public long getId() {
 		return id;
@@ -55,12 +61,7 @@ public class UserSecurity implements Serializable{
 	public void setId(long id) {
 		this.id = id;
 	}
-	public String getServiceKey() {
-		return serviceKey;
-	}
-	public void setServiceKey(String serviceKey) {
-		this.serviceKey = serviceKey;
-	}
+	
 	public User getUser() {
 		return user;
 	}
@@ -73,5 +74,10 @@ public class UserSecurity implements Serializable{
 	public void setRola(Roles rola) {
 		this.rola = rola;
 	}
-	
+	public boolean isEnable() {
+		return enable;
+	}
+	public void setEnable(boolean enable) {
+		this.enable = enable;
+	}
 }

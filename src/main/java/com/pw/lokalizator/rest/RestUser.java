@@ -1,30 +1,20 @@
 package com.pw.lokalizator.rest;
 
 import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.validation.ConstraintViolationException;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceException;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.logging.Logger;
 
-import com.pw.lokalizator.model.RestSecurityKeys;
-import com.pw.lokalizator.model.RestSession;
-import com.pw.lokalizator.model.Roles;
-import com.pw.lokalizator.model.User;
-import com.pw.lokalizator.model.UserSecurity;
-import com.pw.lokalizator.repository.UserRepository;
+import com.pw.lokalizator.model.entity.User;
 import com.pw.lokalizator.security.HTTPHeaderNames;
 import com.pw.lokalizator.security.SecurityService;
 
@@ -32,7 +22,7 @@ import com.pw.lokalizator.security.SecurityService;
 public class RestUser {
 	@EJB
 	private SecurityService securityService;
-	Logger log = Logger.getLogger(RestUser.class);
+	Logger logger = Logger.getLogger(RestUser.class);
 	
 	
 	@POST
@@ -41,15 +31,17 @@ public class RestUser {
 	@Produces( value = {MediaType.APPLICATION_JSON} )
 	public Response login(User user){
 		try{
-			RestSession session = securityService.validateRestLogin(user.getLogin(), user.getPassword());
-			
+			String token = securityService.createRestSessionReturnToken(user.getLogin(), user.getPassword());
 			return Response.status( Response.Status.OK )
-					       .entity( new RestSecurityKeys( session.getUser().getUserSecurity().getServiceKey(), session.getAuthToken() ))
+					       .entity( token )
+					       .build();
+		}catch(NoResultException nre){
+			logger.error("[RestUser] Nie udane logowanie [ login: " + user.getLogin() + ", password: " + user.getPassword() + " ]" + nre.getMessage());
+			return Response.status( Response.Status.EXPECTATION_FAILED )
+					       .entity("Konto o podanych parametrach nie istnieje !")
 					       .build();
 		}catch(Exception e){
-			//TODO
-			e.printStackTrace();
-			
+			logger.error("[RestUser] Nie udane logowanie [ login: " + user.getLogin() + ", password: " + user.getPassword() + " ]" + e.getMessage());
 			return Response.status( Response.Status.EXPECTATION_FAILED )
 					       .build();
 		}
@@ -58,20 +50,19 @@ public class RestUser {
 	
 	@Path("/logout")
 	@GET
-	public Response logout( @HeaderParam( HTTPHeaderNames.SERVICE_KEY )String serviceKey ){
+	public Response logout( @HeaderParam( HTTPHeaderNames.AUTH_TOKEN )String token ){
 		try{
-			boolean result = securityService.logout(serviceKey);
+			boolean result = securityService.logout(token);
 			if(result == true){
 				return Response.status( Response.Status.OK )
 						       .build();
 			}
-		}catch(Exception e){
-			//TODO
-			e.printStackTrace();
+		} catch(Exception e) {
+			logger.error("[RestUser] Nie udane wylogowanie dla [ token: " + token + " ]" + e.getMessage());
 		}
 		
 		return Response.status( Response.Status.EXPECTATION_FAILED )
-				       .build();
+			       .build();
 	}
 	
 	@GET

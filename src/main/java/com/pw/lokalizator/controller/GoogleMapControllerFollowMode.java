@@ -40,26 +40,29 @@ import com.pw.lokalizator.jsf.utilitis.CircleBuilder;
 import com.pw.lokalizator.jsf.utilitis.JsfMessageBuilder;
 import com.pw.lokalizator.jsf.utilitis.MarkerBuilder;
 import com.pw.lokalizator.jsf.utilitis.OverlayIdentyfikator;
+import com.pw.lokalizator.jsf.utilitis.OverlayIdentyfikator.OverlayIdentyfikatorBuilder;
 import com.pw.lokalizator.jsf.utilitis.PolygonBuilder;
 import com.pw.lokalizator.model.GoogleMapModel;
 import com.pw.lokalizator.model.GoogleMapModel.GoogleMapModelBuilder;
-import com.pw.lokalizator.model.Location;
 import com.pw.lokalizator.model.OverlayVisibility;
 import com.pw.lokalizator.model.OverlayVisibility.OverlayVisibilityBuilder;
-import com.pw.lokalizator.model.GoogleMapTypes;
-import com.pw.lokalizator.model.Overlays;
-import com.pw.lokalizator.model.PolygonModel;
-import com.pw.lokalizator.model.PolygonPoint;
-import com.pw.lokalizator.model.Providers;
-import com.pw.lokalizator.model.User;
+import com.pw.lokalizator.model.entity.Location;
+import com.pw.lokalizator.model.entity.LocationNetwork;
+import com.pw.lokalizator.model.entity.PolygonModel;
+import com.pw.lokalizator.model.entity.PolygonPoint;
+import com.pw.lokalizator.model.entity.User;
+import com.pw.lokalizator.model.enums.GoogleMaps;
+import com.pw.lokalizator.model.enums.LocalizationServices;
+import com.pw.lokalizator.model.enums.Overlays;
+import com.pw.lokalizator.model.enums.Providers;
 import com.pw.lokalizator.repository.LocationRepository;
 import com.pw.lokalizator.repository.PolygonModelRepository;
 import com.pw.lokalizator.repository.UserRepository;
 
 @ViewScoped
-@Named("googleMapController")
-public class GoogleMapController implements Serializable{
-	private static Logger LOG = Logger.getLogger(GoogleMapController.class);
+@Named("googleMapControllerFollowMode")
+public class GoogleMapControllerFollowMode implements Serializable{
+	private static Logger LOG = Logger.getLogger(GoogleMapControllerFollowMode.class);
 	@EJB
 	private UserRepository userRepository;
 	@EJB
@@ -69,36 +72,22 @@ public class GoogleMapController implements Serializable{
 	
 	private MapModel googleMapModel;
 	private OverlayVisibility gpsVisibility;
-	private OverlayVisibility networkVisibilty;
-	private OverlayVisibility ownVisibility;
+	private OverlayVisibility networkObcaUslugaVisibilty;
+	private OverlayVisibility networkNaszaUslugaVisibility;
 	private boolean polygonVisible;
 	private Set<User>followUsers;
-	private User singleUser;
-	private Date locationFromDate;
-	private Date locationToDate;
-	
-	private GoogleMapControllerModes mode;
-	
-	private GoogleMapTypes googleMapType;
-	private boolean streetView;
 	private String center;
 	private int zoom;
 	
 
 	@PostConstruct
-	private void init(){
+	private void postConstruct(){
 		googleMapModel = new GoogleMapModel();
-		mode = GoogleMapControllerModes.FOLLOW_USERS;
-		
 		gpsVisibility = new OverlayVisibility();
-		networkVisibilty = new OverlayVisibility();
-		ownVisibility = new OverlayVisibility();
-		polygonVisible = true;
-	
+		networkObcaUslugaVisibilty = new OverlayVisibility();
+		networkNaszaUslugaVisibility = new OverlayVisibility();
+		polygonVisible = true;	
 		followUsers = new HashSet<User>();
-		
-		googleMapType = GoogleMapTypes.HYBRID;
-		streetView = true;
 		center = "51.6014053, 18.9724216";
 		zoom = 10;
 	}
@@ -117,14 +106,12 @@ public class GoogleMapController implements Serializable{
 	}
 	
 	public void update(){
-		switch(mode){
-		case FOLLOW_USERS:
-			updateGoogleMapFollowUserMode();
-			break;
-		case SINGLE_USER:
-			updateGoogleMapSingleUserMode();
-			break;
-		}
+		updateFollowUsers();
+		googleMapModel = createGoogleMap();
+	}
+	
+	public void render(){
+		googleMapModel = createGoogleMap();
 	}
 	
 	public MapModel getGoogleMapModel(){
@@ -142,30 +129,48 @@ public class GoogleMapController implements Serializable{
 	public void addUser(String login){
 		User user = userRepository.findUserWithPolygonsByLogin(login);
 		followUsers.add(user);
-		googleMapModel = createGoogleMapFollowUsers();
-	}
-	
-	public void setSingleUser(String login){
-		singleUser = userRepository.findUserWithPolygonsByLogin(login);
-		googleMapModel = createGoogleMapSingleUser();
-	}
-	
-	public User getSingleUser(){
-		return singleUser;
+		List<Location>locations = getCurrentLocationFromUser(user);
+		googleMapModel.getCircles().addAll( createCircle(locations) );
+		googleMapModel.getMarkers().addAll( createMarker(locations) );
+		googleMapModel.getPolygons().addAll( createPolygon(user.getPolygons()) );
 	}
 	
 	public void removeUser(String login){
-		removeUserFromFollowSet(login);
+		removeUserFromFollow(login);
 		removeUserFromGoogleMap(login);
-		//todo
-		googleMapModel = createGoogleMapFollowUsers();
 	}
 	
 	public void removeUserFromGoogleMap(String login){
+		OverlayIdentyfikator identyfikator = new OverlayIdentyfikatorBuilder()
+		                                           .login(login)
+		                                           .build();
 		
+		Pattern pattern = identyfikator.createPattern();
+		
+		removeMarkersUsingOverlayIdPattern(pattern);
+		removeCirclesUsingOverlayIdPattern(pattern);
 	}
 	
-	public void removeUserFromFollowSet(String login){
+	private void removeMarkersUsingOverlayIdPattern(Pattern pattern){
+		Iterator<Marker>iterator = googleMapModel.getMarkers().iterator();
+		while(iterator.hasNext()){
+			Marker marker = iterator.next();
+			if(pattern.matcher(marker.getId()).matches())
+				iterator.remove();
+		}
+	}
+	
+	private void removeCirclesUsingOverlayIdPattern(Pattern pattern){
+		Iterator<Circle>iterator = googleMapModel.getCircles().iterator();
+		while(iterator.hasNext()){
+			Circle circle = iterator.next();
+			if(pattern.matcher(circle.getId()).matches())
+				iterator.remove();
+		}
+	}
+	
+	
+	public void removeUserFromFollow(String login){
 		Iterator<User>iterator = followUsers.iterator();
 		
 		while(iterator.hasNext()){
@@ -177,55 +182,33 @@ public class GoogleMapController implements Serializable{
 		}
 	}
 	
-	private void updateGoogleMapFollowUserMode(){
-		updateFollowUsers();
-		googleMapModel = createGoogleMapFollowUsers();
-	}
-	
-	private void updateGoogleMapSingleUserMode(){
-		updateSingleUser();
-		googleMapModel = createGoogleMapSingleUser();
-	}
-	
 	private void updateFollowUsers(){
 		updateFollowUsersCurrentLocations();
-	}
-	
-	private void updateSingleUser(){
-		updateSingleUserLocations();
-	}
-	
-	private void updateSingleUserLocations(){
-		List<Location>locations = locationRepository.findByUserIdWhereYoungerThanAndOlderThanOrderByDateDesc(
-				                                        singleUser.getId(),
-				                                        locationFromDate,
-				                                        locationToDate);
-		
-		singleUser.setLocations(locations);
 	}
 	
 	private void updateFollowUsersCurrentLocations(){
 		List<User>usersList = new ArrayList<User>();
 		
 		for(User user : followUsers){
-		   usersList.add( userRepository.findById(user.getId()) );
+		   User userUpdate = userRepository.findById(user.getId());
+		   usersList.add( userUpdate );
 		}
 		
 		for(User user : usersList){
 			User userToUpdate = getUser(user.getLogin());
-			userToUpdate.setLastGpsLocation(user.getLastGpsLocation());
-			userToUpdate.setLastNetworkLocation(user.getLastNetworkLocation());
-			userToUpdate.setLastOwnProviderLocation(user.getLastOwnProviderLocation());
+			userToUpdate.setLastLocationGPS(user.getLastLocationGPS());
+			userToUpdate.setLastLocationNetworkNaszaUsluga(user.getLastLocationNetworkNaszaUsluga());
+			userToUpdate.setLastLocationNetworObcaUsluga(user.getLastLocationNetworObcaUsluga());
 		}
 	}
 
-	private MapModel createGoogleMapFollowUsers(){
+	private MapModel createGoogleMap(){
 		List<Location>locations = getCurrentLocationsFromUsers();
 		List<PolygonModel>polygonsModel = getPolygonModelFromUsers();
 		
-		List<Circle>circles = createCircles(locations);
-		List<Marker>markers = createMarkers(locations);
-		List<Polygon>polygons = createPolygons(polygonsModel);
+		List<Circle>circles = createCircle(locations);
+		List<Marker>markers = createMarker(locations);
+		List<Polygon>polygons = createPolygon(polygonsModel);
 
 		return new GoogleMapModelBuilder()
 		              .circles(circles)
@@ -233,33 +216,32 @@ public class GoogleMapController implements Serializable{
 				      .polygon(polygons)
 				      .build();
 	}
-	
-	private GoogleMapModel createGoogleMapSingleUser(){
-		List<Location>locations = singleUser.getLocations();
-		
-		List<Circle>circles = createCircles(locations);
-		List<Marker>markers = createMarkers(locations);
-		List<Polyline>polylines = createPolylines(locations); //TODO
-		
-		return new GoogleMapModelBuilder()
-		              .circles(circles)
-		              .markers(markers)
-		              .polylines(polylines)
-		              .build();
-	}
-	
 
-	
 	private List<Location>getCurrentLocationsFromUsers(){
 		List<Location>locations = new ArrayList<>();
 		
 		for(User user : followUsers){
-			locations.add(user.getLastGpsLocation());
-			locations.add(user.getLastNetworkLocation());
-			locations.add(user.getLastOwnProviderLocation());
+			if(user.getLastLocationGPS() != null)
+				locations.add(user.getLastLocationGPS());
+			if(user.getLastLocationNetworkNaszaUsluga() != null)
+				locations.add(user.getLastLocationNetworkNaszaUsluga());
+			if(user.getLastLocationNetworObcaUsluga() != null)
+			    locations.add(user.getLastLocationNetworObcaUsluga());
 		}
 		
 		return locations;
+	}
+	
+	private List<Location>getCurrentLocationFromUser(User user){
+		List<Location>location = new ArrayList<Location>();
+		if(user.getLastLocationGPS() != null)
+			location.add(user.getLastLocationGPS());
+		if(user.getLastLocationNetworkNaszaUsluga() != null)
+			location.add(user.getLastLocationNetworkNaszaUsluga());
+		if(user.getLastLocationNetworObcaUsluga() != null)
+		    location.add(user.getLastLocationNetworObcaUsluga());
+		
+		return location;
 	}
 	
 	private List<PolygonModel> getPolygonModelFromUsers(){
@@ -272,12 +254,11 @@ public class GoogleMapController implements Serializable{
 		return polygons;
 	}
 	
-	
-	private List<Circle> createCircles(List<Location>locations){
+	private List<Circle> createCircle(List<Location>locations){
 		List<Circle>circles = new ArrayList<>();
 
 		for(Location location : locations){
-			if(shouldCreateOverlayForProvider(location.getProvider(), Overlays.CIRCLE)){
+			if(shouldCreateOverlayForProvider(location, Overlays.CIRCLE)){
 				circles.add(CircleBuilder.createCircle(location));
 			}
 		}
@@ -285,11 +266,11 @@ public class GoogleMapController implements Serializable{
 		return circles;
 	}
 	
-	private List<Marker> createMarkers(List<Location>locations){
+	private List<Marker> createMarker(List<Location>locations){
 		List<Marker>markers = new ArrayList<>();
 		
 		for(Location location : locations){
-			if( shouldCreateOverlayForProvider(location.getProvider(), Overlays.MARKER) ){
+			if( shouldCreateOverlayForProvider(location, Overlays.MARKER) ){
 				markers.add( MarkerBuilder.createMarker(location) );
 			}
 		}
@@ -297,7 +278,7 @@ public class GoogleMapController implements Serializable{
 		return markers;
 	}
 	
-	private List<Polygon> createPolygons(List<PolygonModel>polygonsModel){
+	private List<Polygon> createPolygon(List<PolygonModel>polygonsModel){
 		List<Polygon>polygons = new ArrayList<>();
 		
 		for(PolygonModel polygonModel : polygonsModel){
@@ -308,26 +289,30 @@ public class GoogleMapController implements Serializable{
 		
 		return polygons;
 	}
+
 	
-	private List<Polyline>createPolylines(List<Location>locations){
-		List<Polyline>polylines = new ArrayList<>();
+	private boolean shouldCreateOverlayForProvider(Location location, Overlays overlay){
+		Providers provider = location.getProviderType();
 		
-		//TODO
-		
-		return null;
-	}
-	
-	private boolean shouldCreateOverlayForProvider(Providers provider, Overlays overlay){
 		switch(provider){
 		case GPS:
 			return shouldCreateOverlay(gpsVisibility, overlay);
 		case NETWORK:
-			return shouldCreateOverlay(networkVisibilty, overlay);
-		case OWN:
-			return shouldCreateOverlay(ownVisibility, overlay);
+			return shouldCreateOverlay(getOverlayVisibilityForNetworkProvider(location), overlay);
 		default:
-			throw new NotSupportedException("Ten provider nie jest wspierany " + provider);
+			throw new IllegalArgumentException("[GoogleMapController] Ten provider nie jest wspierany do ustawien widocznosci " + provider);
 		}
+	}
+	
+	private OverlayVisibility getOverlayVisibilityForNetworkProvider(Location location){
+		LocationNetwork locationNetwork = (LocationNetwork) location;
+		
+		if(locationNetwork.getLocalizationServices() == LocalizationServices.NASZ)
+			return networkNaszaUslugaVisibility;
+		else if(locationNetwork.getLocalizationServices() == LocalizationServices.OBCY)
+			return networkObcaUslugaVisibilty;
+		else
+		   throw new IllegalArgumentException("[GoogleMapController] Nie ma OverlayVisibility dla tego rodzaju uslugi lokalizacji " + locationNetwork.getLocalizationServices());
 	}
 	
 	private boolean shouldCreateOverlay(OverlayVisibility overlayVisibility, Overlays overlay){
@@ -337,42 +322,14 @@ public class GoogleMapController implements Serializable{
 		case MARKER:
 			return overlayVisibility.isMarkerVisible();
 		case POLYGON:
-			throw new NotSupportedException("Ten overlay nie jest dzielony miedzy providerow " + overlay);
+			throw new NotSupportedException("[GoogleMapController] Ten overlay nie jest dzielony miedzy providerow " + overlay);
 		case POLYLINE:
 			return overlayVisibility.isPolylineVisible();
 		case RECTANGLE:
 			return overlayVisibility.isRectangleVisibel();
 		default:
-			throw new NotSupportedException("Ten overlay nie jest wspierany " + overlay);
+			throw new NotSupportedException("[GoogleMapController] Ten overlay nie jest wykorzystywany do ustawien widocznosci " + overlay);
 		}
-	}
-	
-	public static enum GoogleMapControllerModes{
-		FOLLOW_USERS,SINGLE_USER;
-	}
-
-	public GoogleMapControllerModes getMode() {
-		return mode;
-	}
-
-	public void setMode(GoogleMapControllerModes mode) {
-		this.mode = mode;
-	}
-
-	public GoogleMapTypes getGoogleMapType() {
-		return googleMapType;
-	}
-
-	public void setGoogleMapType(GoogleMapTypes googleMapType) {
-		this.googleMapType = googleMapType;
-	}
-
-	public boolean isStreetView() {
-		return streetView;
-	}
-
-	public void setStreetView(boolean streetView) {
-		this.streetView = streetView;
 	}
 
 	public String getCenter() {
@@ -395,8 +352,16 @@ public class GoogleMapController implements Serializable{
 		return followUsers;
 	}
 
-	public void setUsersToFollow(Set<User> usersToFollow) {
-		this.followUsers = usersToFollow;
+	public OverlayVisibility getGpsVisibility() {
+		return gpsVisibility;
 	}
 
+	public OverlayVisibility getNetworkObcaUslugaVisibilty() {
+		return networkObcaUslugaVisibilty;
+	}
+
+	public OverlayVisibility getNetworkNaszaUslugaVisibility() {
+		return networkNaszaUslugaVisibility;
+	}
+	
 }

@@ -2,18 +2,26 @@
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
 	<persistence-unit name="lokalizator" transaction-type="JTA">
 	  <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-	  <jta-data-source>java:jboss/datasources/MySQLDS</jta-data-source>
+	  <!--<jta-data-source>java:jboss/datasources/MySQLDS</jta-data-source>-->
+	  <jta-data-source>java:jboss/datasources/test2</jta-data-source>
 	  
-	  <class>com.pw.lokalizator.model.User</class>
-	  <class>com.pw.lokalizator.model.UserSecurity</class>
-	  <class>com.pw.lokalizator.model.Location</class>
-	  <class>com.pw.lokalizator.model.PolygonModel</class>
-	  <class>com.pw.lokalizator.model.PolygonPoint</class>
-	  <class>com.pw.lokalizator.model.Address</class>
+	  <class>com.pw.lokalizator.model.entity.User</class>
+	  <class>com.pw.lokalizator.model.entity.UserSecurity</class>
+	  <class>com.pw.lokalizator.model.entity.Location</class>
+	  <class>com.pw.lokalizator.model.entity.PolygonModel</class>
+	  <class>com.pw.lokalizator.model.entity.PolygonPoint</class>
+	  <class>com.pw.lokalizator.model.entity.Address</class>
+	  <class>com.pw.lokalizator.model.entity.LocationGPS</class>
+	  <class>com.pw.lokalizator.model.entity.LocationNetwork</class>
+	  <class>com.pw.lokalizator.model.entity.SignalStrength</class>
+	  <class>com.pw.lokalizator.model.entity.CellInfoMobile</class>
+	  <class>com.pw.lokalizator.model.entity.CellInfoLte</class>
+	  <class>com.pw.lokalizator.model.entity.CellInfoGSM</class>
+	  <class>com.pw.lokalizator.model.entity.WifiInfo</class>
 	  
 	  <properties>
 	     <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect" />
-	     <property name="hibernate.hbm2ddl.auto" value="update"/>
+	     <property name="hibernate.hbm2ddl.auto" value="create"/>
 		 <property name="hibernate.show_sql" value="true"/>
 	  </properties>
 	</persistence-unit>

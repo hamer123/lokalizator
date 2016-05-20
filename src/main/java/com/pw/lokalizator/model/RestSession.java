@@ -3,18 +3,17 @@ package com.pw.lokalizator.model;
 import java.util.Date;
 import java.util.Map;
 
+import com.pw.lokalizator.model.entity.User;
+
 public class RestSession {
 	public static final String REST_SESSION_ATR = "j_rest_session";
 	private Date lastUsed;
-	private String authToken;
 	private User user;
 	private Map<String,Object>sessionAttributes;
-
-	public RestSession() {}
 	
-	public RestSession(Date lastUsed, String authToken, User user) {
-		this.lastUsed = lastUsed;
-		this.authToken = authToken;
+	
+	public RestSession(User user) {
+		this.lastUsed = new Date();
 		this.user = user;
 	}
 	
@@ -23,14 +22,6 @@ public class RestSession {
 	}
 	public void setLastUsed(Date lastUsed) {
 		this.lastUsed = lastUsed;
-	}
-
-	public String getAuthToken() {
-		return authToken;
-	}
-
-	public void setAuthToken(String authToken) {
-		this.authToken = authToken;
 	}
 
 	public User getUser() {
@@ -44,9 +35,8 @@ public class RestSession {
 		return sessionAttributes;
 	}
 
-	public void setSessionAttributes(Map<String, Object> sessionAttributes) {
-		this.sessionAttributes = sessionAttributes;
+	public Object getAttribute(String name){
+		return sessionAttributes.get(name);
 	}
-	
 	
 }

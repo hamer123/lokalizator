@@ -5,7 +5,7 @@ import java.util.Set;
 
 import javax.ejb.Local;
 
-import com.pw.lokalizator.model.PolygonModel;
+import com.pw.lokalizator.model.entity.PolygonModel;
 
 @Local
 public interface PolygonModelRepository extends JpaRepository<PolygonModel, Long> {

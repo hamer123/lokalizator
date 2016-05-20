@@ -1,4 +1,4 @@
-package com.pw.lokalizator.model;
+package com.pw.lokalizator.model.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

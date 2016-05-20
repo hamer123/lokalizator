@@ -7,20 +7,24 @@ import org.jboss.resteasy.logging.Logger;
 import org.primefaces.model.map.Circle;
 import org.primefaces.model.map.LatLng;
 
-import com.pw.lokalizator.model.Location;
-import com.pw.lokalizator.model.Overlays;
-import com.pw.lokalizator.model.Providers;
+import com.pw.lokalizator.model.entity.Location;
+import com.pw.lokalizator.model.entity.LocationNetwork;
+import com.pw.lokalizator.model.enums.LocalizationServices;
+import com.pw.lokalizator.model.enums.Overlays;
+import com.pw.lokalizator.model.enums.Providers;
 import com.pw.lokalizator.utilitis.PropertiesReader;
 
 public class CircleBuilder {
 	private static Logger LOG = Logger.getLogger(CircleBuilder.class);
 	
 	private static String GPS_CIRCLE_COLOR;
-	private static String NETWORK_CIRCLE_COLOR;
-	private static String OWN_CIRCLE_COLOR;
+	private static String NETWORK_NASZ_CIRCLE_COLOR;
+	private static String NETWORK_OBCY_CIRCLE_COLOR;
+	
 	private static String GPS_CIRCLE_STROKE_COLOR;
-	private static String NETWORK_CIRCLE_STROKE_COLOR;
-	private static String OWN_CIRCLE_STROKE_COLOR;
+	private static String NETWORK_NASZ_CIRCLE_STROKE_COLOR;
+	private static String NETWORK_OBCY_CIRCLE_STROKE_COLOR;
+	
 	private static double CIRCLE_STROKE_OPACITY;
 	private static double CIRCLE_FILL_OPACITY;
 	
@@ -56,46 +60,67 @@ public class CircleBuilder {
        circle.setFillOpacity(CIRCLE_FILL_OPACITY);
        circle.setStrokeColor(chooseStrokeColor(location));
        circle.setStrokeOpacity(CIRCLE_STROKE_OPACITY);
-
-
-//       OverlayIdentyfikator identyfikator = new OverlayIdentyfikator(location, Overlays.CIRCLE);
-//       circle.setId(identyfikator.createIdentyfikator());
+       OverlayIdentyfikator identyfikator = new OverlayIdentyfikator(location);
+       circle.setId(identyfikator.createIdentyfikator());
        
        return circle;
 	}
 	
 	private static String chooseColor(Location location){
-		Providers type = location.getProvider();
+		Providers type = location.getProviderType();
 		
 		if(type == Providers.GPS)
 			return GPS_CIRCLE_COLOR;
 		else if(type == Providers.NETWORK)
-			return NETWORK_CIRCLE_COLOR;
+			return chooseColorNetwork(location);
 		else
-			return OWN_CIRCLE_COLOR;
+			throw new IllegalStateException("[CircleBuilder] Nie znaleziono koloru dla providera " + type);
+	}
+	
+	private static String chooseColorNetwork(Location location){
+		LocationNetwork locationNetwork = (LocationNetwork)location;
+		
+		if(locationNetwork.getLocalizationServices() == LocalizationServices.NASZ)
+			return NETWORK_NASZ_CIRCLE_COLOR;
+		else if(locationNetwork.getLocalizationServices() == LocalizationServices.OBCY)
+			return NETWORK_OBCY_CIRCLE_COLOR;
+		else
+			throw new IllegalStateException("[CircleBuilder] Nie znaleziono koloru dla Network Localization Services " + locationNetwork.getLocalizationServices());
 	}
 	
 	private static String chooseStrokeColor(Location location){
-		Providers type = location.getProvider();
+		Providers type = location.getProviderType();
 		
-		if(type == Providers.GPS)
+		if(type == Providers.GPS){
 			return GPS_CIRCLE_STROKE_COLOR;
-		else if(type == Providers.NETWORK)
-			return NETWORK_CIRCLE_STROKE_COLOR;
+		} else if(type == Providers.NETWORK){
+			return chooseStrokeColorNetwork(location);
+		} else {
+			throw new IllegalStateException("[CircleBuilder] Nie znaleziono stroke koloru dla providera " + type);
+		}
+	}
+	
+	private static String chooseStrokeColorNetwork(Location location){
+		LocationNetwork locationNetwork = (LocationNetwork)location;
+		
+		if(locationNetwork.getLocalizationServices() == LocalizationServices.NASZ)
+			return NETWORK_NASZ_CIRCLE_STROKE_COLOR;
+		else if(locationNetwork.getLocalizationServices() == LocalizationServices.OBCY)
+			return NETWORK_OBCY_CIRCLE_STROKE_COLOR;
 		else
-			return OWN_CIRCLE_STROKE_COLOR;
+			throw new IllegalStateException("[CircleBuilder] Nie znaleziono stroke koloru dla Network Localization Services " + locationNetwork.getLocalizationServices());
 	}
 	
 	private static void findCircleColor(PropertiesReader propertiesReader){
 		GPS_CIRCLE_COLOR = propertiesReader.findPropertyByName("GPS_CIRCLE_COLOR");
-		NETWORK_CIRCLE_COLOR = propertiesReader.findPropertyByName("NETWORK_CIRCLE_COLOR");
-		OWN_CIRCLE_COLOR = propertiesReader.findPropertyByName("OWN_CIRCLE_COLOR");
+		NETWORK_NASZ_CIRCLE_COLOR = propertiesReader.findPropertyByName("NETWORK_NASZ_CIRCLE_COLOR");
+		NETWORK_OBCY_CIRCLE_COLOR = propertiesReader.findPropertyByName("OWN_CIRCLE_COLOR");
 	}
 	
 	private static void findCircleStrokeColor(PropertiesReader propertiesReader){
 		GPS_CIRCLE_STROKE_COLOR = propertiesReader.findPropertyByName("GPS_CIRCLE_STROKE_COLOR");
-		NETWORK_CIRCLE_STROKE_COLOR = propertiesReader.findPropertyByName("NETWORK_CIRCLE_STROKE_COLOR");
-		OWN_CIRCLE_STROKE_COLOR = propertiesReader.findPropertyByName("OWN_CIRCLE_STROKE_COLOR");
+		NETWORK_NASZ_CIRCLE_STROKE_COLOR = propertiesReader.findPropertyByName("NETWORK_NASZ_CIRCLE_STROKE_COLOR");
+		NETWORK_OBCY_CIRCLE_STROKE_COLOR = propertiesReader.findPropertyByName("NETWORK_OBCY_CIRCLE_STROKE_COLOR");
 	}
 	
 	private static void findCircleStrokeOpacity(PropertiesReader propertiesReader){

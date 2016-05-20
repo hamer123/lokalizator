@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<ui:composition  xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"> 
+      
+      <p:panelGrid columns="2" layout="grid">
+        <p:panel header="Ustawienia mapy">
+          <h:form>
+            <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+              
+              <p:outputLabel for="console" value="Typ mapy" />
+              <p:selectOneMenu id="console" value="#{location.googleMapType}" style="width:125px">
+                <p:ajax update=":gmap" />
+                
+                <f:selectItem itemLabel="Hybrid"   itemValue="HYBRID" />
+                <f:selectItem itemLabel="Terrain"  itemValue="TERRAIN" />
+                <f:selectItem itemLabel="Satelite" itemValue="SATELLITE" />
+                <f:selectItem itemLabel="Roadmap"  itemValue="ROADMAP" />
+              </p:selectOneMenu>
+              
+              <p:outputLabel for="check" value="Pokaz ulice" />
+              <p:selectBooleanCheckbox id="check" value="#{location.streetView}">
+                <p:ajax update=":gmap" />
+              </p:selectBooleanCheckbox>
+             
+            </h:panelGrid>
+          </h:form>
+        </p:panel>
+        <p:panel header="Ustawienia widocznosci">
+         <p:panelGrid columns="2" layout="grid">
+          <p:panel header="Widocznosc sledzenia">
+          
+            <h:form>
+              <h:panelGrid id="widocznoscProvidera" columns="2" style="margin-bottom:10px" cellpadding="5">
+                <p:outputLabel value="Wybierz providera:"/>
+                <p:selectOneMenu value="#{location.choicedProvider}">
+                  <p:ajax event="change" listener="#{location.onChooseProviderChange}" update=":#{p:component('widocznoscProvidera')} :#{p:component('panalFollowWidocznoscChoice')}"/>
+                  <f:selectItems value="#{location.providers}"/>
+                </p:selectOneMenu>
+                
+                <p:outputLabel value="Wybierz usluge:" rendered="#{location.choicedProvider == 'NETWORK'}"/>
+                <p:selectOneMenu value="#{location.choicedLocalizationServices}" rendered="#{location.choicedProvider == 'NETWORK'}">
+                  <p:ajax event="change" listener="#{location.onChooseLocatiozacionServiceChange}" update=":#{p:component('widocznoscProvidera')} :#{p:component('panalFollowWidocznoscChoice')}"/>
+                  <f:selectItems value="#{location.services}"/>
+                </p:selectOneMenu>
+              
+              </h:panelGrid>
+              
+            </h:form>
+            
+            <h:form>
+            <h:panelGrid id="panalFollowWidocznoscChoice" columns="2">
+              
+              <h:outputText value="Circle" />
+              <p:selectBooleanCheckbox value="#{location.overlayVisibilityFollow.circleVisible}">
+                <p:ajax event="change" listener="#{googleMapControllerFollowMode.render}" update=":#{p:component('gmap')}"/>
+              </p:selectBooleanCheckbox>
+
+              <h:outputText value="Marker" />
+              <p:selectBooleanCheckbox value="#{location.overlayVisibilityFollow.markerVisible}">
+                <p:ajax event="change" listener="#{googleMapControllerFollowMode.render}" update=":#{p:component('gmap')}"/>
+              </p:selectBooleanCheckbox>
+              
+              <h:outputText value="Polygon"/>
+              <p:selectBooleanCheckbox>
+                <p:ajax event="change" listener="#{googleMapControllerFollowMode.render}" update=":#{p:component('gmap')}"/>
+              </p:selectBooleanCheckbox>
+              
+            </h:panelGrid>
+            </h:form>
+          </p:panel>
+          <p:panel header="Widocznosc histori"></p:panel>
+         </p:panelGrid>
+        </p:panel>
+      </p:panelGrid>
+
+      
+</ui:composition>

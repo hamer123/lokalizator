@@ -1,4 +1,4 @@
-package com.pw.lokalizator.model;
+package com.pw.lokalizator.model.enums;
 
 import javax.ws.rs.NotFoundException;
 
