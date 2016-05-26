@@ -9,5 +9,7 @@ import com.pw.lokalizator.model.entity.PolygonModel;
 
 @Local
 public interface PolygonModelRepository extends JpaRepository<PolygonModel, Long> {
-	List<PolygonModel> getPolygonsByTargetId(Long id);
+	List<PolygonModel> findByTargetId(long id);
+	List<PolygonModel> findIdAndNameAndFollowTypeAndTargetIdAndTargetLoginByProviderId(long id);
+	List<PolygonModel> findWithEagerFetchPointsAndTargetByProviderId(long id);
 }

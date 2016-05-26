@@ -23,6 +23,8 @@ public class OverlayIdentyfikator {
 			this.localizationServices = getLocalizationServicesFromLocation(location);
 	}
 	
+
+	
 	public OverlayIdentyfikator(Providers providerType, LocalizationServices localizationServices, String login, long id){
 		this.id = id;
 		this.login = login;

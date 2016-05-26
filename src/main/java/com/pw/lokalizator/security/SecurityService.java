@@ -104,8 +104,7 @@ public class SecurityService {
 
 		@Override
 		public boolean isUserInRole(String role) {
-			return user.getUserSecurity()
-			           .getRola()
+			return user.getRola()
 			           .toString()
 			           .equalsIgnoreCase(role);
 		}
@@ -117,8 +116,7 @@ public class SecurityService {
 
 		@Override
 		public String getAuthenticationScheme() {
-			return user.getUserSecurity()
-			           .getRola()
+			return user.getRola()
 			           .toString();
 		}
 		

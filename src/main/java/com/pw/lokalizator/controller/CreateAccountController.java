@@ -31,7 +31,7 @@ public class CreateAccountController implements Serializable{
 		user.setEmail(email);
 		
 		try{
-			userService.createAccount(user);
+			userService.createAcount(user);
 			
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_INFO,

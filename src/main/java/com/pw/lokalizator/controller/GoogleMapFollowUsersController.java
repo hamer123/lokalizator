@@ -36,6 +36,8 @@ import org.primefaces.model.map.Polygon;
 import org.primefaces.model.map.Polyline;
 import org.primefaces.model.map.Rectangle;
 
+import com.pw.lokalizator.exception.ProviderNotSupportedException;
+import com.pw.lokalizator.job.PolygonService;
 import com.pw.lokalizator.jsf.utilitis.CircleBuilder;
 import com.pw.lokalizator.jsf.utilitis.JsfMessageBuilder;
 import com.pw.lokalizator.jsf.utilitis.MarkerBuilder;
@@ -61,8 +63,8 @@ import com.pw.lokalizator.repository.UserRepository;
 
 @ViewScoped
 @Named("googleMapControllerFollowMode")
-public class GoogleMapControllerFollowMode implements Serializable{
-	private static Logger LOG = Logger.getLogger(GoogleMapControllerFollowMode.class);
+public class GoogleMapFollowUsersController implements Serializable{
+	private static Logger logger = Logger.getLogger(GoogleMapFollowUsersController.class);
 	@EJB
 	private UserRepository userRepository;
 	@EJB
@@ -92,6 +94,35 @@ public class GoogleMapControllerFollowMode implements Serializable{
 		zoom = 10;
 	}
 	
+	public void update(){
+		updateFollowUsers();
+		googleMapModel = createGoogleMap();
+	}
+	
+	public void render(){
+		googleMapModel = createGoogleMap();
+	}
+	
+	public User getUser(String login){
+		for(User user : followUsers){
+			if(user.getLogin().equals(login))
+				return user;
+		}
+		
+		throw new IllegalArgumentException("[GoogleMapFollowUsersController] Nie znaleziono na liscie do sledzenia uzytkownika " + login);
+	}
+	
+	public void addUser(String login){
+		User user = getUserWithCurrentLocationsAndPolygons(login);
+		addUserToFollowList(user);
+		addUserToGoogleMap(user);
+	}
+	
+	public void removeUser(String login){
+		removeUserFromFollowList(login);
+		removeUserFromGoogleMap(login);
+	}
+	
 	public void onGoogleMapStateChange(StateChangeEvent event){
 		center = createCenter(event.getCenter().getLat(), 
 				              event.getCenter().getLng());
@@ -105,42 +136,33 @@ public class GoogleMapControllerFollowMode implements Serializable{
 				+ lon;
 	}
 	
-	public void update(){
-		updateFollowUsers();
-		googleMapModel = createGoogleMap();
+	public String createCenter(LatLng latLng){
+		return    latLng.getLat() 
+				+ ", "
+				+ latLng.getLng();
 	}
 	
-	public void render(){
-		googleMapModel = createGoogleMap();
+	private User getUserWithCurrentLocationsAndPolygons(String login){
+		User user = userRepository.findByIdFetchEagerLastLocations(login);
+		long id = user.getId();
+		List<PolygonModel>polygonModels = polygonModelRepository.findWithEagerFetchPointsAndTargetByProviderId(id); 
+		user.setPolygons(polygonModels);
+		return user;
 	}
 	
-	public MapModel getGoogleMapModel(){
-		return googleMapModel;
-	}
-	
-	public User getUser(String login){
-		for(User user : followUsers){
-			if(user.getLogin().equals(login))
-				return user;
-		}
-		throw new NotFoundException("Nie znaleziono na liscie do sledzenia uzytkownika " + login);
-	}
-	
-	public void addUser(String login){
-		User user = userRepository.findUserWithPolygonsByLogin(login);
-		followUsers.add(user);
+	private void addUserToGoogleMap(User user){
 		List<Location>locations = getCurrentLocationFromUser(user);
 		googleMapModel.getCircles().addAll( createCircle(locations) );
 		googleMapModel.getMarkers().addAll( createMarker(locations) );
 		googleMapModel.getPolygons().addAll( createPolygon(user.getPolygons()) );
 	}
 	
-	public void removeUser(String login){
-		removeUserFromFollow(login);
-		removeUserFromGoogleMap(login);
+	
+	private void addUserToFollowList(User user){
+		followUsers.add(user);
 	}
 	
-	public void removeUserFromGoogleMap(String login){
+	private void removeUserFromGoogleMap(String login){
 		OverlayIdentyfikator identyfikator = new OverlayIdentyfikatorBuilder()
 		                                           .login(login)
 		                                           .build();
@@ -149,6 +171,7 @@ public class GoogleMapControllerFollowMode implements Serializable{
 		
 		removeMarkersUsingOverlayIdPattern(pattern);
 		removeCirclesUsingOverlayIdPattern(pattern);
+		removePolygonsUsingOverlayIdPattern(pattern);
 	}
 	
 	private void removeMarkersUsingOverlayIdPattern(Pattern pattern){
@@ -169,8 +192,17 @@ public class GoogleMapControllerFollowMode implements Serializable{
 		}
 	}
 	
+	private void removePolygonsUsingOverlayIdPattern(Pattern pattern){
+		Iterator<Polygon>iterator = googleMapModel.getPolygons().iterator();
+		while(iterator.hasNext()){
+			Polygon polygon = iterator.next();
+			if(pattern.matcher(polygon.getId()).matches())
+				iterator.remove();
+		}
+	}
 	
-	public void removeUserFromFollow(String login){
+	
+	private void removeUserFromFollowList(String login){
 		Iterator<User>iterator = followUsers.iterator();
 		
 		while(iterator.hasNext()){
@@ -187,14 +219,21 @@ public class GoogleMapControllerFollowMode implements Serializable{
 	}
 	
 	private void updateFollowUsersCurrentLocations(){
-		List<User>usersList = new ArrayList<User>();
+		List<User>userList = new ArrayList<User>();
 		
-		for(User user : followUsers){
-		   User userUpdate = userRepository.findById(user.getId());
-		   usersList.add( userUpdate );
-		}
+		long time = System.currentTimeMillis();
+
+		Set<Long>idSet = new HashSet<Long>();
+		for(User user : followUsers)
+			idSet.add(user.getId());
+	
 		
-		for(User user : usersList){
+//TODO
+		userList = userRepository.findByIdFetchEagerLastLocations(idSet);     //findById(idSet);
+		
+		System.out.println("TIME of update FOLLOW USERS : " + (System.currentTimeMillis() - time));
+		
+		for(User user : userList){
 			User userToUpdate = getUser(user.getLogin());
 			userToUpdate.setLastLocationGPS(user.getLastLocationGPS());
 			userToUpdate.setLastLocationNetworkNaszaUsluga(user.getLastLocationNetworkNaszaUsluga());
@@ -294,14 +333,12 @@ public class GoogleMapControllerFollowMode implements Serializable{
 	private boolean shouldCreateOverlayForProvider(Location location, Overlays overlay){
 		Providers provider = location.getProviderType();
 		
-		switch(provider){
-		case GPS:
+		if(provider == Providers.GPS)
 			return shouldCreateOverlay(gpsVisibility, overlay);
-		case NETWORK:
+		else if(provider == Providers.NETWORK)
 			return shouldCreateOverlay(getOverlayVisibilityForNetworkProvider(location), overlay);
-		default:
+		else
 			throw new IllegalArgumentException("[GoogleMapController] Ten provider nie jest wspierany do ustawien widocznosci " + provider);
-		}
 	}
 	
 	private OverlayVisibility getOverlayVisibilityForNetworkProvider(Location location){
@@ -328,10 +365,14 @@ public class GoogleMapControllerFollowMode implements Serializable{
 		case RECTANGLE:
 			return overlayVisibility.isRectangleVisibel();
 		default:
-			throw new NotSupportedException("[GoogleMapController] Ten overlay nie jest wykorzystywany do ustawien widocznosci " + overlay);
+			throw new IllegalArgumentException("[GoogleMapController] Ten overlay nie jest wykorzystywany do ustawien widocznosci " + overlay);
 		}
 	}
 
+	public MapModel getGoogleMapModel(){
+		return googleMapModel;
+	}
+	
 	public String getCenter() {
 		return center;
 	}
@@ -362,6 +403,14 @@ public class GoogleMapControllerFollowMode implements Serializable{
 
 	public OverlayVisibility getNetworkNaszaUslugaVisibility() {
 		return networkNaszaUslugaVisibility;
+	}
+
+	public boolean isPolygonVisible() {
+		return polygonVisible;
+	}
+
+	public void setPolygonVisible(boolean polygonVisible) {
+		this.polygonVisible = polygonVisible;
 	}
 	
 }

@@ -19,6 +19,7 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.event.map.OverlaySelectEvent;
 import org.primefaces.model.map.DefaultMapModel;
+import org.primefaces.model.map.LatLng;
 import org.primefaces.model.map.MapModel;
 
 import com.pw.lokalizator.jsf.utilitis.JsfMessageBuilder;
@@ -28,6 +29,8 @@ import com.pw.lokalizator.model.entity.CellInfoLte;
 import com.pw.lokalizator.model.entity.Location;
 import com.pw.lokalizator.model.entity.LocationGPS;
 import com.pw.lokalizator.model.entity.LocationNetwork;
+import com.pw.lokalizator.model.entity.PolygonModel;
+import com.pw.lokalizator.model.entity.PolygonPoint;
 import com.pw.lokalizator.model.entity.User;
 import com.pw.lokalizator.model.enums.GoogleMaps;
 import com.pw.lokalizator.model.enums.LocalizationServices;
@@ -51,9 +54,9 @@ public class LocationViewController implements Serializable{
 	@EJB
 	private WifiInfoRepository wifiInfoRepository;
 	@Inject
-	private GoogleMapControllerFollowMode googleMapControllerFollowMode;
+	private GoogleMapFollowUsersController googleMapFollowUsersController;
 	@Inject
-	private GoogleMapControllerSingleMode googleMapControllerSingleMode;
+	private GoogleMapUserHistoryController googleMapUserHistoryController;
 	
 	private static final Providers[] providers = Providers.values();
 	private static final LocalizationServices[] services = LocalizationServices.values();
@@ -85,7 +88,7 @@ public class LocationViewController implements Serializable{
 	private void postConstruct(){
 		choicedProvider = providers[0];
 		choicedLocalizationServices = services[0];
-		overlayVisibilityFollow = googleMapControllerFollowMode.getGpsVisibility();
+		overlayVisibilityFollow = googleMapFollowUsersController.getGpsVisibility();
 		
 		
 		googleMapType = GoogleMaps.HYBRID;
@@ -96,23 +99,24 @@ public class LocationViewController implements Serializable{
 		userLoginOnline = restSessionManager.getUserOnlineLogins();
 	}
 	
-	
-	public void test(){
-		System.out.println(overlayVisibilityFollow);
+	public void onPokazPolygonLocation(PolygonModel polygonModel){
+	    List<PolygonPoint>points = new ArrayList<PolygonPoint>( polygonModel.getPoints().values() );
+		String center = googleMapFollowUsersController.createCenter(getLatLngFirstPoint(points));
+		googleMapFollowUsersController.setCenter(center);
 	}
 	
 	public void onChooseProviderChange(){
 		if(choicedProvider == Providers.GPS)
-			overlayVisibilityFollow = googleMapControllerFollowMode.getGpsVisibility();
+			overlayVisibilityFollow = googleMapFollowUsersController.getGpsVisibility();
 		else 
-			overlayVisibilityFollow = googleMapControllerFollowMode.getNetworkNaszaUslugaVisibility();
+			overlayVisibilityFollow = googleMapFollowUsersController.getNetworkNaszaUslugaVisibility();
 	}
 	
 	public void onChooseLocatiozacionServiceChange(){
 		if(choicedLocalizationServices == LocalizationServices.NASZ)
-			overlayVisibilityFollow = googleMapControllerFollowMode.getNetworkNaszaUslugaVisibility();
+			overlayVisibilityFollow = googleMapFollowUsersController.getNetworkNaszaUslugaVisibility();
 		else
-			overlayVisibilityFollow = googleMapControllerFollowMode.getNetworkObcaUslugaVisibilty();
+			overlayVisibilityFollow = googleMapFollowUsersController.getNetworkObcaUslugaVisibilty();
 	}
 	
 	public List<String> onAutoCompleteUser(String userLogin){
@@ -121,13 +125,13 @@ public class LocationViewController implements Serializable{
 
 	public void onUserSelectToFollow(){
 		if(!isUserFollow(selectedLoginToFollow))
-			googleMapControllerFollowMode.addUser(selectedLoginToFollow);
+			googleMapFollowUsersController.addUser(selectedLoginToFollow);
 		else 
 			JsfMessageBuilder.errorMessageFromProperties("userArleadyFollowed");
 	}
 	
 	public void onUserRemove(String login){
-		googleMapControllerFollowMode.removeUser(login);
+		googleMapFollowUsersController.removeUser(login);
 		
 		if(selectedUserToShowData != null && login.equals( selectedUserToShowData.getLogin() )){
 			clearAndHideDanePanel();
@@ -136,9 +140,9 @@ public class LocationViewController implements Serializable{
 	
 	public void onRowSelectedOstatnieLokacje(SelectEvent event){
 		Location location = (Location) event.getObject();
-		String center = googleMapControllerFollowMode.createCenter(location.getLatitude(), location.getLongitude());
-		googleMapControllerFollowMode.setCenter(center);
-		googleMapControllerFollowMode.setZoom(15);
+		String center = googleMapFollowUsersController.createCenter(location.getLatitude(), location.getLongitude());
+		googleMapFollowUsersController.setCenter(center);
+		googleMapFollowUsersController.setZoom(15);
 	}
 
 	private void clearAndHideDanePanel(){
@@ -147,12 +151,12 @@ public class LocationViewController implements Serializable{
 	}
 	
 	public void onPokazDane(String login){
-		selectedUserToShowData = googleMapControllerFollowMode.getUser(login);
+		selectedUserToShowData = googleMapFollowUsersController.getUser(login);
 		panelDaneVisible = true;
 	}
 	
 	public boolean isUserFollow(String login){
-		for(User user : googleMapControllerFollowMode.getUsersToFollow())
+		for(User user : googleMapFollowUsersController.getUsersToFollow())
 			if(user.getLogin().equals(login))
 				return true;
 		
@@ -191,6 +195,11 @@ public class LocationViewController implements Serializable{
     	return locationNetwork.getLocalizationServices().toString();
     }
     
+	private LatLng getLatLngFirstPoint(List<PolygonPoint>points){
+		PolygonPoint polygonPoint =  points.get(0);
+		return new LatLng(polygonPoint.getLat(), polygonPoint.getLng());
+	}
+    
     private void setupLocationSzczegoly(Location location){
     	if(location instanceof LocationNetwork)
     		setupLocationNetworkSzczegoly(location);
@@ -215,7 +224,7 @@ public class LocationViewController implements Serializable{
     }
 	
 	public void onPollFollowMode(){
-		googleMapControllerFollowMode.update();
+		googleMapFollowUsersController.update();
 		userLoginOnline = restSessionManager.getUserOnlineLogins();
 	}
 	

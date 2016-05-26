@@ -27,7 +27,7 @@ import com.pw.lokalizator.repository.UserRepository;
 
 @Named("googleMapControllerSingleMode")
 @ViewScoped
-public class GoogleMapControllerSingleMode implements Serializable{
+public class GoogleMapUserHistoryController implements Serializable{
 	@EJB
 	private UserRepository userRepository;
 	@EJB

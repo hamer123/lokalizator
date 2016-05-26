@@ -18,6 +18,27 @@
           
           <h:outputText value="RSSI" />
           <h:outputText value="#{location.locationNetworkShowSzczegoly.infoWifi.RSSI}" />
+          
+          <h:outputText value="SIID" />
+          <h:outputText value="#{location.locationNetworkShowSzczegoly.infoWifi.SSID}" />
+          
+          <h:outputText value="Frequency" />
+          <h:outputText value="#{location.locationNetworkShowSzczegoly.infoWifi.frequency}" />
+          
+          <h:outputText value="Ip Address" />
+          <h:outputText value="#{location.locationNetworkShowSzczegoly.infoWifi.ipAddress}" />
+          
+          <h:outputText value="Ip Address" />
+          <h:outputText value="#{location.locationNetworkShowSzczegoly.infoWifi.ipAddress}" />
+          
+          <h:outputText value="Link Speed" />
+          <h:outputText value="#{location.locationNetworkShowSzczegoly.infoWifi.linkSpeed}" />
+          
+          <h:outputText value="Mac Address" />
+          <h:outputText value="#{location.locationNetworkShowSzczegoly.infoWifi.macAddress}" />
+          
+          <h:outputText value="Network Id" />
+          <h:outputText value="#{location.locationNetworkShowSzczegoly.infoWifi.networkId}" />
         </p:panelGrid>
 
         <p:panelGrid columns="2" layout="grid" rendered="#{location.cellInfoGSMShowSzczegoly != null}">
@@ -25,19 +46,19 @@
             <h:outputText value="GSM" />
           </f:facet>
           
-          <h:outputText value="cid" />
+          <h:outputText value="CID" />
           <h:outputText value="#{location.cellInfoGSMShowSzczegoly.cid}" />
           
-          <h:outputText value="lac" />
+          <h:outputText value="LAC" />
           <h:outputText value="#{location.cellInfoGSMShowSzczegoly.lac}" />
           
-          <h:outputText value="mcc" />
+          <h:outputText value="MCC" />
           <h:outputText value="#{location.cellInfoGSMShowSzczegoly.mcc}" />
           
-          <h:outputText value="mnc" />
+          <h:outputText value="MNC" />
           <h:outputText value="#{location.cellInfoGSMShowSzczegoly.mnc}" />
           
-          <h:outputText value="psc" />
+          <h:outputText value="PSC" />
           <h:outputText value="#{location.cellInfoGSMShowSzczegoly.psc}" />
         </p:panelGrid>
       
@@ -46,22 +67,22 @@
             <h:outputText value="Lte" />
           </f:facet>
           
-          <h:outputText value="ci" />
+          <h:outputText value="CI" />
           <h:outputText value="#{location.cellInfoLteShowSzczegoly.ci}" />
           
-          <h:outputText value="mcc" />
+          <h:outputText value="MCC" />
           <h:outputText value="#{location.cellInfoLteShowSzczegoly.mcc}" />
           
-          <h:outputText value="mnc" />
+          <h:outputText value="MNC" />
           <h:outputText value="#{location.cellInfoLteShowSzczegoly.mnc}" />
           
-          <h:outputText value="pci" />
+          <h:outputText value="PCI" />
           <h:outputText value="#{location.cellInfoLteShowSzczegoly.pci}" />
           
-          <h:outputText value="tac" />
+          <h:outputText value="TAC" />
           <h:outputText value="#{location.cellInfoLteShowSzczegoly.tac}" />
           
-          <p:outputLabel value="timing advance"/>
+          <p:outputLabel value="Timing Advance"/>
           <h:outputText value="#{location.cellInfoLteShowSzczegoly.timingAdvance}" />
           
         </p:panelGrid>
@@ -72,13 +93,13 @@
             <h:outputText value="Signal Strenght" />
           </f:facet>
           
-          <h:outputText value="assusLevel" />
+          <h:outputText value="AssusLevel" />
           <h:outputText value="#{location.locationNetworkShowSzczegoly.cellInfoMobile.signalStrength.assusLevel}" />
           
-          <h:outputText value="dbm" />
+          <h:outputText value="Dbm" />
           <h:outputText value="#{location.locationNetworkShowSzczegoly.cellInfoMobile.signalStrength.dbm}" />
           
-          <h:outputText value="level" />
+          <h:outputText value="Level" />
           <h:outputText value="#{location.locationNetworkShowSzczegoly.cellInfoMobile.signalStrength.level}" />
           
         </p:panelGrid>

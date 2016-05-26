@@ -4,7 +4,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -12,6 +14,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKey;
 import javax.persistence.NamedQueries;
@@ -20,6 +23,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import com.pw.lokalizator.model.enums.PolygonFollows;
 
@@ -32,6 +38,10 @@ import com.pw.lokalizator.model.enums.PolygonFollows;
 		                  query="DELETE FROM PolygonModel p WHERE p.id = :id"),
 		      @NamedQuery(name="PolygonModel.findAll",
 		                  query="SELECT p FROM PolygonModel p"),
+		      @NamedQuery(name="Polygon.findIdAndNameAndFollowTypeAndTargetIdAndTargetLoginByProviderId",
+		                  query="SELECT new com.pw.lokalizator.model.entity.PolygonModel(p.id, p.name, p.polygonFollowType, t.id, t.login) FROM PolygonModel p INNER JOIN p.target t WHERE p.provider.id =:id"),
+		      @NamedQuery(name="Polygon.findWithEagerFetchPointsAndTargetByProviderId",
+		                  query="SELECT p FROM PolygonModel p JOIN FETCH p.target WHERE p.provider.id =:id")
 })
 public class PolygonModel {
     @TableGenerator(
@@ -44,21 +54,37 @@ public class PolygonModel {
 	@Id
 	@GeneratedValue(strategy=GenerationType.TABLE, generator="polGen")
 	private long id;
+    
+    @Column
 	private String name;
-	@OneToMany(fetch=FetchType.EAGER, cascade=CascadeType.ALL, mappedBy="polygon")
+    
+	@OneToMany(mappedBy="polygon", fetch=FetchType.LAZY, cascade= { CascadeType.REMOVE, CascadeType.PERSIST })
 	@MapKey(name="number")
 	private Map<Integer, PolygonPoint>points;
-	@OneToOne
+	
+	@OneToOne(optional = false)
 	private User target;
-	@OneToOne
+	
+	@ManyToOne(fetch = FetchType.LAZY)
 	private User provider;
+	
 	@Enumerated(EnumType.STRING)
 	private PolygonFollows polygonFollowType;
 	
 	public PolygonModel(){}
 	
+	public PolygonModel(long id, String name, PolygonFollows polygonFollows, long targetID, String targetLogin){
+		this.id = id;
+		this.name = name;
+		this.polygonFollowType = polygonFollows;
+		
+		User target = new User();
+		target.setId(targetID);
+		target.setLogin(targetLogin);
+		
+		this.target = target;
+	}
 	
-
 	public long getId() {
 		return id;
 	}

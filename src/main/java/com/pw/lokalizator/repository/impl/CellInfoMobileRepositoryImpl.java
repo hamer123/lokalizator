@@ -16,7 +16,7 @@ public class CellInfoMobileRepositoryImpl implements CellInfoMobileRepository{
 	private EntityManager em;
 	
 	@Override
-	public CellInfoMobile add(CellInfoMobile entity) {
+	public CellInfoMobile create(CellInfoMobile entity) {
 		// TODO Auto-generated method stub
 		return null;
 	}

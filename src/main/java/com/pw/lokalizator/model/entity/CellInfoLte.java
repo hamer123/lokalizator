@@ -4,9 +4,10 @@ import javax.persistence.Entity;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 @Entity
-@XmlRootElement
+@XmlRootElement(name = "cellInfoLte")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CellInfoLte extends CellInfoMobile{
 	@Column(name="CI")

@@ -11,6 +11,7 @@ import org.jboss.resteasy.logging.Logger;
 import org.primefaces.model.map.LatLng;
 import org.primefaces.model.map.Polygon;
 
+import com.pw.lokalizator.jsf.utilitis.OverlayIdentyfikator.OverlayIdentyfikatorBuilder;
 import com.pw.lokalizator.model.entity.PolygonModel;
 import com.pw.lokalizator.model.entity.PolygonPoint;
 import com.pw.lokalizator.utilitis.PropertiesReader;
@@ -32,7 +33,13 @@ public class PolygonBuilder {
 		return createPolygonInstance(polygonModel);
 	}
 	
-	public static List<Polygon> createPolygon(List<PolygonModel>polygonModelList){
+	public static Polygon createEmpty(){
+		Polygon polygon = new Polygon();
+		setupPolygonView(polygon);
+		return polygon;
+	}
+	
+	public static List<Polygon> createPolygons(List<PolygonModel>polygonModelList){
 		List<Polygon>polygonList = new ArrayList<Polygon>();
 		
 		for(PolygonModel polygonModel : polygonModelList)
@@ -41,13 +48,22 @@ public class PolygonBuilder {
 		return polygonList;
 	}
 	
-	private static Polygon createPolygonInstance(PolygonModel polygonModel){
-		Polygon polygon = new Polygon();
+	private static void setupPolygonView(Polygon polygon){
 		polygon.setFillColor(POLYGON_FILL_COLOR);
 		polygon.setFillOpacity(POLYGON_FILL_OPACITY);
 		polygon.setStrokeColor(POLYGON_STROKE_COLOR);
 		polygon.setStrokeOpacity(POLYGON_STROKE_OPACITY);
+	}
+	
+	private static Polygon createPolygonInstance(PolygonModel polygonModel){
+		Polygon polygon = new Polygon();
+		setupPolygonView(polygon);
 		polygon.setData(polygonModel);
+		
+		OverlayIdentyfikator identyfikator = new OverlayIdentyfikatorBuilder().login(polygonModel.getProvider().getLogin())
+				                                                              .id(polygonModel.getId())
+				                                                              .build();
+		polygon.setId(identyfikator.createIdentyfikator());
 		
 		List<LatLng>pathList = createPaths(polygonModel.getPoints());
 		polygon.setPaths(pathList);

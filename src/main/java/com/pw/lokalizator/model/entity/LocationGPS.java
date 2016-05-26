@@ -6,7 +6,6 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 @Entity
-@DiscriminatorValue(value="GPS")
 public class LocationGPS extends Location implements Serializable{
 	
 }

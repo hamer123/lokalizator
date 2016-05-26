@@ -8,9 +8,10 @@ import javax.persistence.TableGenerator;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 @Entity
-@XmlRootElement
+@XmlRootElement(name = "cellInfoGSM")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CellInfoGSM extends CellInfoMobile{
 	

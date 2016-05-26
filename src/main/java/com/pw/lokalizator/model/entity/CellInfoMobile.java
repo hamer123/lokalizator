@@ -1,5 +1,7 @@
 package com.pw.lokalizator.model.entity;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Embedded;
@@ -13,10 +15,15 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.TableGenerator;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public class CellInfoMobile{
+@XmlSeeAlso({CellInfoLte.class, CellInfoGSM.class})
+public abstract class CellInfoMobile implements Serializable{
     @TableGenerator(
             name="cellInfoGen", 
             table="ID_GEN", 

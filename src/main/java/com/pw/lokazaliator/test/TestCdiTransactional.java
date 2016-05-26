@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
@@ -24,7 +26,7 @@ import org.primefaces.model.map.LatLng;
 import org.primefaces.model.map.MapModel;
 import org.primefaces.model.map.Marker;
 
-import com.pw.lokalizator.controller.GoogleMapControllerFollowMode;
+import com.pw.lokalizator.controller.GoogleMapFollowUsersController;
 import com.pw.lokalizator.jsf.utilitis.MarkerBuilder;
 import com.pw.lokalizator.model.GoogleMapModel;
 import com.pw.lokalizator.model.entity.CellInfoGSM;
@@ -32,6 +34,7 @@ import com.pw.lokalizator.model.entity.CellInfoMobile;
 import com.pw.lokalizator.model.entity.Location;
 import com.pw.lokalizator.model.entity.LocationGPS;
 import com.pw.lokalizator.model.entity.LocationNetwork;
+import com.pw.lokalizator.model.entity.PolygonModel;
 import com.pw.lokalizator.model.entity.User;
 import com.pw.lokalizator.model.enums.Providers;
 import com.pw.lokalizator.repository.UserRepository;
@@ -45,18 +48,47 @@ public class TestCdiTransactional implements Serializable{
 	EntityManager em;
 	
 	@Inject
-	GoogleMapControllerFollowMode controller;
+	GoogleMapFollowUsersController controller;
 	
 	@EJB
 	UserRepository repository;
 	
 	
-	@Transactional
+//	@Transactional
 	public void doTestTransaction(){
 		
-		User user = em.find(User.class, 1L);
+		Set<Long>set = new HashSet<Long>();
+		set.add(1L);
 		
-		user.getUserSecurity().getId();
+		List<User>users = em.createQuery("SELECT u FROM User u LEFT OUTER JOIN FETCH u.lastLocationNetworkNaszaUsluga LEFT OUTER JOIN FETCH u.lastLocationNetworObcaUsluga LEFT OUTER JOIN FETCH u.lastLocationGPS WHERE u.id IN (:id)", User.class)
+		.setParameter("id", set)
+		.getResultList();
+		
+		System.out.println(users.size());
+
+//		list.get(0).getPoints().containsKey(null);
+		
+		
+//		String query2 = "SELECT new com.pw.lokalizator.model.entity.PolygonModel(p.id, p.name, p.polygonFollowType, t.id, t.login) FROM PolygonModel p INNER JOIN p.target t WHERE p.provider.id =:id";
+//		
+//		List<PolygonModel>list = em.createQuery(query2, PolygonModel.class)
+//		  .setParameter("id", 1L)
+//		  .getResultList();
+//		
+//		for(PolygonModel polygon : list){
+//			System.out.println(polygon.getId() + ", " + polygon.getName() + ", " + polygon.getPolygonFollowType() + ", " + polygon.getTarget().getLogin());
+//		}
+//		
+//		String query = "SELECT p FROM PolygonModel p WHERE p.provider.id =:id";
+//		List<PolygonModel>list = em.createQuery(query, PolygonModel.class)
+//		   .setParameter("id", 1L)
+//		   .getResultList();
+//		
+//		PolygonModel polygon = list.get(0);
+//		
+//		System.out.println(polygon.getTarget().getLogin());
+		  
+		
 		
 //		CellInfoMobile cellInfoMobile = new CellInfoMobile();
 //		CellInfoGSM gsm = new CellInfoGSM();

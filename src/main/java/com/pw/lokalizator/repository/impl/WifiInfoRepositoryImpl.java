@@ -18,7 +18,7 @@ public class WifiInfoRepositoryImpl implements WifiInfoRepository {
 	private EntityManager em;
 	
 	@Override
-	public WifiInfo add(WifiInfo entity) {
+	public WifiInfo create(WifiInfo entity) {
 		// TODO Auto-generated method stub
 		return null;
 	}

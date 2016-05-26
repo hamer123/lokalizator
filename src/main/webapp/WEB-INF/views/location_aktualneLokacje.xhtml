@@ -58,11 +58,11 @@
                    <p:column headerText="Typ sledzenia">
                      <h:outputText value="#{user_polygon.polygonFollowType}" />
                    </p:column>
-                   <p:column headerText="Tworca polgyona">
-                     <h:outputText value="#{user_polygon.provider.login}" />
-                   </p:column>
                    <p:column headerText="Sledzony uzytkownik">
                      <h:outputText value="#{user_polygon.target.login}" />
+                   </p:column>
+                   <p:column headerText="Pokaz">
+                     <p:commandButton value="POKAZ" actionListener="#{location.onPokazPolygonLocation(user_polygon)}" update=":#{p:component('gmap_follow')}"/>
                    </p:column>
                  </p:dataTable>
                </p:panel>

@@ -7,6 +7,7 @@
 
 <h:head>
   <title>polygon</title>
+  <h:outputStylesheet library="css" name="standardPanelGrid"/>
   <script src="https://maps.googleapis.com/maps/api/js"/>
 </h:head> 
 
@@ -15,52 +16,87 @@
      <ui:insert name="menu" >
 	    <ui:include src="/WEB-INF/views/menu_templete.xhtml" />
 	  </ui:insert>
+	 
 	  
-   <h:form id="mainForm">
-     <p:growl id="messages" showDetail="true" life="2000" />
-   
-     <p:gmap id="gmap" center="#{polyglon.googleMapSetting.center}" zoom="#{polyglon.googleMapSetting.zoom}" type="#{polyglon.googleMapSetting.googleMapType}" style="width:100%;height:500px" model="#{polyglon.polygonModel}">
-       <p:ajax event="pointSelect" listener="#{polyglon.onPointSelect}" update="gmap points" />
-       <p:ajax event="stateChange" listener="#{polyglon.onStateChanged}" update="gmap" />
+	 <p:gmap id="gmap" center="#{polyglon.center}" zoom="#{polyglon.zoom}" style="width:100%;height:500px" model="#{polyglon.polygonModel}" type="TERRAIN">
+       <p:ajax event="pointSelect" listener="#{polyglon.onPointSelect}" update="gmap :#{p:component('paths')}" />
+       <p:ajax event="stateChange" listener="#{polyglon.onStateChanged}" update="gmap" /> 
      </p:gmap>
      
+     <h:form>
+       <p:growl id="growl"/>
+     </h:form>
+	  
+	 <p:panelGrid columns="2" layout="grid">
+ 	   
+	
+	     <p:panel id="panelCreate" header="Tworzenie polygonu">
+	     
+	
+	   	 <h:form>
+	       <h:panelGrid columns="3" cellpadding="5" styleClass="panelGrid">
 
-     <p:panel header="Polygon creater">
-     
-       <!-- FORM PANEL -->
-       <p:panelGrid columns="3">
-         <p:outputLabel value="Save polygon"/>
-         <p:inputText placeholder="name"/>
-         
-        <p:selectOneMenu id="targets" value="#{polyglon.listTargetsId}" style="width:300px">
-           <f:selectItems value="#{polyglon.listFriends}" var="target" itemLabel="#{target.login}" itemValue="#{target.id}"/>
-        </p:selectOneMenu>
-        
-        <p:commandButton value="Save"/>
-        
-       </p:panelGrid>
-     
-       <!-- TABLE WITH POINTS -->
-       <p:dataTable var="point" value="#{polyglon.points}" style="margin-top: 20px; padding: 5px;" id="points" rowIndexVar="index">
-         
-         <p:column headerText="number">
-           <h:outputText value="#{index + 1}" />
-         </p:column>
-         
-         <p:column headerText="lat">
-           <h:outputText value="#{point.lat}" />
-         </p:column>
-         
-         <p:column headerText="lng">
-           <h:outputText value="#{point.lng}" />
-         </p:column>
-         
-         <p:column headerText="remove">
-           <p:commandButton value="remove" actionListener="#{polyglon.actionRemove(index + 1)}" update="mainForm:points mainForm:gmap"/>
-         </p:column>
-         
-       </p:dataTable>
-     </p:panel>
-   </h:form>
+	         <p:outputLabel for="nazwa" value="Nazwa Polygona:"/>
+	         <p:inputText id="nazwa" required="true" value="#{polyglon.nazwaPolygona}">
+	           <f:validateLength minimum="4" maximum="16"/>
+	         </p:inputText>
+	         <p:message for="nazwa" display="icon" />
+	         
+	         <p:outputLabel for="typPolygon" value="Typ Polygona:"/>
+	         <p:selectOneMenu id="typPolygon" value="#{polyglon.polygonType}" required="true">
+	           <f:selectItems value="#{polyglon.polygonFollowTypes}"/>
+	         </p:selectOneMenu>
+	         <p:message for="typPolygon" display="icon" />
+	         
+	         <p:outputLabel for="login" value="Login Targetu:"/>
+	         <p:autoComplete id="login" value="#{polyglon.targetLogin}" completeMethod="#{polyglon.onAutoCompleteUser}" required="true" forceSelection="true"/>
+	         <p:message for="login" display="icon" />
+	         
+	         <p:commandButton value="Creacte" update=":#{p:component('growl')} :#{p:component('existPolygons')}" action="#{polyglon.createPolygon()}"/>
+	       </h:panelGrid>
+	     </h:form>
+	     
+	     
+	     <h:form id="paths">
+	       <p:dataTable value="#{polyglon.paths}" var="path">
+	         <p:column headerText="Wartosc">
+	           <h:outputText value="#{path}" />
+	         </p:column>
+	         <p:column headerText="Pokaz">
+	           <p:commandButton value="POKAZ" actionListener="#{polyglon.showPath(path)}" update=":#{p:component('gmap')}"/>
+	         </p:column>
+	         <p:column headerText="Usun">
+	           <p:commandButton value="USUN" actionListener="#{polyglon.removePath(path)}" update=":#{p:component('gmap')} :#{p:component('paths')}"/>
+	         </p:column>
+	       </p:dataTable>
+	     </h:form>
+	     
+	     
+	    </p:panel>
+	  
+	   <p:panel header="Istniejace polygony">
+	           <h:form id="existPolygons">
+                 <p:dataTable var="user_polygon" value="#{polyglon.polygonList}">
+                   <p:column headerText="Nazwa">
+                     <h:outputText value="#{user_polygon.name}" />
+                   </p:column>
+                   <p:column headerText="Typ sledzenia">
+                     <h:outputText value="#{user_polygon.polygonFollowType}" />
+                   </p:column>
+                   <p:column headerText="Sledzony uzytkownik">
+                     <h:outputText value="#{user_polygon.target.login}" />
+                   </p:column>
+                   <p:column headerText="Pokaz">
+                     <p:commandButton update=":#{p:component('gmap')} :#{p:component('panelCreate')}" actionListener="#{polyglon.onPokazPolygon(user_polygon)}" value="POKAZ"/>
+                   </p:column>
+                   <p:column headerText="Usun">
+                     <p:commandButton update=":#{p:component('panelCreate')}" actionListener="#{polyglon.onRemovePolygon(user_polygon.id)}"  value="USUN"/>
+                   </p:column>
+                 </p:dataTable>
+	           </h:form>
+	   </p:panel>
+	   	   
+	 </p:panelGrid>
+
 </h:body> 
 </html>

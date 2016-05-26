@@ -13,7 +13,6 @@ import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 
 import com.pw.lokalizator.model.entity.User;
-import com.pw.lokalizator.model.entity.UserSecurity;
 import com.pw.lokalizator.model.enums.Roles;
 import com.pw.lokalizator.repository.UserRepository;
 
@@ -24,14 +23,11 @@ public class UserService implements Serializable{
 	UserRepository userRepository;
 	
 //	@TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-	public void createAccount(User user){
+	public void createAcount(User user){
 		
-		UserSecurity security = new UserSecurity();
-		security.setRola(Roles.USER);
-		security.setEnable(true);
-		security.setUser(user);
-		user.setUserSecurity(security);
-		userRepository.add(user);
+		user.setRola(Roles.USER);
+		
+		userRepository.create(user);
 		
 	}
 }

@@ -9,7 +9,7 @@
   <title>Login</title>
   <h:outputStylesheet library="css" name="login.css"/>
   <f:metadata>
-    <f:event listener="#{lokalizatorSession.checkIsLogged}" type="preRenderView"/>
+    <f:event listener="#{lokalizatorSecurityController.redirectIfArleadyLogged()}" type="preRenderView"/>
   </f:metadata>
 </h:head> 
 
@@ -23,7 +23,7 @@
             
             <h:panelGrid columns="3" cellpadding="5" styleClass="table" >
                 <p:outputLabel for="userName" value="User Name:" />
-                <p:inputText id="userName" value="#{lokalizatorSession.userLogin}"
+                <p:inputText id="userName" value="#{lokalizatorSecurityController.login}"
                     required="true" label="User name">
                     <f:validateLength minimum="6" />
                 </p:inputText>
@@ -31,13 +31,13 @@
 
                 <p:outputLabel for="password" value="Password:" />
                 <p:password id="password"
-                    value="#{lokalizatorSession.userPassword}" required="true"
+                    value="#{lokalizatorSecurityController.password}" required="true"
                     label="Password">
                     <f:validateLength minimum="6" />
                 </p:password>
                 <p:message for="password" display="icon" />
                 
-                <p:commandButton value="Login" update="panel messages" action="#{lokalizatorSession.login()}" />
+                <p:commandButton value="Login" update="panel messages" action="#{lokalizatorSecurityController.login()}" />
                 <p:button value="Create" outcome="create" styleClass="button"/>
             </h:panelGrid>
         </p:panel>

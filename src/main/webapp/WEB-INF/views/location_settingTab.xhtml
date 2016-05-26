@@ -64,12 +64,14 @@
                 <p:ajax event="change" listener="#{googleMapControllerFollowMode.render}" update=":#{p:component('gmap')}"/>
               </p:selectBooleanCheckbox>
               
-              <h:outputText value="Polygon"/>
-              <p:selectBooleanCheckbox>
+              <h:outputText value="Polygon (brak podzialu na providery)"/>
+              <p:selectBooleanCheckbox value="#{googleMapControllerFollowMode.polygonVisible}">
                 <p:ajax event="change" listener="#{googleMapControllerFollowMode.render}" update=":#{p:component('gmap')}"/>
               </p:selectBooleanCheckbox>
               
+              
             </h:panelGrid>
+            
             </h:form>
           </p:panel>
           <p:panel header="Widocznosc histori"></p:panel>

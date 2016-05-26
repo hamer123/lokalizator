@@ -18,93 +18,18 @@ import com.pw.lokalizator.repository.UserRepository;
 @Named(value="lokalizatorSession")
 @SessionScoped
 public class LokalizatorSession implements Serializable{
-	private static final long serialVersionUID = 1L;
-	Logger log = Logger.getLogger(LokalizatorSession.class);
-	@Inject
-	private UserRepository userRepository;
+	private User user;
 	
-	private boolean isLogged;
-	private String userLogin;
-	private String userPassword;
-	private User currentUser;
-	
-	public String login(){
-		try{
-			currentUser = userRepository.findUserWithSecurityByLoginAndPassword(userLogin,userPassword);
-		}catch(Exception e){
-			e.printStackTrace();
-			//TODO
-		}
-		
-		if(currentUser != null){
-			isLogged = true;
-			userPassword = "";
-			
-			log.info("login successful for " + userLogin);
-			return "/location.xhtml?faces-redirect=true";
-		}else{
-			log.info("failed to login for " + userLogin);
-			
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_WARN,
-							"Login failed",
-							"Invalid or unknown credentials."));
-			
-			return null;
-		}
-	}
-	
-	
-	public void checkIsLogged() throws IOException{
-		if(isLogged)
-			FacesContext.getCurrentInstance().getExternalContext().redirect("logout.xhtml");
-	}
-	
-	public String logout(){
-		FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
-		log.debug("logout successful for " + userLogin);
-		
-		return "/login.xhtml?faces-redirect=true";
+	public boolean isLogged(){
+		return user != null;
 	}
 
-
-	public String getUserLogin() {
-		return userLogin;
+	public User getUser() {
+		return user;
 	}
 
-
-	public void setUserLogin(String userLogin) {
-		this.userLogin = userLogin;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
-
-	public String getUserPassword() {
-		return userPassword;
-	}
-
-
-	public void setUserPassword(String userPassword) {
-		this.userPassword = userPassword;
-	}
-
-
-	public boolean isLogged() {
-		return isLogged;
-	}
-
-
-	public void setLogged(boolean isLogged) {
-		this.isLogged = isLogged;
-	}
-
-
-	public User getCurrentUser() {
-		return currentUser;
-	}
-
-
-	public void setCurrentUser(User currentUser) {
-		this.currentUser = currentUser;
-	}
-	
 }

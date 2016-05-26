@@ -30,7 +30,7 @@ public class LocationRepositoryImpl implements LocationRepository{
 	
 	Logger log = Logger.getLogger(LocationRepositoryImpl.class);
 	
-	public Location add(Location entity) {
+	public Location create(Location entity) {
 		em.persist(entity);
 		return entity;
 	}

@@ -16,7 +16,7 @@ public class PolygonModelRepositoryImpl implements PolygonModelRepository{
 	private EntityManager em;
 	
 	@Override
-	public PolygonModel add(PolygonModel entity) {
+	public PolygonModel create(PolygonModel entity) {
 		em.persist(entity);
 		return entity;
 	}
@@ -51,10 +51,29 @@ public class PolygonModelRepositoryImpl implements PolygonModelRepository{
 	}
 
 	@Override
-	public List<PolygonModel> getPolygonsByTargetId(Long id){
+	public List<PolygonModel> findByTargetId(long id){
 		return em.createNamedQuery("PolygonModel.getPolygonsByTargetId", PolygonModel.class)
 		         .setParameter("id", id)
 		         .getResultList();
+	}
+
+	@Override
+	public List<PolygonModel> findIdAndNameAndFollowTypeAndTargetIdAndTargetLoginByProviderId(long id) {
+		return em.createNamedQuery("Polygon.findIdAndNameAndFollowTypeAndTargetIdAndTargetLoginByProviderId", PolygonModel.class)
+				 .setParameter("id", id)
+				 .getResultList();
+	}
+
+	@Override
+	public List<PolygonModel> findWithEagerFetchPointsAndTargetByProviderId(long id) {
+		List<PolygonModel>polygonModels = em.createNamedQuery("Polygon.findWithEagerFetchPointsAndTargetByProviderId", PolygonModel.class)
+				 .setParameter("id", id)
+				 .getResultList();	
+
+		for(PolygonModel polygonModel : polygonModels)
+			polygonModel.getPoints().size();
+		
+		return polygonModels;
 	}
 
 }

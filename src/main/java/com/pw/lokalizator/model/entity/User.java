@@ -8,6 +8,8 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -37,15 +39,22 @@ import com.pw.lokalizator.model.enums.Roles;
 		value = {
 		  @NamedQuery(name="USER.findAll", query = "SELECT u FROM User u"),
 		  @NamedQuery(name="USER.deleteByID", query="DELETE FROM User u WHERE u.id = :id"),
-		  @NamedQuery(name="USER.findByLogin", query="SELECT u FROM User u WHERE u.login = :login"),
+		  @NamedQuery(name="USER.findByLogin", query="SELECT u FROM User u WHERE u.login =:login"),
+		  @NamedQuery(name="USER.findByLoginAndPassword", query="SELECT u FROM User u WHERE u.login = :login AND u.password =:password"),
 		  @NamedQuery(name="USER.findLoginByLoginLike", query="SELECT u.login FROM User u WHERE u.login LIKE :login"),
 		  @NamedQuery(name="USER.findUserWithPolygonsByLogin", query="SELECT u FROM User u INNER JOIN FETCH u.polygons WHERE u.login =:login"),
-		  @NamedQuery(name="USER.findUserWithSecurityByLoginAndPassword", query="SELECT new com.pw.lokalizator.model.entity.User"
-		  		          + "(u.id, u.login, u.password, u.email, u.phone, u.userSecurity.id, u.userSecurity.enable, u.userSecurity.rola)"
-		  		          + " FROM User u "
-		  		          + " WHERE u.login =:login AND u.password =:password"),
-
+		  @NamedQuery(name="USER.findUsersById", query="SELECT u FROM User u WHERE u.id IN (:id)"),
+		  @NamedQuery(name="USER.findUserWithSecurityByLoginAndPassword", 
+		              query="SELECT new com.pw.lokalizator.model.entity.User(u.id, u.login, u.password, u.email, u.phone, u.rola) "
+		  		           +"From User u WHERE u.login =:login AND u.password =:password"),
+		  @NamedQuery(name="USER.findByIdFetchEagerLastLocations", 
+		              query="SELECT u FROM User u LEFT JOIN FETCH u.lastLocationGPS LEFT JOIN FETCH u.lastLocationNetworkNaszaUsluga LEFT JOIN FETCH u.lastLocationNetworObcaUsluga "
+		              	  + "WHERE u.login =:login")
 		})
+@NamedNativeQueries(value = {
+		@NamedNativeQuery(name="User.Native.updateUserLastLocationNetworkNaszaUslugaById", 
+				          query="UPDATE user SET LAST_LOC_NET_NASZA_ID =:locationId WHERE id =:userId")
+})
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
 public class User implements Serializable {
@@ -74,19 +83,19 @@ public class User implements Serializable {
 	@Column(name="PHONE")
 	private String phone;
 	
-	@OneToOne(optional=false, fetch=FetchType.LAZY, cascade=CascadeType.ALL, mappedBy="user",  orphanRemoval = true)
-	@JoinColumn(name = "USER_ID")
-	private UserSecurity userSecurity;
+	@Enumerated(EnumType.STRING)
+	private Roles rola;
 	
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(updatable = true, name = "LAST_LOC_GPS")
 	private LocationGPS lastLocationGPS;
 	
-	@OneToOne
-	@JoinColumn(name = "LAST_LOC_NET_NASZA_ID")
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(updatable = true, name = "LAST_LOC_NET_NASZA_ID")
 	private LocationNetwork lastLocationNetworkNaszaUsluga;
 	
-	@JoinColumn(name = "LAST_LOC_NET_OBCA_ID")
-	@OneToOne 
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(updatable = true, name = "LAST_LOC_NET_OBCA_ID")
 	private LocationNetwork lastLocationNetworObcaUsluga;
 	
 	@OneToMany(mappedBy="user", orphanRemoval = true, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
@@ -98,24 +107,20 @@ public class User implements Serializable {
 	@OneToMany(mappedBy="user", orphanRemoval = true, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
 	private List<LocationNetwork> locationNetworkObcaUsluga;
 
-	@OneToMany(mappedBy = "provider", orphanRemoval = true, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+	@OneToMany(mappedBy = "provider", orphanRemoval = true, fetch= FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
 	private List<PolygonModel>polygons;
 	
 	public User(){}
 	
-	public User(long id, String login, String password, String email, String phone, long secId, boolean enable, Roles rola){
+	public User(long id, String login, String password, String email, String phone, Roles rola){
 		this.id = id;
 		this.login = login;
 		this.password = password;
 		this.email = email;
 		this.phone = phone;
-		this.userSecurity = new UserSecurity();
-		this.userSecurity.setId(secId);
-		this.userSecurity.setEnable(enable);
-		this.userSecurity.setRola(rola);
-		this.userSecurity.setUser(this);
+		this.rola = rola;
 	}
-
+	
 	public long getId() {
 		return id;
 	}
@@ -146,14 +151,6 @@ public class User implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
-	}
-
-	public UserSecurity getUserSecurity() {
-		return userSecurity;
-	}
-
-	public void setUserSecurity(UserSecurity userSecurity) {
-		this.userSecurity = userSecurity;
 	}
 
 	public LocationGPS getLastLocationGPS() {
@@ -231,4 +228,13 @@ public class User implements Serializable {
 			List<LocationNetwork> locationNetworkObcaUsluga) {
 		this.locationNetworkObcaUsluga = locationNetworkObcaUsluga;
 	}
+
+	public Roles getRola() {
+		return rola;
+	}
+
+	public void setRola(Roles rola) {
+		this.rola = rola;
+	}
+	
 }
