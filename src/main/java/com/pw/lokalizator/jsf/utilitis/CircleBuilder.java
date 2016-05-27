@@ -56,14 +56,19 @@ public class CircleBuilder {
                 100);
 
        circle.setData(location);
+       circle.setRadius(getRadius(location));
        circle.setFillColor(chooseColor(location));
-       circle.setFillOpacity(location.getAccuracy());
+       circle.setFillOpacity(CIRCLE_FILL_OPACITY);
        circle.setStrokeColor(chooseStrokeColor(location));
        circle.setStrokeOpacity(CIRCLE_STROKE_OPACITY);
        OverlayIdentyfikator identyfikator = new OverlayIdentyfikator(location);
        circle.setId(identyfikator.createIdentyfikator());
        
        return circle;
+	}
+	
+	private static double getRadius(Location location){
+		return location.getAccuracy() * 100;
 	}
 	
 	private static String chooseColor(Location location){
