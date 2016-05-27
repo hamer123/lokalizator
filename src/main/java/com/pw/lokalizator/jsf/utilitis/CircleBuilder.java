@@ -15,7 +15,7 @@ import com.pw.lokalizator.model.enums.Providers;
 import com.pw.lokalizator.utilitis.PropertiesReader;
 
 public class CircleBuilder {
-	private static Logger LOG = Logger.getLogger(CircleBuilder.class);
+	private static Logger logger = Logger.getLogger(CircleBuilder.class);
 	
 	private static String GPS_CIRCLE_COLOR;
 	private static String NETWORK_NASZ_CIRCLE_COLOR;
@@ -57,7 +57,7 @@ public class CircleBuilder {
 
        circle.setData(location);
        circle.setFillColor(chooseColor(location));
-       circle.setFillOpacity(CIRCLE_FILL_OPACITY);
+       circle.setFillOpacity(location.getAccuracy());
        circle.setStrokeColor(chooseStrokeColor(location));
        circle.setStrokeOpacity(CIRCLE_STROKE_OPACITY);
        OverlayIdentyfikator identyfikator = new OverlayIdentyfikator(location);

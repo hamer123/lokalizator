@@ -1,6 +1,5 @@
 package com.pw.lokalizator.rest;
 
-import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -19,7 +18,7 @@ import com.pw.lokalizator.service.LocationService;
 
 @Path("/location/gps")
 public class RestLocationGPS {
-	@EJB
+	@Inject
 	private LocationService locationService;
 	Logger logger = Logger.getLogger(RestLocationNetwork.class);
 	
