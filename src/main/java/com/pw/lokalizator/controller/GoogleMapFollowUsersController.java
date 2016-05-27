@@ -215,7 +215,8 @@ public class GoogleMapFollowUsersController implements Serializable{
 	}
 	
 	private void updateFollowUsers(){
-		updateFollowUsersCurrentLocations();
+		if(!followUsers.isEmpty())
+			updateFollowUsersCurrentLocations();
 	}
 	
 	private void updateFollowUsersCurrentLocations(){
