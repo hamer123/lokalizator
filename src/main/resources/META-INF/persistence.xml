@@ -2,8 +2,8 @@
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
 	<persistence-unit name="lokalizator" transaction-type="JTA">
 	  <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-	  <!--  <jta-data-source>java:jboss/datasources/MySQLDS</jta-data-source>  -->
-	  <jta-data-source>java:jboss/datasources/test2</jta-data-source>
+	  <jta-data-source>java:jboss/datasources/MySQLDS</jta-data-source>
+	  <!--  <jta-data-source>java:jboss/datasources/test2</jta-data-source>  -->
 	  
 	  <class>com.pw.lokalizator.model.entity.User</class>
 	  <class>com.pw.lokalizator.model.entity.Location</class>
@@ -20,7 +20,7 @@
 	  
 	  <properties>
 	     <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect" />
-	     <property name="hibernate.hbm2ddl.auto" value="update"/>
+	     <property name="hibernate.hbm2ddl.auto" value="create"/>
 		 <property name="hibernate.show_sql" value="true"/>
 	  </properties>
 	</persistence-unit>
