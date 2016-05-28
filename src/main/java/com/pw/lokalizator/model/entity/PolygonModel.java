@@ -54,8 +54,8 @@ public class PolygonModel {
 	@GeneratedValue(strategy=GenerationType.TABLE, generator="polygonGenerator")
 	private long id;
     
-	@NotNull
-	@Size(min = 4, max = 16)
+//	@NotNull
+//	@Size(min = 4, max = 16)
     @Column
 	private String name;
     
@@ -63,16 +63,16 @@ public class PolygonModel {
 	@MapKey(name="number")
 	private Map<Integer, PolygonPoint>points;
 	
-	@NotNull
+//	@NotNull
 	@OneToOne(optional = false)
 	@JoinColumn(unique = false)
 	private User target;
 	
-	@NotNull
+//	@NotNull
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	private User provider;
 	
-	@NotNull
+//	@NotNull
 	@Enumerated(EnumType.STRING)
 	private PolygonFollows polygonFollowType;
 	
