@@ -10,7 +10,7 @@
      <p:dataTable id="polygonsTable" var="polygon" value="#{messageController.polygonList}"
                   selectionMode="single" selection="#{messageController.selectedPolygonModel}" rowKey="#{polygon.id}">
         <p:ajax event="rowSelect" listener="#{messageController.onPolygonSelect}" 
-                update=":#{p:component('options')} :#{p:component('messages')} :#{p:component('messageNody')}"/>
+                update=":#{p:component('options')} :#{p:component('messages')} :#{p:component('messageBody')}"/>
                 
         <p:column headerText="Nazwa">
           <h:outputText value="#{polygon.name}" />
