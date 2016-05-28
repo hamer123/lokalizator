@@ -82,11 +82,9 @@ public class PolygonModel {
 		this.id = id;
 		this.name = name;
 		this.polygonFollowType = polygonFollows;
-		
 		User target = new User();
 		target.setId(targetID);
 		target.setLogin(targetLogin);
-		
 		this.target = target;
 	}
 	
