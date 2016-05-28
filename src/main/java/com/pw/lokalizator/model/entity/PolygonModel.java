@@ -12,6 +12,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKey;
 import javax.persistence.NamedQueries;
@@ -64,7 +65,7 @@ public class PolygonModel {
 	
 	@NotNull
 	@OneToOne(optional = false)
-	@Column(unique = false)
+	@JoinColumn(unique = false)
 	private User target;
 	
 	@NotNull
