@@ -10,27 +10,31 @@
   <title>Wiadomosci</title>
 </h:head> 
 <h:body>
-   <ui:insert name="menu" >
+   <ui:insert name="menu">
      <ui:include src="/WEB-INF/views/menu_templete.xhtml" />
    </ui:insert> 
    
-   <p:outputPanel id="firstHalf">
+   <p:outputPanel layout="grid">
+   
+   <p:outputPanel id="firstHalf" layout="grid">
      <p:panel id="polygons" header="Polygons">
        <ui:include src="/WEB-INF/views/message/message_polygonPanel.xhtml"/> 
      </p:panel>
      
-     <p:panel id="options" header="Options" rendered="#{messageController.selectedPolygonModel != null}">
+     <p:outputPanel id="options" header="Options" rendered="#{messageController.selectedPolygonModel != null}">
        <ui:include src="/WEB-INF/views/message/message_optionPanel.xhtml"/>
-     </p:panel>
+     </p:outputPanel>
    </p:outputPanel>
    
-   <p:outputPanel id="secondHalf">
+   <p:outputPanel id="secondHalf" layout="grid">
      <p:panel id="messageBody" header="Message Body" closable="true">
      </p:panel>
    
      <p:panel id="messages" header="Messages">
        <ui:include src="/WEB-INF/views/message/message_messagesPanel.xhtml"/>
      </p:panel>
+   </p:outputPanel>
+   
    </p:outputPanel>
 
 </h:body> 
