@@ -24,12 +24,10 @@ public class MessageController implements Serializable{
 	private PolygonModel selectedPolygonModel;
 	private List<PolygonModel> polygonList;
 	
-	
 	@PostConstruct
 	private void postConstruct(){
 		long id = lokalizatorSession.getUser().getId();
 		polygonList = polygonModelRepository.findWithEagerFetchPointsAndTargetByProviderId(id); 
-		
 	}
 	
 	public void onPolygonSelect(SelectEvent event){

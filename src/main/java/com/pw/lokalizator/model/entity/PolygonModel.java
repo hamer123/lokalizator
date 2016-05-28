@@ -1,10 +1,8 @@
 package com.pw.lokalizator.model.entity;
 
-import java.util.Collection;
-import java.util.List;
+
 import java.util.Map;
 
-import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,7 +12,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKey;
 import javax.persistence.NamedQueries;
@@ -23,9 +20,10 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import org.apache.commons.io.filefilter.FalseFileFilter;
 
 import com.pw.lokalizator.model.enums.PolygonFollows;
 
@@ -45,16 +43,18 @@ import com.pw.lokalizator.model.enums.PolygonFollows;
 })
 public class PolygonModel {
     @TableGenerator(
-            name="polGen", 
+            name="polygonGenerator", 
             table="ID_GEN", 
             pkColumnName="GEN_KEY", 
             valueColumnName="GEN_VALUE", 
-            pkColumnValue="POL_ID", 
+            pkColumnValue="POLYGON_ID", 
             allocationSize=1)
 	@Id
-	@GeneratedValue(strategy=GenerationType.TABLE, generator="polGen")
+	@GeneratedValue(strategy=GenerationType.TABLE, generator="polygonGenerator")
 	private long id;
     
+	@NotNull
+	@Size(min = 4, max = 16)
     @Column
 	private String name;
     
@@ -62,12 +62,16 @@ public class PolygonModel {
 	@MapKey(name="number")
 	private Map<Integer, PolygonPoint>points;
 	
+	@NotNull
 	@OneToOne(optional = false)
+	@Column(unique = false)
 	private User target;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@NotNull
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	private User provider;
 	
+	@NotNull
 	@Enumerated(EnumType.STRING)
 	private PolygonFollows polygonFollowType;
 	

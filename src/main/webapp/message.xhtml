@@ -21,9 +21,9 @@
        <ui:include src="/WEB-INF/views/message/message_polygonPanel.xhtml"/> 
      </p:panel>
      
-     <p:outputPanel id="options" header="Options"> <!--  rendered="#{messageController.selectedPolygonModel != null}"  -->
+     <p:panel id="options" header="Options" rendered="#{messageController.selectedPolygonModel != null}">
        <ui:include src="/WEB-INF/views/message/message_optionPanel.xhtml"/>
-     </p:outputPanel>
+     </p:panel>
    </p:outputPanel>
    
    <p:outputPanel id="secondHalf" layout="grid">
