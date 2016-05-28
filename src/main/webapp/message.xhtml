@@ -14,14 +14,14 @@
      <ui:include src="/WEB-INF/views/menu_templete.xhtml" />
    </ui:insert> 
    
-   <p:outputPanel layout="grid">
+   <h:panelGrid columns="2" cellspacing="2">
    
    <p:outputPanel id="firstHalf" layout="grid">
      <p:panel id="polygons" header="Polygons">
        <ui:include src="/WEB-INF/views/message/message_polygonPanel.xhtml"/> 
      </p:panel>
      
-     <p:outputPanel id="options" header="Options" rendered="#{messageController.selectedPolygonModel != null}">
+     <p:outputPanel id="options" header="Options"> <!--  rendered="#{messageController.selectedPolygonModel != null}"  -->
        <ui:include src="/WEB-INF/views/message/message_optionPanel.xhtml"/>
      </p:outputPanel>
    </p:outputPanel>
@@ -35,7 +35,7 @@
      </p:panel>
    </p:outputPanel>
    
-   </p:outputPanel>
+   </h:panelGrid>
 
 </h:body> 
 </html>
