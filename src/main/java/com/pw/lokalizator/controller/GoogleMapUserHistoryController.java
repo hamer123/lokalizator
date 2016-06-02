@@ -22,7 +22,7 @@ import com.pw.lokalizator.model.entity.Location;
 import com.pw.lokalizator.model.entity.User;
 import com.pw.lokalizator.model.enums.GoogleMaps;
 import com.pw.lokalizator.repository.LocationRepository;
-import com.pw.lokalizator.repository.PolygonModelRepository;
+import com.pw.lokalizator.repository.AreaRepository;
 import com.pw.lokalizator.repository.UserRepository;
 
 @Named("googleMapControllerSingleMode")
@@ -31,7 +31,7 @@ public class GoogleMapUserHistoryController implements Serializable{
 	@EJB
 	private UserRepository userRepository;
 	@EJB
-	private PolygonModelRepository polygonModelRepository;
+	private AreaRepository polygonModelRepository;
 	@EJB
 	private LocationRepository locationRepository;
 	

@@ -37,7 +37,7 @@ import org.primefaces.model.map.Polyline;
 import org.primefaces.model.map.Rectangle;
 
 import com.pw.lokalizator.exception.ProviderNotSupportedException;
-import com.pw.lokalizator.job.PolygonService;
+import com.pw.lokalizator.job.AreaEventService;
 import com.pw.lokalizator.jsf.utilitis.CircleBuilder;
 import com.pw.lokalizator.jsf.utilitis.JsfMessageBuilder;
 import com.pw.lokalizator.jsf.utilitis.MarkerBuilder;
@@ -50,7 +50,7 @@ import com.pw.lokalizator.model.OverlayVisibility;
 import com.pw.lokalizator.model.OverlayVisibility.OverlayVisibilityBuilder;
 import com.pw.lokalizator.model.entity.Location;
 import com.pw.lokalizator.model.entity.LocationNetwork;
-import com.pw.lokalizator.model.entity.PolygonModel;
+import com.pw.lokalizator.model.entity.Area;
 import com.pw.lokalizator.model.entity.PolygonPoint;
 import com.pw.lokalizator.model.entity.User;
 import com.pw.lokalizator.model.enums.GoogleMaps;
@@ -58,7 +58,7 @@ import com.pw.lokalizator.model.enums.LocalizationServices;
 import com.pw.lokalizator.model.enums.Overlays;
 import com.pw.lokalizator.model.enums.Providers;
 import com.pw.lokalizator.repository.LocationRepository;
-import com.pw.lokalizator.repository.PolygonModelRepository;
+import com.pw.lokalizator.repository.AreaRepository;
 import com.pw.lokalizator.repository.UserRepository;
 
 @ViewScoped
@@ -68,7 +68,7 @@ public class GoogleMapFollowUsersController implements Serializable{
 	@EJB
 	private UserRepository userRepository;
 	@EJB
-	private PolygonModelRepository polygonModelRepository;
+	private AreaRepository polygonModelRepository;
 	@EJB
 	private LocationRepository locationRepository;
 	
@@ -145,7 +145,7 @@ public class GoogleMapFollowUsersController implements Serializable{
 	private User getUserWithCurrentLocationsAndPolygons(String login){
 		User user = userRepository.findByIdFetchEagerLastLocations(login);
 		long id = user.getId();
-		List<PolygonModel>polygonModels = polygonModelRepository.findWithEagerFetchPointsAndTargetByProviderId(id); 
+		List<Area>polygonModels = polygonModelRepository.findWithEagerFetchPointsAndTargetByProviderId(id); 
 		user.setPolygons(polygonModels);
 		return user;
 	}
@@ -244,7 +244,7 @@ public class GoogleMapFollowUsersController implements Serializable{
 
 	private MapModel createGoogleMap(){
 		List<Location>locations = getCurrentLocationsFromUsers();
-		List<PolygonModel>polygonsModel = getPolygonModelFromUsers();
+		List<Area>polygonsModel = getPolygonModelFromUsers();
 		
 		List<Circle>circles = createCircle(locations);
 		List<Marker>markers = createMarker(locations);
@@ -284,8 +284,8 @@ public class GoogleMapFollowUsersController implements Serializable{
 		return location;
 	}
 	
-	private List<PolygonModel> getPolygonModelFromUsers(){
-		List<PolygonModel>polygons = new ArrayList<>();
+	private List<Area> getPolygonModelFromUsers(){
+		List<Area>polygons = new ArrayList<>();
 		
 		for(User user : followUsers){
 			polygons.addAll(user.getPolygons());
@@ -318,10 +318,10 @@ public class GoogleMapFollowUsersController implements Serializable{
 		return markers;
 	}
 	
-	private List<Polygon> createPolygon(List<PolygonModel>polygonsModel){
+	private List<Polygon> createPolygon(List<Area>polygonsModel){
 		List<Polygon>polygons = new ArrayList<>();
 		
-		for(PolygonModel polygonModel : polygonsModel){
+		for(Area polygonModel : polygonsModel){
 			if(polygonVisible){
 				polygons.add( PolygonBuilder.create(polygonModel) );
 			}

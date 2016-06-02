@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"> 
+
+<h:head>
+  <title>polygon</title>
+  <h:outputStylesheet library="css" name="standardPanelGrid"/>
+  <h:outputStylesheet library="css" name="polygonPanles"/>
+  <h:outputStylesheet library="css" name="default.css"/>
+  <script src="https://maps.googleapis.com/maps/api/js"/>
+</h:head> 
+
+<h:body styleClass="body"> 
+
+     <ui:insert name="menu" >
+	    <ui:include src="/WEB-INF/views/menu_templete.xhtml" />
+	  </ui:insert>
+	 
+	 <h:form>
+       <p:growl id="growl"/>
+       
+	   <p:gmap id="gmap" center="#{polyglon.center}" zoom="#{polyglon.zoom}" style="width:100%;height:500px" model="#{polyglon.polygonModel}" type="TERRAIN">
+          <p:ajax event="pointSelect" listener="#{polyglon.onPointSelect}" update="gmap :#{p:component('paths')}" />
+          <p:ajax event="stateChange" listener="#{polyglon.onStateChanged}" update="gmap" /> 
+       </p:gmap>
+     
+     </h:form>
+     
+     <p:panelGrid columns="2" layout="grid" style="margin-top: 5px">
+     
+        <ui:include src="/WEB-INF/views/area/createArea.xhtml" />
+        
+        <ui:include src="/WEB-INF/views/area/existArea.xhtml" />
+        
+    </p:panelGrid>
+    
+    
+</h:body> 
+</html>

@@ -32,7 +32,7 @@ import com.pw.lokalizator.model.enums.Providers;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
 @MappedSuperclass
-@DiscriminatorColumn(name="PROVIDER_TYPE", discriminatorType = DiscriminatorType.STRING)
+//@DiscriminatorColumn(name="PROVIDER_TYPE", discriminatorType = DiscriminatorType.STRING)
 public abstract class Location implements Serializable{
     @Id
     @TableGenerator(

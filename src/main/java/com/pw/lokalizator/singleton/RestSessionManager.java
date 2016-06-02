@@ -1,9 +1,12 @@
 package com.pw.lokalizator.singleton;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -74,5 +77,30 @@ public class RestSessionManager {
 		return restSessions.stream()
 				           .map(rs -> rs.getUser().getLogin())
 				           .collect(Collectors.toList());
+	}
+	
+	public boolean isUserOnline(String login){
+		Optional<RestSession> optionalRestSession = restSessions
+				.values()
+				.stream()
+				.filter( rs -> rs.getUser().getLogin().equals(login))
+				.findFirst();
+		
+		try{
+			RestSession restSession = optionalRestSession.get();
+			long time = 2 * 60 * 1000; //2min
+			
+			if(olderTwoMinutesThanCurrentDate(restSession.getLastUsed()))
+				return true;
+		}catch(NoSuchElementException e){
+		}
+		
+		return false;
+	}
+	
+	private boolean olderTwoMinutesThanCurrentDate(Date date){
+		Date now = new Date();
+		long twoMin = 2 * 60 * 1000;
+		return now.getTime() - twoMin < date.getTime(); 
 	}
 }

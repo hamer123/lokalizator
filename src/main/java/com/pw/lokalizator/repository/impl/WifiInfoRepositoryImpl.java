@@ -48,7 +48,7 @@ public class WifiInfoRepositoryImpl implements WifiInfoRepository {
 	}
 
 	@Override
-	public Collection<WifiInfo> findAll() {
+	public List<WifiInfo> findAll() {
 		// TODO Auto-generated method stub
 		return null;
 	}

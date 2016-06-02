@@ -51,7 +51,7 @@ public class LocationRepositoryImpl implements LocationRepository{
 		return em.find(Location.class, id);
 	}
 
-	public Collection<Location> findAll() {
+	public List<Location> findAll() {
 		return em.createQuery("SELECT l FROM Location l", Location.class).getResultList();
 	}
 

@@ -9,23 +9,32 @@
   <script src="https://maps.googleapis.com/maps/api/js"/>
 </h:head> 
 <h:body>
-   <h:form>
-      <p:messages/>
-      <p:growl/>
+  <p:layout fullPage="true">
  
-      <p:commandButton value="CLICK TEST" actionListener="#{testCdiTransactional.doTestTransaction()}" update=":#{p:component('gmap')}"/>
-      <p:commandButton value="CLICK 2" actionListener="#{testCdiTransactional.findUserOnline()}" update=":#{p:component('gmap')}"/>
-   </h:form>
-
-	<p:gmap id="gmap" center="#{googleMapController.center}"
-		zoom="#{googleMapController.zoom}"
-		type="#{googleMapController.googleMapType}"
-		style="width:100%;height:400px"
-		model="#{googleMapController.googleMapModel}">
-		<p:ajax event="stateChange"
-			listener="#{googleMapController.onGoogleMapStateChange}" />
-	</p:gmap>
-
-
+    <p:layoutUnit position="north" size="80" resizable="true" collapsible="true">
+        <ui:insert name="menu" >
+	      <ui:include src="/WEB-INF/views/menu_templete.xhtml" />
+	    </ui:insert>
+    </p:layoutUnit>
+ 
+    <p:layoutUnit position="south" size="100" header="Bottom" resizable="true" closable="true" collapsible="true">
+        <h:outputText value="South unit content." />
+    </p:layoutUnit>
+ 
+ <!--
+    <p:layoutUnit position="west" size="0" header="Left" resizable="true" closable="true" collapsible="true">
+        <h:outputText value="West unit content." />
+    </p:layoutUnit>
+ 
+    <p:layoutUnit position="east" size="0" header="Right" resizable="true" closable="true" collapsible="true" effect="drop">
+        <h:outputText value="Right unit content." />
+    </p:layoutUnit>
+ 
+-->
+    <p:layoutUnit position="center">
+         <p:gmap center="41.381542, 2.122893" zoom="15" type="HYBRID" style="width:100%;height:500px" />
+    </p:layoutUnit>
+    
+  </p:layout>
 </h:body> 
 </html>

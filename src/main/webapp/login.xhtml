@@ -8,6 +8,7 @@
 <h:head>
   <title>Login</title>
   <h:outputStylesheet library="css" name="login.css"/>
+  <h:outputStylesheet library="css" name="default.css"/>
   <f:metadata>
     <f:event listener="#{lokalizatorSecurityController.redirectIfArleadyLogged()}" type="preRenderView"/>
   </f:metadata>
@@ -15,7 +16,6 @@
 
 <h:body styleClass="body">
     
-    <h:outputStylesheet library="css" name="default.css"/>
     <h:form>
 
         <p:messages id="messages" showDetail="false" />

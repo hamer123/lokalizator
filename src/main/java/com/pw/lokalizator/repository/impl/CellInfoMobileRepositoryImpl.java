@@ -1,6 +1,7 @@
 package com.pw.lokalizator.repository.impl;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.ejb.Stateful;
 import javax.ejb.Stateless;
@@ -46,7 +47,7 @@ public class CellInfoMobileRepositoryImpl implements CellInfoMobileRepository{
 	}
 
 	@Override
-	public Collection<CellInfoMobile> findAll() {
+	public List<CellInfoMobile> findAll() {
 		// TODO Auto-generated method stub
 		return null;
 	}

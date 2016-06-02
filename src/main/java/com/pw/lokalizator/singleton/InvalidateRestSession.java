@@ -21,7 +21,7 @@ public class InvalidateRestSession {
 	private RestSessionManager restSessionSimulator;
 	Logger logger = Logger.getLogger(InvalidateRestSession.class);
 	
-	@Schedule(minute="*/10",hour="*", persistent=false)
+	@Schedule(minute="*/5",hour="*", persistent=false)
 	public void timeoutRestSession(){
 		logger.info("[InvalidateRestSession] InvalidateRestSession job has started");
 		
@@ -33,7 +33,7 @@ public class InvalidateRestSession {
 	}
 	
 	public boolean isPassedTime(Date date){
-		final long timeout = 10 * 60 * 1000; // 10min
+		final long timeout = 5 * 60 * 1000; // 5min
 		long currentTime = new Date().getTime();
 		
 		return currentTime - timeout > date.getTime();

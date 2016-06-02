@@ -15,7 +15,7 @@ import javax.persistence.TableGenerator;
 @Table(name="polygonpoint")
 @NamedQueries(value={
 		@NamedQuery(name="PolygonPoint.findByPolygonModelId",
-				    query="SELECT pp FROM PolygonPoint pp WHERE pp.polygon.id =:id")
+				    query="SELECT pp FROM PolygonPoint pp WHERE pp.area.id =:id")
 })
 public class PolygonPoint {
     @TableGenerator(
@@ -36,7 +36,7 @@ public class PolygonPoint {
 	private double lng;
 	
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	private PolygonModel polygon;
+	private Area area;
 	
 	public long getId() {
 		return id;
@@ -62,11 +62,11 @@ public class PolygonPoint {
 	public void setLng(double lng) {
 		this.lng = lng;
 	}
-	public PolygonModel getPolygon() {
-		return polygon;
+	public Area getPolygon() {
+		return area;
 	}
-	public void setPolygon(PolygonModel polygon) {
-		this.polygon = polygon;
+	public void setPolygon(Area polygon) {
+		this.area = polygon;
 	}
 	
 }

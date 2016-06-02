@@ -59,7 +59,7 @@ public class UserRepositoryImpl implements UserRepository{
 		return em.find(User.class, id);
 	}
 	
-	public Collection<User> findAll() {
+	public List<User> findAll() {
 		return em.createNamedQuery("USER.findAll", User.class)
 				 .getResultList();
 	}

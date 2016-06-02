@@ -108,7 +108,7 @@ public class User implements Serializable {
 	private List<LocationNetwork> locationNetworkObcaUsluga;
 
 	@OneToMany(mappedBy = "provider", orphanRemoval = true, fetch= FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-	private List<PolygonModel>polygons;
+	private List<Area>polygons;
 	
 	public User(){}
 	
@@ -161,11 +161,11 @@ public class User implements Serializable {
 		this.lastLocationGPS = lastLocationGPS;
 	}
 
-	public List<PolygonModel> getPolygons() {
+	public List<Area> getPolygons() {
 		return polygons;
 	}
 
-	public void setPolygons(List<PolygonModel> polygons) {
+	public void setPolygons(List<Area> polygons) {
 		this.polygons = polygons;
 	}
 

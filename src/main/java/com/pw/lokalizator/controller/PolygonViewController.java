@@ -29,11 +29,11 @@ import org.primefaces.model.map.Polygon;
 
 import com.pw.lokalizator.jsf.utilitis.JsfMessageBuilder;
 import com.pw.lokalizator.jsf.utilitis.PolygonBuilder;
-import com.pw.lokalizator.model.entity.PolygonModel;
+import com.pw.lokalizator.model.entity.Area;
 import com.pw.lokalizator.model.entity.PolygonPoint;
 import com.pw.lokalizator.model.entity.User;
-import com.pw.lokalizator.model.enums.PolygonFollows;
-import com.pw.lokalizator.repository.PolygonModelRepository;
+import com.pw.lokalizator.model.enums.AreaFollows;
+import com.pw.lokalizator.repository.AreaRepository;
 import com.pw.lokalizator.repository.PolygonPointRepository;
 import com.pw.lokalizator.repository.UserRepository;
 
@@ -45,7 +45,7 @@ public class PolygonViewController implements Serializable{
 	@Inject
 	private LokalizatorSession lokalizatorSession;
 	@Inject
-	private PolygonModelRepository polygonModelRepository;
+	private AreaRepository areaRepository;
 	@Inject
 	private PolygonPointRepository polygonPointRepository;
 	
@@ -55,76 +55,75 @@ public class PolygonViewController implements Serializable{
 	private Polygon polygon;
 	private List<LatLng>polygonLatLngs;
 	private List<String>listTargetsId;
-	private List<PolygonModel>polygonList;
+	private List<Area>polygonList;
 	
 	private int zoom;
 	private String center;
 	
 	private String nazwaPolygona;
-	private PolygonFollows polygonFollowType;
+	private AreaFollows polygonFollowType;
 	private String targetLogin;
 	
-	private static final PolygonFollows[] polygonFollowTypes = PolygonFollows.values();
+	private static final AreaFollows[] polygonFollowTypes = AreaFollows.values();
 	
 	@PostConstruct
 	private void postConstruct(){
 		googleMapModel = new DefaultMapModel();
 		polygonLatLngs = new ArrayList<LatLng>();
 		polygon = PolygonBuilder.createEmpty();
-		polygonList = new ArrayList<PolygonModel>();
-		polygonList.addAll(findPolygonModels());
+		polygonList = new ArrayList<Area>();
+		polygonList.addAll(findAreaModels());
 		googleMapModel.addOverlay(polygon);
 		center = "51.6014053, 18.9724216";
 		zoom = 15;
 	}
 	
-	public void onRemovePolygon(long id){
+	public void onRemoveArea(Area area){
 		try{
-			polygonModelRepository.remove(id);
 			JsfMessageBuilder.infoMessage("Udalo sie usunac polygon");
+			areaRepository.remove(area.getId());
+			polygonList.remove(area);
 		}catch(Exception e){
-			logger.error("[PolygonViewController] Nie udalo sie usunac PolygonModel dla id: " + id + e);
+			logger.error("[PolygonViewController] Nie udalo sie usunac PolygonModel dla id: " + area.getId());
 			JsfMessageBuilder.errorMessage("Nie udalo sie usunac polygon");
 		}
 	}
 	
-	private List<PolygonModel>findPolygonModels(){
+	private List<Area>findAreaModels(){
 		long id = lokalizatorSession.getUser().getId();
-		return polygonModelRepository.findIdAndNameAndFollowTypeAndTargetIdAndTargetLoginByProviderId(id); //findPolygonAndPointsAndTargetByProviderId(id); //
+		return areaRepository.findIdAndNameAndFollowTypeAndTargetIdAndTargetLoginByProviderId(id);
 	}
 	
 	public List<String> onAutoCompleteUser(String userLogin){
 		return userRepository.findLoginByLoginLike(userLogin);
 	}
 	
-	public void createPolygon(){
+	public void onCreateArea(){
 		try{
-			PolygonModel polygonModel = createPolygonModel();
-			polygonModel = polygonModelRepository.create(polygonModel);
-			polygonList.add(polygonModel);
-			
+			Area area = createArea();
+			area = areaRepository.create(area);
+			polygonList.add(area);
 			JsfMessageBuilder.infoMessage("Udalo sie utworzyc polygon o nazwie " + nazwaPolygona + " sledzacy uzytkownika " + targetLogin);
 		}catch(Exception e){
-			//TODO
-			JsfMessageBuilder.errorMessage("Nie udalo sie utworzyc polygona");
+			JsfMessageBuilder.errorMessage("Nie udalo sie utworzyc polygona " + e);
 		}
 	}
 	
-	public PolygonModel createPolygonModel(){
-		PolygonModel polygonModel = new PolygonModel();
+	public Area createArea(){
+		Area area = new Area();
 		
-		polygonModel.setName(nazwaPolygona);
-		polygonModel.setPoints( createPolygonPoints(polygonLatLngs, polygonModel) );
-		polygonModel.setPolygonFollowType(polygonFollowType);
-		polygonModel.setProvider(lokalizatorSession.getUser());
+		area.setName(nazwaPolygona);
+		area.setPoints( createPolygonPoints(polygonLatLngs, area) );
+		area.setPolygonFollowType(polygonFollowType);
+		area.setProvider(lokalizatorSession.getUser());
 		
 		User target = userRepository.findByLogin(targetLogin);
-		polygonModel.setTarget(target);
+		area.setTarget(target);
 		
-		return polygonModel;
+		return area;
 	}
 	
-	private Map<Integer, PolygonPoint>createPolygonPoints(List<LatLng>latLngs, PolygonModel polygonModel){
+	private Map<Integer, PolygonPoint>createPolygonPoints(List<LatLng>latLngs, Area polygonModel){
 		Map<Integer, PolygonPoint>points = new HashMap<Integer, PolygonPoint>();
 		
 		for(int i = 0; i<latLngs.size(); i++){
@@ -142,7 +141,7 @@ public class PolygonViewController implements Serializable{
 		return points;
 	}
 	
-	public void onPokazPolygon(PolygonModel polygonModel){
+	public void onPokazPolygon(Area polygonModel){
 		List<PolygonPoint>points = polygonPointRepository.findByPolygonModelId(polygonModel.getId());
 		List<LatLng>paths = getPathsFromPolygonPoints(points);
 		polygon.setPaths(paths);
@@ -250,11 +249,11 @@ public class PolygonViewController implements Serializable{
 		this.nazwaPolygona = nazwaPolygona;
 	}
 
-	public PolygonFollows getPolygonType() {
+	public AreaFollows getPolygonType() {
 		return polygonFollowType;
 	}
 
-	public void setPolygonType(PolygonFollows polygonType) {
+	public void setPolygonType(AreaFollows polygonType) {
 		this.polygonFollowType = polygonType;
 	}
 
@@ -266,15 +265,15 @@ public class PolygonViewController implements Serializable{
 		this.targetLogin = targetLogin;
 	}
 
-	public PolygonFollows[] getPolygonFollowTypes() {
+	public AreaFollows[] getPolygonFollowTypes() {
 		return polygonFollowTypes;
 	}
 
-	public List<PolygonModel> getPolygonList() {
+	public List<Area> getPolygonList() {
 		return polygonList;
 	}
 
-	public void setPolygonList(List<PolygonModel> polygonList) {
+	public void setPolygonList(List<Area> polygonList) {
 		this.polygonList = polygonList;
 	}
 

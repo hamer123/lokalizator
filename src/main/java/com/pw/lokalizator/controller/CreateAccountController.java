@@ -25,12 +25,11 @@ public class CreateAccountController implements Serializable{
 	private String email;
 	
 	public void createAccount(){
-		User user = new User();
-		user.setLogin(login);
-		user.setPassword(password);
-		user.setEmail(email);
-		
 		try{
+			User user = new User();
+			user.setLogin(login);
+			user.setPassword(password);
+			user.setEmail(email);
 			userService.createAcount(user);
 			
 			FacesContext.getCurrentInstance().addMessage(null,

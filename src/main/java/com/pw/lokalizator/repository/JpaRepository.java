@@ -2,6 +2,8 @@ package com.pw.lokalizator.repository;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
+
 import javax.ejb.Local;
 
 @Local
@@ -11,5 +13,5 @@ public interface JpaRepository<T, ID extends Serializable> {
 	void remove(T entity);
 	void remove(ID id);
 	T findById(ID id);
-	Collection<T> findAll();
+	List<T> findAll();
 }

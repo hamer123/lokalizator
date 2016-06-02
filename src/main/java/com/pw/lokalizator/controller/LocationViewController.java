@@ -29,7 +29,7 @@ import com.pw.lokalizator.model.entity.CellInfoLte;
 import com.pw.lokalizator.model.entity.Location;
 import com.pw.lokalizator.model.entity.LocationGPS;
 import com.pw.lokalizator.model.entity.LocationNetwork;
-import com.pw.lokalizator.model.entity.PolygonModel;
+import com.pw.lokalizator.model.entity.Area;
 import com.pw.lokalizator.model.entity.PolygonPoint;
 import com.pw.lokalizator.model.entity.User;
 import com.pw.lokalizator.model.enums.GoogleMaps;
@@ -99,7 +99,7 @@ public class LocationViewController implements Serializable{
 		userLoginOnline = restSessionManager.getUserOnlineLogins();
 	}
 	
-	public void onPokazPolygonLocation(PolygonModel polygonModel){
+	public void onPokazPolygonLocation(Area polygonModel){
 	    List<PolygonPoint>points = new ArrayList<PolygonPoint>( polygonModel.getPoints().values() );
 		String center = googleMapFollowUsersController.createCenter(getLatLngFirstPoint(points));
 		googleMapFollowUsersController.setCenter(center);

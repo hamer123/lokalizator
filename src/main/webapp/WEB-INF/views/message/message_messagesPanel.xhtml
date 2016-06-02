@@ -6,6 +6,31 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:c="http://java.sun.com/jsp/jstl/core"> 
 
-Message TODO
+   <h:form>
+      <p:dataTable id="areaEvents" value="#{messageController.areaEvents}" var="areaEvent" reflow="true" rows="20" paginator="true">
+
+         <p:column headerText="Data">
+           <h:outputText value="#{areaEvent.location.date}" />
+         </p:column>
+         
+         <p:column headerText="Typ providera">
+           <h:outputText value="#{areaEvent.location.providerType}" />
+         </p:column>
+         
+         <p:column headerText="Miasto">
+           <h:outputText value="#{areaEvent.location.address.city}" />
+         </p:column>
+         
+         <p:column headerText="Ulica">
+           <h:outputText value="#{areaEvent.location.address.street}" />
+         </p:column>
+         
+         <p:column headerText="Pokaz lokacje">
+           <p:commandButton value="POKAZ" oncomplete="showGoogleMapDialog()"
+                            actionListener="#{messageController.onChooseLocationToDisplayInDialog(areaEvent)}" />
+         </p:column>
+         
+      </p:dataTable>
+   </h:form>
    
 </ui:composition>

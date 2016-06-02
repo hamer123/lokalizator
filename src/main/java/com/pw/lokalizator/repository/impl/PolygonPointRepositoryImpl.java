@@ -47,7 +47,7 @@ public class PolygonPointRepositoryImpl implements PolygonPointRepository{
 
 	@Override
 	@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
-	public Collection<PolygonPoint> findAll() {
+	public List<PolygonPoint> findAll() {
 		// TODO Auto-generated method stub
 		return null;
 	}

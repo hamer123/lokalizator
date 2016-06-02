@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<ui:composition  xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"> 
+
+   <p:panel id="panelCreate" header="Tworzenie polygonu">
+      <h:form>
+	     <h:panelGrid columns="3" cellpadding="5" styleClass="panelGrid">
+            <p:outputLabel for="nazwa" value="Nazwa Polygona:"/>
+	        <p:inputText id="nazwa" required="true" value="#{polyglon.nazwaPolygona}">
+	           <f:validateLength minimum="4" maximum="16"/>
+	        </p:inputText>
+	        <p:message for="nazwa" display="icon" />
+	         
+	        <p:outputLabel for="typPolygon" value="Typ Polygona:"/>
+	        <p:selectOneMenu id="typPolygon" value="#{polyglon.polygonType}" required="true">
+	           <f:selectItems value="#{polyglon.polygonFollowTypes}"/>
+	        </p:selectOneMenu>
+	        <p:message for="typPolygon" display="icon" />
+	         
+	        <p:outputLabel for="login" value="Login Targetu:"/>
+	        <p:autoComplete id="login" value="#{polyglon.targetLogin}" completeMethod="#{polyglon.onAutoCompleteUser}" required="true" forceSelection="true"/>
+	        <p:message for="login" display="icon" />
+
+	        <p:commandButton value="Creacte" update=":#{p:component('growl')} :#{p:component('existPolygons')}" action="#{polyglon.onCreateArea()}"/>
+	     </h:panelGrid>
+	  </h:form> 
+	  <h:form id="paths">
+	     <p:dataTable value="#{polyglon.paths}" var="path">
+	        <p:column headerText="Wartosc">
+	           <h:outputText value="#{path}" />
+	        </p:column>
+	       <p:column headerText="Pokaz">
+	          <p:commandButton value="POKAZ" actionListener="#{polyglon.showPath(path)}" update=":#{p:component('gmap')}"/>
+	       </p:column>
+	       <p:column headerText="Usun">
+	          <p:commandButton value="USUN" actionListener="#{polyglon.removePath(path)}" update=":#{p:component('gmap')} :#{p:component('paths')}"/>
+	       </p:column>
+	    </p:dataTable>
+	 </h:form>
+   </p:panel>
+   
+</ui:composition>

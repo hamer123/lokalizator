@@ -8,8 +8,11 @@
 
 <h:head>
   <title>Wiadomosci</title>
+  <h:outputStylesheet library="css" name="default.css"/>
+  <h:outputScript library="js" name="messageGoogleMapDialog.js"/>
+  <script src="https://maps.googleapis.com/maps/api/js"/>
 </h:head> 
-<h:body>
+<h:body styleClass="body">
    <ui:insert name="menu">
      <ui:include src="/WEB-INF/views/menu_templete.xhtml" />
    </ui:insert> 
@@ -21,13 +24,14 @@
        <ui:include src="/WEB-INF/views/message/message_polygonPanel.xhtml"/> 
      </p:panel>
      
-     <p:panel id="options" header="Options" rendered="#{messageController.selectedPolygonModel != null}">
+     <p:panel id="options" header="Options">
        <ui:include src="/WEB-INF/views/message/message_optionPanel.xhtml"/>
      </p:panel>
    </p:outputPanel>
    
    <p:outputPanel id="secondHalf" layout="grid">
      <p:panel id="messageBody" header="Message Body" closable="true">
+       #{messageController.selectedPolygonModel != null}
      </p:panel>
    
      <p:panel id="messages" header="Messages">
@@ -36,6 +40,8 @@
    </p:outputPanel>
    
    </p:panelGrid>
+   
+   <ui:include src="/WEB-INF/views/message/message _messageDialogLocation.xhtml"/>
 
 </h:body> 
 </html>

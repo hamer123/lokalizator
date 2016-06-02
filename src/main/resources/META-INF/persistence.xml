@@ -6,7 +6,6 @@
 
 	  <class>com.pw.lokalizator.model.entity.User</class>
 	  <class>com.pw.lokalizator.model.entity.Location</class>
-	  <class>com.pw.lokalizator.model.entity.PolygonModel</class>
 	  <class>com.pw.lokalizator.model.entity.PolygonPoint</class>
 	  <class>com.pw.lokalizator.model.entity.Address</class>
 	  <class>com.pw.lokalizator.model.entity.LocationGPS</class>
@@ -16,6 +15,10 @@
 	  <class>com.pw.lokalizator.model.entity.CellInfoLte</class>
 	  <class>com.pw.lokalizator.model.entity.CellInfoGSM</class>
 	  <class>com.pw.lokalizator.model.entity.WifiInfo</class>
+	  <class>com.pw.lokalizator.model.entity.AreaEventNetwork</class>
+	  <class>com.pw.lokalizator.model.entity.Area</class>
+	  <class>com.pw.lokalizator.model.entity.AreaEventGPS</class>
+	  <class>com.pw.lokalizator.model.entity.AreaEvent</class>
 	  
 	  <properties>
 	     <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect" />

@@ -10,12 +10,6 @@
 
 }
 
-.body{
-	
-	background-image: url("../images/loginBackground.png");
-	background-size: 100% auto;
-}
-
 .button{
 	float: right;
 }

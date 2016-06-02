@@ -12,7 +12,7 @@ import org.primefaces.model.map.LatLng;
 import org.primefaces.model.map.Polygon;
 
 import com.pw.lokalizator.jsf.utilitis.OverlayIdentyfikator.OverlayIdentyfikatorBuilder;
-import com.pw.lokalizator.model.entity.PolygonModel;
+import com.pw.lokalizator.model.entity.Area;
 import com.pw.lokalizator.model.entity.PolygonPoint;
 import com.pw.lokalizator.utilitis.PropertiesReader;
 
@@ -29,7 +29,7 @@ public class PolygonBuilder {
 		findProperties(propertiesReader);
 	}
 	
-	public static Polygon create(PolygonModel polygonModel){
+	public static Polygon create(Area polygonModel){
 		return createPolygonInstance(polygonModel);
 	}
 	
@@ -39,10 +39,10 @@ public class PolygonBuilder {
 		return polygon;
 	}
 	
-	public static List<Polygon> createPolygons(List<PolygonModel>polygonModelList){
+	public static List<Polygon> createPolygons(List<Area>polygonModelList){
 		List<Polygon>polygonList = new ArrayList<Polygon>();
 		
-		for(PolygonModel polygonModel : polygonModelList)
+		for(Area polygonModel : polygonModelList)
 			polygonList.add(createPolygonInstance(polygonModel));
 		
 		return polygonList;
@@ -55,7 +55,7 @@ public class PolygonBuilder {
 		polygon.setStrokeOpacity(POLYGON_STROKE_OPACITY);
 	}
 	
-	private static Polygon createPolygonInstance(PolygonModel polygonModel){
+	private static Polygon createPolygonInstance(Area polygonModel){
 		Polygon polygon = new Polygon();
 		setupPolygonView(polygon);
 		polygon.setData(polygonModel);

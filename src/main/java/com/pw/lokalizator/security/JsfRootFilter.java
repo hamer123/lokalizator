@@ -21,7 +21,10 @@ import com.pw.lokalizator.controller.LokalizatorSession;
 
 
 @WebFilter(
-		urlPatterns = {"/location.xhtml", "/polygon.xhtml"}
+		urlPatterns = {"/location.xhtml", 
+				       "/area.xhtml" , 
+				       "/message.xhtml"
+				       }
 		)
 
 public class JsfRootFilter implements Filter {

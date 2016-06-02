@@ -2,6 +2,7 @@ package com.pw.lokazaliator.test;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -34,14 +35,15 @@ import com.pw.lokalizator.model.entity.CellInfoMobile;
 import com.pw.lokalizator.model.entity.Location;
 import com.pw.lokalizator.model.entity.LocationGPS;
 import com.pw.lokalizator.model.entity.LocationNetwork;
-import com.pw.lokalizator.model.entity.PolygonModel;
+import com.pw.lokalizator.model.entity.Area;
 import com.pw.lokalizator.model.entity.User;
 import com.pw.lokalizator.model.enums.Providers;
+import com.pw.lokalizator.repository.AreaRepository;
 import com.pw.lokalizator.repository.UserRepository;
 
 @Named
 @ViewScoped
-//@Transactional
+@Transactional
 public class TestCdiTransactional implements Serializable{
 
 	@PersistenceContext
@@ -54,18 +56,28 @@ public class TestCdiTransactional implements Serializable{
 	UserRepository repository;
 	
 	
-//	@Transactional
-	public void doTestTransaction(){
-		
-		Set<Long>set = new HashSet<Long>();
-		set.add(1L);
-		
-		List<User>users = em.createQuery("SELECT u FROM User u LEFT OUTER JOIN FETCH u.lastLocationNetworkNaszaUsluga LEFT OUTER JOIN FETCH u.lastLocationNetworObcaUsluga LEFT OUTER JOIN FETCH u.lastLocationGPS WHERE u.id IN (:id)", User.class)
-		.setParameter("id", set)
-		.getResultList();
-		
-		System.out.println(users.size());
+	@PostConstruct
+	private void init(){}
+	
+	@Transactional
+	public void doIt(){
 
+	}
+	
+	@Transactional
+	public void onremove(){
+		
+	}
+	
+	@Transactional
+	public void doTestTransaction(){
+
+		doIt();
+		
+		
+//		Area area = em.find(Area.class, 1L);
+//		em.remove(area);
+		
 //		list.get(0).getPoints().containsKey(null);
 		
 		

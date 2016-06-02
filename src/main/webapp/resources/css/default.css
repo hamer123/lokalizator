@@ -7,3 +7,9 @@
 .ui-panel{
     padding: 0.8em !important;
 }
+
+.body{
+	
+	background-image: url("../images/loginBackground.png");
+	background-size: 100% auto;
+}
