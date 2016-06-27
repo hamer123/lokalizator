@@ -15,9 +15,13 @@ import javax.faces.event.ActionEvent;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
+import javax.transaction.Transactional.TxType;
 
 import org.jboss.logging.Logger;
 import org.primefaces.event.map.PointSelectEvent;
@@ -29,132 +33,186 @@ import org.primefaces.model.map.Polygon;
 
 import com.pw.lokalizator.jsf.utilitis.JsfMessageBuilder;
 import com.pw.lokalizator.jsf.utilitis.PolygonBuilder;
+import com.pw.lokalizator.model.GoogleMapModel;
+import com.pw.lokalizator.model.LokalizatorSession;
 import com.pw.lokalizator.model.entity.Area;
-import com.pw.lokalizator.model.entity.PolygonPoint;
+import com.pw.lokalizator.model.entity.AreaMessageMail;
+import com.pw.lokalizator.model.entity.AreaPoint;
 import com.pw.lokalizator.model.entity.User;
 import com.pw.lokalizator.model.enums.AreaFollows;
+import com.pw.lokalizator.model.enums.AreaMailMessageModes;
 import com.pw.lokalizator.repository.AreaRepository;
-import com.pw.lokalizator.repository.PolygonPointRepository;
+import com.pw.lokalizator.repository.AreaPointRepository;
 import com.pw.lokalizator.repository.UserRepository;
 
 @Named(value="polyglon")
 @ViewScoped
 public class PolygonViewController implements Serializable{
 	@Inject
-	private UserRepository userRepository;
-	@Inject
 	private LokalizatorSession lokalizatorSession;
+	
+	@Inject
+	private UserRepository userRepository;
 	@Inject
 	private AreaRepository areaRepository;
 	@Inject
-	private PolygonPointRepository polygonPointRepository;
+	private AreaPointRepository polygonPointRepository;
 	
-	private Logger logger = Logger.getLogger(PolygonViewController.class);
+	@Inject
+	private GoogleMapController googleMapController;
+	@Inject 
+	private Logger logger;
 	
-	private MapModel googleMapModel;
-	private Polygon polygon;
-	private List<LatLng>polygonLatLngs;
-	private List<String>listTargetsId;
-	private List<Area>polygonList;
-	
-	private int zoom;
-	private String center;
-	
-	private String nazwaPolygona;
-	private AreaFollows polygonFollowType;
-	private String targetLogin;
-	
+	private static final AreaMailMessageModes[] areaMailMessageModes = AreaMailMessageModes.values();
 	private static final AreaFollows[] polygonFollowTypes = AreaFollows.values();
 	
+	private Polygon polygon;
+	private Area area;
+	private List<Area>areaList = new ArrayList<Area>();
+	private List<String>targetLoginList;
+
 	@PostConstruct
 	private void postConstruct(){
-		googleMapModel = new DefaultMapModel();
-		polygonLatLngs = new ArrayList<LatLng>();
+		clearArea();
 		polygon = PolygonBuilder.createEmpty();
-		polygonList = new ArrayList<Area>();
-		polygonList.addAll(findAreaModels());
-		googleMapModel.addOverlay(polygon);
-		center = "51.6014053, 18.9724216";
-		zoom = 15;
+		areaList = areaRepository.findByProviderId( lokalizatorSession.getUser().getId() );
+		googleMapController.addOverlay(polygon);
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////   ACTIONS   ///////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	public void onSaveArea(){
+		try{
+			
+			if(isAreaWithName(area.getName())){
+				JsfMessageBuilder.errorMessage("Obszar sledzenia o tej nazwie juz istnieje... zmien nazwe");
+				return;
+			} 
+			
+			if(polygon.getPaths().size() < 2){
+				JsfMessageBuilder.errorMessage("Obszar sledzenia musi posiadac przynaimej 2 punkty");
+				return;
+			}
+
+			prepareAreaBeforeSave();
+			area = areaRepository.create(area);
+			areaList.add(area);
+			clearArea();
+			JsfMessageBuilder.infoMessage("Udalo sie utworzyc obszar sledzenia o nazwie " + area.getName() + " sledzacy uzytkownika " + area.getTarget().getLogin());
+		} catch(Exception e) {
+			JsfMessageBuilder.errorMessage("Nie udalo sie utworzyc obszaru sledzenia " + e);
+			e.printStackTrace();
+		}
+	}
+	
+	public void onChangeAreaActiveStatus(Area area){
+		try{	
+			if(area.isAktywny()){
+				areaRepository.updateAktywnyById(false, area.getId());
+				area.setAktywny(false);
+				JsfMessageBuilder.infoMessage("Udalo sie dezaktywowac obszar sledzenia");
+			} else {
+				areaRepository.updateAktywnyById(true, area.getId());
+				area.setAktywny(true);
+				JsfMessageBuilder.infoMessage("Udalo sie aktywowac obszar sledzenia");
+			}
+		} catch(Exception e) {
+			logger.error("[PolygonViewController] Nie udalo sie zmienic stanu aktywnosci obszaru sledzenia " + e);
+			JsfMessageBuilder.errorMessage("Nie udalo sie zmienic stanu aktywnosci obszaru sledzenia");
+		}
 	}
 	
 	public void onRemoveArea(Area area){
 		try{
+			areaRepository.delete(area.getId());
+			areaList.remove(area);
 			JsfMessageBuilder.infoMessage("Udalo sie usunac polygon");
-			areaRepository.remove(area.getId());
-			polygonList.remove(area);
-		}catch(Exception e){
+		} catch(Exception e) {
 			logger.error("[PolygonViewController] Nie udalo sie usunac PolygonModel dla id: " + area.getId());
 			JsfMessageBuilder.errorMessage("Nie udalo sie usunac polygon");
 		}
-	}
-	
-	private List<Area>findAreaModels(){
-		long id = lokalizatorSession.getUser().getId();
-		return areaRepository.findIdAndNameAndFollowTypeAndTargetIdAndTargetLoginByProviderId(id);
 	}
 	
 	public List<String> onAutoCompleteUser(String userLogin){
 		return userRepository.findLoginByLoginLike(userLogin);
 	}
 	
-	public void onCreateArea(){
-		try{
-			Area area = createArea();
-			area = areaRepository.create(area);
-			polygonList.add(area);
-			JsfMessageBuilder.infoMessage("Udalo sie utworzyc polygon o nazwie " + nazwaPolygona + " sledzacy uzytkownika " + targetLogin);
-		}catch(Exception e){
-			JsfMessageBuilder.errorMessage("Nie udalo sie utworzyc polygona " + e);
-		}
+	public void onShowArea(Area area){
+		Area areaToDisplay  = copyArea(area);
+		
+		List<AreaPoint>points = polygonPointRepository.findByAreaId(area.getId());
+		setArea(areaToDisplay);
+		
+		List<LatLng>paths =  convertAreaPoint(points);
+		polygon.setPaths(paths);
+		setPolygonFillColor(area.getColor());
 	}
 	
-	public Area createArea(){
-		Area area = new Area();
+	public void onPointShow(LatLng latLng){
+		googleMapController.setCenter( GoogleMapModel.center(latLng) );
+	}
+	
+	public void onPathRemove(LatLng latLng, int index){
+		removePathFromPolygon(latLng);
+	}
+	
+	public void onPointSelect(PointSelectEvent event){
+        LatLng latlng = event.getLatLng();
+        addPathToPolygon(latlng);
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////   UTILITIES   ///////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	private boolean isAreaWithName(String name){
+		for(Area area : areaList)
+			if(area.getName().equals(name))
+				return true;
 		
-		area.setName(nazwaPolygona);
-		area.setPoints( createPolygonPoints(polygonLatLngs, area) );
-		area.setPolygonFollowType(polygonFollowType);
+		return false;
+	}
+	
+	private void prepareAreaBeforeSave(){
+		User user = userRepository.findByLogin(area.getTarget().getLogin());
+		area.setTarget(user);
 		area.setProvider(lokalizatorSession.getUser());
-		
-		User target = userRepository.findByLogin(targetLogin);
-		area.setTarget(target);
-		
-		return area;
+		area.setPoints( convertLatLng(polygon.getPaths(), area) );
+	}
+
+	private void addPathToPolygon(LatLng latLng){
+		polygon.getPaths().add(latLng);
 	}
 	
-	private Map<Integer, PolygonPoint>createPolygonPoints(List<LatLng>latLngs, Area polygonModel){
-		Map<Integer, PolygonPoint>points = new HashMap<Integer, PolygonPoint>();
+	private void removePathFromPolygon(LatLng latLng){
+		List<LatLng>paths = polygon.getPaths();
+		paths.remove(latLng);
+	}
+	
+	private Map<Integer, AreaPoint> convertLatLng(List<LatLng>latLngs, Area area){
+		Map<Integer, AreaPoint>map = new HashMap<Integer, AreaPoint>();
 		
-		for(int i = 0; i<latLngs.size(); i++){
+		for(int i = 0; i < latLngs.size(); i++){
 			LatLng latLng = latLngs.get(i);
 			
-			PolygonPoint point = new PolygonPoint();
-			point.setLat(latLng.getLat());
-			point.setLng(latLng.getLng());
-			point.setNumber(i);
-			point.setPolygon(polygonModel);
+			AreaPoint areaPoint = new AreaPoint();
+			areaPoint.setLat(latLng.getLat());
+			areaPoint.setLng(latLng.getLng());
+			areaPoint.setArea(area);
+			areaPoint.setNumber(i);
 			
-			points.put(i, point);
+			map.put(i, areaPoint);
 		}
 		
-		return points;
+		return map;
 	}
-	
-	public void onPokazPolygon(Area polygonModel){
-		List<PolygonPoint>points = polygonPointRepository.findByPolygonModelId(polygonModel.getId());
-		List<LatLng>paths = getPathsFromPolygonPoints(points);
-		polygon.setPaths(paths);
-		nazwaPolygona = polygonModel.getName();
-		polygonFollowType = polygonModel.getPolygonFollowType();
-		targetLogin = polygonModel.getTarget().getLogin();
-	}
-	
 
-	private List<LatLng> getPathsFromPolygonPoints(List<PolygonPoint>points){
+	private List<LatLng> convertAreaPoint(List<AreaPoint>points){
 		List<LatLng>paths = new ArrayList<LatLng>();
 		
-		for(PolygonPoint point : points){
+		for(AreaPoint point : points){
 			LatLng latLng = new LatLng(point.getLat(), point.getLng());
 			paths.add(latLng);
 		}
@@ -162,119 +220,85 @@ public class PolygonViewController implements Serializable{
 		return paths;
 	}
 	
-	public void onStateChanged(StateChangeEvent event){
-		center = createCenter(event.getCenter().getLat(), event.getCenter().getLng());
-		zoom = event.getZoomLevel();
+	private Area copyArea(Area area){
+		Area copy = new Area();
+		
+		copy.setName(area.getName());
+		copy.setColor(area.getColor());
+		copy.setAreaFollowType(area.getAreaFollowType());
+		
+		AreaMessageMail areaMessageMail = new AreaMessageMail();
+		areaMessageMail.setActive(area.getAreaMessageMail().isActive());
+		areaMessageMail.setAreaMailMessageMode(area.getAreaMessageMail().getAreaMailMessageMode());
+		copy.setAreaMessageMail(areaMessageMail);
+		
+		copy.setTarget(area.getTarget());
+		copy.setProvider(area.getProvider());
+		
+		return copy;
 	}
 	
-	public void onPointSelect(PointSelectEvent event){
-        LatLng latlng = event.getLatLng();
-        polygonLatLngs.add(latlng);
-        addPathToPolygon(latlng);
+	private void setPolygonFillColor(String color){
+		if(color.startsWith("#"))
+			polygon.setFillColor(color);
+		else
+			polygon.setFillColor("#" + color);
 	}
+
+	private void clearArea(){
+		area = new Area();
+		area.setName("");
+		area.setAreaMessageMail(new AreaMessageMail());
+		area.setTarget(new User());
+		area.setPoints(new HashMap<Integer, AreaPoint>());
+	}
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////  GETTERS SETTERS  ///////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	private void addPathToPolygon(LatLng latLng){
-		List<LatLng>paths = polygon.getPaths();
-		paths.add(latLng);
-	}
 	
 	public List<LatLng> getPaths(){
 		return polygon.getPaths();
 	}
-	
-	public void removePath(LatLng latLng){
-		getPaths().remove(latLng);
-	}
-	
-	public void showPath(LatLng latLng){
-		center = createCenter(latLng.getLat(), latLng.getLng());
-	}
-	
-	public void actionRemove(String index){
-		polygonLatLngs.remove( Integer.parseInt(index) - 1 );
-		googleMapModel.getPolygons().get(0).getPaths().remove( Integer.parseInt(index) - 1 );
+
+	public String getAreaActiveButtonValue(Area area){
+		if(area.isAktywny())
+			return "Dezaktywuj";
+		
+		return "Aktywuj";
 	}
 	
-	public String createCenter(double lat, double lon){
-		return    lat 
-				+ ", "
-				+ lon;
-	}
-
-	public MapModel getPolygonModel() {
-		return googleMapModel;
-	}
-
-	public void setPolygonModel(MapModel polygonModel) {
-		this.googleMapModel = polygonModel;
-	}
-
-	public List<LatLng> getPoints() {
-		return polygonLatLngs;
-	}
-
-	public void setPoints(List<LatLng> points) {
-		this.polygonLatLngs = points;
-	}
-
 	public List<String> getListTargetsId() {
-		return listTargetsId;
+		return targetLoginList;
 	}
 
 	public void setListTargetsId(List<String> listTargetsId) {
-		this.listTargetsId = listTargetsId;
-	}
-
-	public int getZoom() {
-		return zoom;
-	}
-
-	public void setZoom(int zoom) {
-		this.zoom = zoom;
-	}
-
-	public String getCenter() {
-		return center;
-	}
-
-	public void setCenter(String center) {
-		this.center = center;
-	}
-
-	public String getNazwaPolygona() {
-		return nazwaPolygona;
-	}
-
-	public void setNazwaPolygona(String nazwaPolygona) {
-		this.nazwaPolygona = nazwaPolygona;
-	}
-
-	public AreaFollows getPolygonType() {
-		return polygonFollowType;
-	}
-
-	public void setPolygonType(AreaFollows polygonType) {
-		this.polygonFollowType = polygonType;
-	}
-
-	public String getTargetLogin() {
-		return targetLogin;
-	}
-
-	public void setTargetLogin(String targetLogin) {
-		this.targetLogin = targetLogin;
+		this.targetLoginList = listTargetsId;
 	}
 
 	public AreaFollows[] getPolygonFollowTypes() {
 		return polygonFollowTypes;
 	}
 
-	public List<Area> getPolygonList() {
-		return polygonList;
+	public List<Area> getAreaList() {
+		return areaList;
 	}
 
-	public void setPolygonList(List<Area> polygonList) {
-		this.polygonList = polygonList;
+	public AreaMailMessageModes[] getAreaMailMessageModes() {
+		return areaMailMessageModes;
 	}
 
+
+	public Area getArea() {
+		return area;
+	}
+
+	public void setArea(Area area) {
+		this.area = area;
+	}
+
+	public GoogleMapController getGoogleMapController() {
+		return googleMapController;
+	}
 }

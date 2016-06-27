@@ -3,6 +3,7 @@ package com.pw.lokalizator.security;
 import java.math.BigInteger;
 import java.security.Principal;
 import java.security.SecureRandom;
+import java.util.Date;
 
 import javax.ejb.EJB;
 import javax.ejb.Local;
@@ -36,11 +37,7 @@ public class SecurityService {
 			logger.info("Trying to create SecurityContext [ token : " + token + " ]");
 			
 			RestSession session = restSessionManager.getRestSession(token);
-			
-			if(session == null){
-				throw new SecurityException("Nie poprawny token");
-			}
-			
+			session.setLastUsed(new Date());
 			request.getSession().setAttribute(RestSession.REST_SESSION_ATR , session);
 			return new SecurityContextRest( session.getUser() );
 			
@@ -57,22 +54,20 @@ public class SecurityService {
 		User user = userRepository.findUserWithSecurityByLoginAndPassword(login, password);
 		String token = restSessionManager.getTokenForLogin(login);
 		
-		if(token != null){
-			return token;
-		} else {
-			
-			do{
-				token = generateToken();
-			} while(restSessionManager.isTokenArleadyUse(token));
-			
+		if(token == null){
+			token = generateToken(user.getId());
 			restSessionManager.addRestSession(token, user);
 			return token;
 		}
+		
+		return token;
 	}
 	
 	
-	private String generateToken(){
-		return new BigInteger(130, random).toString(32);
+	private String generateToken(long id){
+		String token = null;
+		token = new BigInteger(130, random).toString(32) + id;
+		return token;
 	}
 	
 	public boolean logout(String token){

@@ -15,16 +15,12 @@ import com.pw.lokalizator.model.enums.Providers;
 import com.pw.lokalizator.utilitis.PropertiesReader;
 
 public class CircleBuilder {
-	private static Logger logger = Logger.getLogger(CircleBuilder.class);
-	
 	private static String GPS_CIRCLE_COLOR;
 	private static String NETWORK_NASZ_CIRCLE_COLOR;
 	private static String NETWORK_OBCY_CIRCLE_COLOR;
-	
 	private static String GPS_CIRCLE_STROKE_COLOR;
 	private static String NETWORK_NASZ_CIRCLE_STROKE_COLOR;
 	private static String NETWORK_OBCY_CIRCLE_STROKE_COLOR;
-	
 	private static double CIRCLE_STROKE_OPACITY;
 	private static double CIRCLE_FILL_OPACITY;
 	
@@ -61,7 +57,7 @@ public class CircleBuilder {
        circle.setFillOpacity(CIRCLE_FILL_OPACITY);
        circle.setStrokeColor(chooseStrokeColor(location));
        circle.setStrokeOpacity(CIRCLE_STROKE_OPACITY);
-       OverlayIdentyfikator identyfikator = new OverlayIdentyfikator(location);
+       OverlayIdentyfikator identyfikator = new OverlayIdentyfikator(location, Overlays.CIRCLE);
        circle.setId(identyfikator.createIdentyfikator());
        
        return circle;

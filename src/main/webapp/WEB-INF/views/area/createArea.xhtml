@@ -7,37 +7,56 @@
       xmlns:c="http://java.sun.com/jsp/jstl/core"> 
 
    <p:panel id="panelCreate" header="Tworzenie polygonu">
-      <h:form>
+      <h:form id="createArea">
 	     <h:panelGrid columns="3" cellpadding="5" styleClass="panelGrid">
-            <p:outputLabel for="nazwa" value="Nazwa Polygona:"/>
-	        <p:inputText id="nazwa" required="true" value="#{polyglon.nazwaPolygona}">
-	           <f:validateLength minimum="4" maximum="16"/>
+            <p:outputLabel for="nazwa" value="Nazwa obszaru:"/>
+	        <p:inputText id="nazwa" required="true" value="#{polyglon.area.name}">
+	           <f:validateLength minimum="4" maximum="16"/> 
 	        </p:inputText>
 	        <p:message for="nazwa" display="icon" />
 	         
-	        <p:outputLabel for="typPolygon" value="Typ Polygona:"/>
-	        <p:selectOneMenu id="typPolygon" value="#{polyglon.polygonType}" required="true">
+	        <p:outputLabel for="typPolygon" value="Typ Obszaru:"/>
+	        <p:selectOneMenu id="typPolygon" value="#{polyglon.area.areaFollowType}">
 	           <f:selectItems value="#{polyglon.polygonFollowTypes}"/>
 	        </p:selectOneMenu>
 	        <p:message for="typPolygon" display="icon" />
-	         
+	        
 	        <p:outputLabel for="login" value="Login Targetu:"/>
-	        <p:autoComplete id="login" value="#{polyglon.targetLogin}" completeMethod="#{polyglon.onAutoCompleteUser}" required="true" forceSelection="true"/>
+	        <p:autoComplete id="login" value="#{polyglon.area.target.login}" completeMethod="#{polyglon.onAutoCompleteUser}" required="true" forceSelection="true"/>
 	        <p:message for="login" display="icon" />
+	        
+	        <p:outputLabel for="color" value="Kolor obszaru"/>
+	        <p:colorPicker id="color" value="#{polyglon.area.color}"/>
+	        <p:message for="color" display="icon" />
+	        
+	        <p:outputLabel for="mailMessage" value="Wysylanie wiadomosci email"/>
+	        <p:selectBooleanCheckbox id="mailMessage" value="#{polyglon.area.areaMessageMail.active}">
+               <p:ajax event="change" update=":#{p:component('mailMessageMode')}"/>
+	        </p:selectBooleanCheckbox>
+	        <p:message for="mailMessage"/>
 
-	        <p:commandButton value="Creacte" update=":#{p:component('growl')} :#{p:component('existPolygons')}" action="#{polyglon.onCreateArea()}"/>
-	     </h:panelGrid>
+            
+	        <p:outputLabel  for="mailMessageMode" value="Tryb wysylania email" />
+	        <p:selectOneMenu id="mailMessageMode" value="#{polyglon.area.areaMessageMail.areaMailMessageMode}" disabled="#{!polyglon.area.areaMessageMail.active}">
+	           <f:selectItems value="#{polyglon.areaMailMessageModes}"/>
+	        </p:selectOneMenu>
+	        <p:message for="mailMessageMode"/>
+            
+            <p:commandButton value="Creacte" update=":#{p:component('growl')} :#{p:component('existPolygons')}" 
+	                         action="#{polyglon.onSaveArea()}"/>
+         </h:panelGrid>
+
 	  </h:form> 
 	  <h:form id="paths">
-	     <p:dataTable value="#{polyglon.paths}" var="path">
+	     <p:dataTable value="#{polyglon.paths}" var="path" rowIndexVar="index">
 	        <p:column headerText="Wartosc">
 	           <h:outputText value="#{path}" />
 	        </p:column>
 	       <p:column headerText="Pokaz">
-	          <p:commandButton value="POKAZ" actionListener="#{polyglon.showPath(path)}" update=":#{p:component('gmap')}"/>
+	          <p:commandButton value="POKAZ" actionListener="#{polyglon.onPathRemove(path)}" update=":#{p:component('gmap')}"/>
 	       </p:column>
 	       <p:column headerText="Usun">
-	          <p:commandButton value="USUN" actionListener="#{polyglon.removePath(path)}" update=":#{p:component('gmap')} :#{p:component('paths')}"/>
+	          <p:commandButton value="USUN" actionListener="#{polyglon.onPathRemove(path, index)}" update=":#{p:component('gmap')} :#{p:component('paths')}"/>
 	       </p:column>
 	    </p:dataTable>
 	 </h:form>

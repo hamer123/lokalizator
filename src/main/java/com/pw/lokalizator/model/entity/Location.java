@@ -75,6 +75,9 @@ public abstract class Location implements Serializable{
 	@XmlElement
 	@Column(name = "ACCURACY", nullable = false, updatable = false)
 	private double accuracy;
+	
+	@Column(name = "event_check")
+	private boolean eventCheck;
 
 	public long getId() {
 		return id;
@@ -139,6 +142,14 @@ public abstract class Location implements Serializable{
 
 	public void setAccuracy(double accuracy) {
 		this.accuracy = accuracy;
+	}
+
+	public boolean isEventCheck() {
+		return eventCheck;
+	}
+
+	public void setEventCheck(boolean eventCheck) {
+		this.eventCheck = eventCheck;
 	}
 
 	@Override

@@ -38,6 +38,7 @@ import com.pw.lokalizator.model.enums.Roles;
 @NamedQueries(
 		value = {
 		  @NamedQuery(name="USER.findAll", query = "SELECT u FROM User u"),
+		  @NamedQuery(name="USER.findByLogins", query = "SELECT u FROM User u WHERE u.login IN (:logins)"),
 		  @NamedQuery(name="USER.deleteByID", query="DELETE FROM User u WHERE u.id = :id"),
 		  @NamedQuery(name="USER.findByLogin", query="SELECT u FROM User u WHERE u.login =:login"),
 		  @NamedQuery(name="USER.findByLoginAndPassword", query="SELECT u FROM User u WHERE u.login = :login AND u.password =:password"),
@@ -86,15 +87,15 @@ public class User implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private Roles rola;
 	
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne
 	@JoinColumn(updatable = true, name = "LAST_LOC_GPS")
 	private LocationGPS lastLocationGPS;
 	
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne
 	@JoinColumn(updatable = true, name = "LAST_LOC_NET_NASZA_ID")
 	private LocationNetwork lastLocationNetworkNaszaUsluga;
 	
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne
 	@JoinColumn(updatable = true, name = "LAST_LOC_NET_OBCA_ID")
 	private LocationNetwork lastLocationNetworObcaUsluga;
 	
@@ -102,11 +103,8 @@ public class User implements Serializable {
 	private List<LocationGPS> locationGPS;
 	
 	@OneToMany(mappedBy="user", orphanRemoval = true, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-	private List<LocationNetwork> locationNetworkNaszaUsluga;
+	private List<LocationNetwork> locationNetwork;
 	
-	@OneToMany(mappedBy="user", orphanRemoval = true, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-	private List<LocationNetwork> locationNetworkObcaUsluga;
-
 	@OneToMany(mappedBy = "provider", orphanRemoval = true, fetch= FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
 	private List<Area>polygons;
 	
@@ -161,11 +159,11 @@ public class User implements Serializable {
 		this.lastLocationGPS = lastLocationGPS;
 	}
 
-	public List<Area> getPolygons() {
+	public List<Area> getArea() {
 		return polygons;
 	}
 
-	public void setPolygons(List<Area> polygons) {
+	public void setArea(List<Area> polygons) {
 		this.polygons = polygons;
 	}
 
@@ -178,11 +176,11 @@ public class User implements Serializable {
 	}
 
 	public List<LocationNetwork> getLocationNetwork() {
-		return locationNetworkNaszaUsluga;
+		return locationNetwork;
 	}
 
 	public void setLocationNetwork(List<LocationNetwork> locationNetwork) {
-		this.locationNetworkNaszaUsluga = locationNetwork;
+		this.locationNetwork = locationNetwork;
 	}
 
 	public String getPhone() {
@@ -209,24 +207,6 @@ public class User implements Serializable {
 	public void setLastLocationNetworObcaUsluga(
 			LocationNetwork lastLocationNetworObcaUsluga) {
 		this.lastLocationNetworObcaUsluga = lastLocationNetworObcaUsluga;
-	}
-
-	public List<LocationNetwork> getLocationNetworkNaszaUsluga() {
-		return locationNetworkNaszaUsluga;
-	}
-
-	public void setLocationNetworkNaszaUsluga(
-			List<LocationNetwork> locationNetworkNaszaUsluga) {
-		this.locationNetworkNaszaUsluga = locationNetworkNaszaUsluga;
-	}
-
-	public List<LocationNetwork> getLocationNetworkObcaUsluga() {
-		return locationNetworkObcaUsluga;
-	}
-
-	public void setLocationNetworkObcaUsluga(
-			List<LocationNetwork> locationNetworkObcaUsluga) {
-		this.locationNetworkObcaUsluga = locationNetworkObcaUsluga;
 	}
 
 	public Roles getRola() {

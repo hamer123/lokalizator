@@ -1,6 +1,5 @@
 package com.pw.lokalizator.repository.impl;
 
-import java.util.Collection;
 import java.util.List;
 
 import javax.ejb.Stateless;
@@ -27,12 +26,12 @@ public class AreaRepositoryImpl implements AreaRepository{
 	}
 
 	@Override
-	public void remove(Area entity) {
+	public void delete(Area entity) {
 		em.remove(entity);
 	}
 
 	@Override
-	public void remove(Long id) {
+	public void delete(Long id) {
 		Area area = em.find(Area.class, id);
 		em.remove(area);
 	}
@@ -55,12 +54,12 @@ public class AreaRepositoryImpl implements AreaRepository{
 		         .getResultList();
 	}
 
-	@Override
-	public List<Area> findIdAndNameAndFollowTypeAndTargetIdAndTargetLoginByProviderId(long id) {
-		return em.createNamedQuery("Area.findIdAndNameAndFollowTypeAndTargetIdAndTargetLoginByProviderId", Area.class)
-				 .setParameter("id", id)
-				 .getResultList();
-	}
+//	@Override
+//	public List<Area> findIdAndNameAndFollowTypeAndTargetIdAndTargetLoginByProviderId(long id) {
+//		return em.createNamedQuery("Area.findIdAndNameAndFollowTypeAndTargetIdAndTargetLoginByProviderId", Area.class)
+//				 .setParameter("id", id)
+//				 .getResultList();
+//	}
 
 	@Override
 	public List<Area> findWithEagerFetchPointsAndTargetByProviderId(long id) {
@@ -72,6 +71,21 @@ public class AreaRepositoryImpl implements AreaRepository{
 			polygonModel.getPoints().size();
 		
 		return polygonModels;
+	}
+
+	@Override
+	public int updateAktywnyById(boolean aktywny, long id) {
+		return em.createQuery(Area.AREA_updateAktywnyById)
+				 .setParameter("id", id)
+				 .setParameter("aktywny", aktywny)
+		         .executeUpdate();
+	}
+
+	@Override
+	public List<Area> findByProviderId(long id) {
+		return em.createNamedQuery("Area.findByProviderId", Area.class)
+				  .setParameter("id", id)
+				  .getResultList();
 	}
 
 }

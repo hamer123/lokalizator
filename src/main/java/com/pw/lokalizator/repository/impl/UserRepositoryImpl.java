@@ -18,6 +18,7 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
+import com.pw.lokalizator.model.entity.Area;
 import com.pw.lokalizator.model.entity.Location;
 import com.pw.lokalizator.model.entity.LocationGPS;
 import com.pw.lokalizator.model.entity.LocationNetwork;
@@ -45,11 +46,11 @@ public class UserRepositoryImpl implements UserRepository{
 		return em.merge(entity);
 	}
 	
-	public void remove(User entity) {
+	public void delete(User entity) {
 		em.remove(entity);
 	}
 	
-	public void remove(Long id) {
+	public void delete(Long id) {
 		em.createNamedQuery("USER.deleteByID")
 		   .setParameter("id", id)
 		   .executeUpdate();
@@ -95,7 +96,7 @@ public class UserRepositoryImpl implements UserRepository{
 		User user =  em.createNamedQuery("USER.findByLogin", User.class)
 				       .setParameter("login", login)
 				       .getSingleResult();
-		user.getPolygons().size();
+		user.getArea().size();
 		return user;
 	}
 
@@ -149,5 +150,25 @@ public class UserRepositoryImpl implements UserRepository{
         	return results.get(0);
         
         throw new NonUniqueResultException();	
+	}
+
+	@Override
+	public List<User> findByLogin(List<String> logins) {
+		return em.createNamedQuery("USER.findByLogins", User.class)
+				 .setParameter("logins", logins)
+				 .getResultList();
+	}
+
+	@Override
+	public User findByLoginFetchArea(String login) {
+		User user =  em.createNamedQuery("USER.findByLogin", User.class)
+			       .setParameter("login", login)
+			       .getSingleResult();
+		
+		List<Area>areas = user.getArea();
+		for(Area area : areas)
+			area.getPoints().size();
+		
+		return user;
 	}
 }

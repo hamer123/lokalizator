@@ -19,6 +19,9 @@
         <param-value>dot-luv</param-value>  
     </context-param>  
     
+    <welcome-file-list>
+       <welcome-file>location.xhtml</welcome-file>
+    </welcome-file-list>
     
     
 	<!-- Auto scan REST service -->

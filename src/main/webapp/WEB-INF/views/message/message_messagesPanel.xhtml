@@ -17,6 +17,10 @@
            <h:outputText value="#{areaEvent.location.providerType}" />
          </p:column>
          
+         <p:column headerText="Usluga Lokalizacji">
+           <h:outputText value="#{messageController.getLocalicationService(areaEvent)}" />
+         </p:column>
+         
          <p:column headerText="Miasto">
            <h:outputText value="#{areaEvent.location.address.city}" />
          </p:column>
@@ -26,8 +30,8 @@
          </p:column>
          
          <p:column headerText="Pokaz lokacje">
-           <p:commandButton value="POKAZ" oncomplete="showGoogleMapDialog()"
-                            actionListener="#{messageController.onChooseLocationToDisplayInDialog(areaEvent)}" />
+           <p:commandButton value="POKAZ" oncomplete="showGoogleMapDialog()" update=":#{p:component('locationDialog')}"
+                            actionListener="#{messageController.onDisplayLocationInDialog(areaEvent)}" />
          </p:column>
          
       </p:dataTable>

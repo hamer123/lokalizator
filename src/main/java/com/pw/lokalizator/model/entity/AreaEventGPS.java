@@ -8,7 +8,9 @@ import javax.persistence.OneToOne;
 
 @Entity
 @NamedQueries(value ={
-		@NamedQuery(name = "AreaEventGPS.findByAreaId", query = "SELECT a FROM AreaEventGPS a WHERE a.area.id = :id")
+		@NamedQuery(name = "AreaEventGPS.findByAreaId", query = "SELECT a FROM AreaEventGPS a WHERE a.area.id = :id"),
+		@NamedQuery(name = "AreaEventGPS.findAllWhereMailSendIsTrue", 
+		            query = "SELECT a FROM AreaEventGPS a WHERE a.mailSend = true")
 })
 public class AreaEventGPS extends AreaEvent{
 

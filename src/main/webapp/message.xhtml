@@ -20,7 +20,7 @@
    <p:panelGrid columns="2" cellspacing="2" layout="grid">
    
    <p:outputPanel id="firstHalf" layout="grid">
-     <p:panel id="polygons" header="Polygons">
+     <p:panel id="polygons" header="Obszary sledzenia">
        <ui:include src="/WEB-INF/views/message/message_polygonPanel.xhtml"/> 
      </p:panel>
      
@@ -31,7 +31,7 @@
    
    <p:outputPanel id="secondHalf" layout="grid">
      <p:panel id="messageBody" header="Message Body" closable="true">
-       #{messageController.selectedPolygonModel != null}
+       <ui:include src="/WEB-INF/views/message/message_messageBody.xhtml" />
      </p:panel>
    
      <p:panel id="messages" header="Messages">

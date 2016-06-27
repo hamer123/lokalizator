@@ -26,13 +26,13 @@ public class AreaEventGPSRepositoryImpl implements AreaEventGPSRepository{
 	}
 
 	@Override
-	public void remove(AreaEventGPS entity) {
+	public void delete(AreaEventGPS entity) {
 		em.remove(entity);
 		
 	}
 
 	@Override
-	public void remove(Long id) {
+	public void delete(Long id) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -53,6 +53,12 @@ public class AreaEventGPSRepositoryImpl implements AreaEventGPSRepository{
 		return em.createNamedQuery("AreaEventGPS.findByAreaId", AreaEventGPS.class)
 				  .setParameter("id", id)
 				  .getResultList();
+	}
+
+	@Override
+	public List<AreaEventGPS> findAllWhereMailSendIsTrue() {
+		return em.createNamedQuery("AreaEventGPS.findAllWhereMailSendIsTrue", AreaEventGPS.class)
+				 .getResultList();
 	}
 
 }

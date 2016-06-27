@@ -37,7 +37,7 @@ public class MarkerBuilder {
 		marker.setDraggable(false);
 		marker.setClickable(true);
 		marker.setTitle(createTitle(location));
-		OverlayIdentyfikator identyfikator = new OverlayIdentyfikator(location);
+		OverlayIdentyfikator identyfikator = new OverlayIdentyfikator(location, Overlays.MARKER);
 		marker.setId(identyfikator.createIdentyfikator());
 		
 		return marker;

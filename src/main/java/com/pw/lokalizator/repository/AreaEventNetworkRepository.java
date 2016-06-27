@@ -10,4 +10,5 @@ import com.pw.lokalizator.model.entity.AreaEventNetwork;
 @Local
 public interface AreaEventNetworkRepository extends JpaRepository<AreaEventNetwork, Long>{
 	public List<AreaEventNetwork> findByAreaId(long id);
+	public List<AreaEventNetwork> findAllWhereMailSendIsTrue();
 }

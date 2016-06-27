@@ -38,34 +38,34 @@ public class RESTRequestFilter implements ContainerRequestFilter{
 		logger.info("RESt request " + requestCtx.getRequest().getMethod() + " path " + path );
           
         // IMPORTANT!!! First, Acknowledge any pre-flight test from browsers for this case before validating the headers (CORS stuff)
-        if ( requestCtx.getRequest().getMethod().equals( "OPTIONS" ) ) {
+        if (requestCtx.getRequest().getMethod().equals( "OPTIONS" )) {
             requestCtx.abortWith(Response.status( Response.Status.OK ).build() );
- 
             return;
-        }  
+        }
         
-        // Then check are tokens exist and are valid.    
-       validateTokens(requestCtx);
+        if(path.startsWith( "/user/login" )){
+        	return;
+        }
+
+       createRestSession(requestCtx);
 	}
 	
-	private void validateTokens(ContainerRequestContext requestCtx){
-		String path = requestCtx.getUriInfo().getPath();
-		
-        if( !path.startsWith("/user/login") ){
-            String token = requestCtx.getHeaderString( HTTPHeaderNames.AUTH_TOKEN);
-     
-            if(token != null){
-                try{
-                	SecurityContext sc = securityService.createSecurityContext ( token, request );
-                	requestCtx.setSecurityContext(sc);
-                }catch(Exception e){
-                	requestCtx.abortWith( Response.status( Response.Status.UNAUTHORIZED ).build() );
-                	logger.error(e);
-                }
-            }else{
-            	requestCtx.abortWith( Response.status( Response.Status.UNAUTHORIZED ).build() );
-            }
-        }
+	private void createRestSession(ContainerRequestContext requestCtx){
+		try{
+	        String token = requestCtx.getHeaderString( HTTPHeaderNames.AUTH_TOKEN);
+	        
+	        if(validateToken(token)){
+	        	SecurityContext sc = securityService.createSecurityContext ( token, request );
+	        	requestCtx.setSecurityContext(sc);
+	        }
+		} catch(Exception e){
+        	requestCtx.abortWith( Response.status( Response.Status.UNAUTHORIZED ).build() );
+        	logger.error(e);
+		}
 	}
-
+	
+	private boolean validateToken(String token){
+		return token != null;
+	}
+	
 }

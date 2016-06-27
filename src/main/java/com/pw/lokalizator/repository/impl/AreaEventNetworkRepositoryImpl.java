@@ -27,14 +27,14 @@ public class AreaEventNetworkRepositoryImpl implements AreaEventNetworkRepositor
 	}
 
 	@Override
-	public void remove(AreaEventNetwork entity) {
+	public void delete(AreaEventNetwork entity) {
 		em.remove(entity);
 	}
 
 	@Override
-	public void remove(Long id) {
-		// TODO Auto-generated method stub
-		
+	public void delete(Long id) {
+		em.createNamedQuery("AreaEventNetwork.removeById")
+		  .executeUpdate();
 	}
 
 	@Override
@@ -44,8 +44,8 @@ public class AreaEventNetworkRepositoryImpl implements AreaEventNetworkRepositor
 
 	@Override
 	public List<AreaEventNetwork> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+		return em.createNamedQuery("AreaEventNetwork.findAll", AreaEventNetwork.class)
+				 .getResultList();
 	}
 
 	@Override
@@ -53,6 +53,12 @@ public class AreaEventNetworkRepositoryImpl implements AreaEventNetworkRepositor
 		return em.createNamedQuery("AreaEventNetwork.findByAreaId", AreaEventNetwork.class)
 				  .setParameter("id", id)
 				  .getResultList();
+	}
+
+	@Override
+	public List<AreaEventNetwork> findAllWhereMailSendIsTrue() {
+		return em.createNamedQuery("AreaEventNetwork.findAllWhereMailSendIsTrue", AreaEventNetwork.class)
+				 .getResultList();
 	}
 
 }

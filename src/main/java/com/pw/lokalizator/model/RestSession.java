@@ -7,7 +7,7 @@ import com.pw.lokalizator.model.entity.User;
 
 public class RestSession {
 	public static final String REST_SESSION_ATR = "j_rest_session";
-	private Date lastUsed;
+	private Date lastUsed = new Date();
 	private User user;
 	private Map<String,Object>sessionAttributes;
 	

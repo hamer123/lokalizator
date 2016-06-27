@@ -8,18 +8,23 @@
         
    <p:panel id="panelExistArea" header="Istniejace obszary sledzenia">
       <h:form id="existPolygons">
-         <p:dataTable var="user_area" value="#{polyglon.polygonList}">
+         <p:dataTable var="user_area" value="#{polyglon.areaList}">
             <p:column headerText="Nazwa">
                <h:outputText value="#{user_area.name}" />
             </p:column>
             <p:column headerText="Typ sledzenia">
-               <h:outputText value="#{user_area.polygonFollowType}" />
+               <h:outputText value="#{user_area.areaFollowType}" />
             </p:column>
             <p:column headerText="Sledzony uzytkownik">
                <h:outputText value="#{user_area.target.login}" />
             </p:column>
             <p:column headerText="Pokaz">
-               <p:commandButton update=":#{p:component('gmap')} :#{p:component('panelCreate')}" actionListener="#{polyglon.onPokazPolygon(user_area)}" value="POKAZ"/>
+               <p:commandButton update=":#{p:component('gmap')} :#{p:component('panelCreate')}" actionListener="#{polyglon.onShowArea(user_area)}" value="POKAZ"/>
+            </p:column>
+            <p:column headerText="Zmien status">
+               <p:commandButton update=":#{p:component('existPolygons')}  :#{p:component('growl')}" 
+                                actionListener="#{polyglon.onChangeAreaActiveStatus(user_area)}" 
+                                value="#{polyglon.getAreaActiveButtonValue(user_area)}"/>
             </p:column>
             <p:column headerText="Usun">
                <p:commandButton update=":#{p:component('existPolygons')}" actionListener="#{polyglon.onRemoveArea(user_area)}" value="USUN"/>

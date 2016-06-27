@@ -1,4 +1,4 @@
-package com.pw.lokalizator.service;
+package com.pw.lokalizator.service.impl;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -13,6 +13,7 @@ import com.pw.lokalizator.model.entity.User;
 import com.pw.lokalizator.model.enums.LocalizationServices;
 import com.pw.lokalizator.repository.LocationRepository;
 import com.pw.lokalizator.repository.UserRepository;
+import com.pw.lokalizator.service.LocationService;
 
 @Stateless
 public class LocationServiceImpl implements LocationService{

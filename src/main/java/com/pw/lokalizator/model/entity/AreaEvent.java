@@ -1,13 +1,17 @@
 package com.pw.lokalizator.model.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.TableGenerator;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @MappedSuperclass
 public abstract class AreaEvent implements Serializable{
@@ -27,6 +31,12 @@ public abstract class AreaEvent implements Serializable{
     private Area area;
     
     private String message;
+    
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date date;
+    
+    @Column(name = "mail_send")
+    private boolean mailSend;
 
 	public long getId() {
 		return id;
@@ -51,6 +61,22 @@ public abstract class AreaEvent implements Serializable{
 	public void setMessage(String message) {
 		this.message = message;
 	}
-    
-    public abstract Location getLocation();
+
+    public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+
+	public boolean isMailSend() {
+		return mailSend;
+	}
+
+	public void setMailSend(boolean mailSend) {
+		this.mailSend = mailSend;
+	}
+
+	public abstract Location getLocation();
 }

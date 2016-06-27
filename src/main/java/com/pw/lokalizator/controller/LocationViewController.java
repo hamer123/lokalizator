@@ -2,350 +2,305 @@ package com.pw.lokalizator.controller;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
-
 import javax.annotation.PostConstruct;
-import javax.ejb.EJB;
-import javax.faces.event.ActionEvent;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-
-import org.hibernate.sql.Update;
 import org.jboss.logging.Logger;
-import org.primefaces.event.SelectEvent;
-import org.primefaces.event.TabChangeEvent;
-import org.primefaces.event.map.OverlaySelectEvent;
-import org.primefaces.model.map.DefaultMapModel;
-import org.primefaces.model.map.LatLng;
-import org.primefaces.model.map.MapModel;
-
+import org.primefaces.event.ToggleEvent;
+import org.primefaces.model.map.Overlay;
 import com.pw.lokalizator.jsf.utilitis.JsfMessageBuilder;
-import com.pw.lokalizator.model.OverlayVisibility;
-import com.pw.lokalizator.model.entity.CellInfoGSM;
-import com.pw.lokalizator.model.entity.CellInfoLte;
-import com.pw.lokalizator.model.entity.Location;
-import com.pw.lokalizator.model.entity.LocationGPS;
-import com.pw.lokalizator.model.entity.LocationNetwork;
+import com.pw.lokalizator.jsf.utilitis.OverlayIdentyfikator;
+import com.pw.lokalizator.jsf.utilitis.OverlayIdentyfikator.OverlayIdentyfikatorBuilder;
+import com.pw.lokalizator.model.GoogleMapComponentVisible;
+import com.pw.lokalizator.model.GoogleMapModel;
 import com.pw.lokalizator.model.entity.Area;
-import com.pw.lokalizator.model.entity.PolygonPoint;
+import com.pw.lokalizator.model.entity.AreaPoint;
+import com.pw.lokalizator.model.entity.Location;
+import com.pw.lokalizator.model.entity.LocationNetwork;
 import com.pw.lokalizator.model.entity.User;
-import com.pw.lokalizator.model.enums.GoogleMaps;
 import com.pw.lokalizator.model.enums.LocalizationServices;
-import com.pw.lokalizator.model.enums.Providers;
 import com.pw.lokalizator.repository.CellInfoMobileRepository;
-import com.pw.lokalizator.repository.LocationRepository;
 import com.pw.lokalizator.repository.UserRepository;
 import com.pw.lokalizator.repository.WifiInfoRepository;
+import com.pw.lokalizator.serivce.qualifier.DialogGoogleMap;
+import com.pw.lokalizator.service.GoogleMapUserComponentService;
+import com.pw.lokalizator.service.UserLastLocationsService;
 import com.pw.lokalizator.singleton.RestSessionManager;
 
-@Named(value="location")
+
 @ViewScoped
+@Named(value="location")
 public class LocationViewController implements Serializable{
-	private Logger logger = Logger.getLogger(LocationViewController.class);
-	@EJB
+	@Inject
 	private UserRepository userRepository;
-	@EJB
-	private RestSessionManager restSessionManager;
-	@EJB
-	private CellInfoMobileRepository cellInfoMobileRepository;
-	@EJB
+	@Inject
 	private WifiInfoRepository wifiInfoRepository;
 	@Inject
-	private GoogleMapFollowUsersController googleMapFollowUsersController;
+	private CellInfoMobileRepository cellInfoMobileRepository;
+	
 	@Inject
-	private GoogleMapUserHistoryController googleMapUserHistoryController;
+	private GoogleMapController googleMapController;
+	@Inject @DialogGoogleMap
+	private GoogleMapSingleUserDialogController googleMapSingleUserDialogController;
 	
-	private static final Providers[] providers = Providers.values();
-	private static final LocalizationServices[] services = LocalizationServices.values();
+	@Inject
+	private GoogleMapUserComponentService googleMapUserComponentService;
+	@Inject
+	private UserLastLocationsService userLastLocationsService;
+
+	@Inject
+	RestSessionManager restSessionManager;
+	@Inject
+	Logger logger;
 	
-	private boolean panelDaneVisible;
-	private User selectedUserToShowData;
-	private String selectedLoginToFollow;
-	private Location selectedUserToShowDataLocation;
-	private List<String>userLoginOnline;
+	private static final String GOOGLE_MAP_STYLE_MIN_WIDTH = "googleMapMin";
+	private static final String GOOGLE_MAP_STYLE_MAX_WIDTH = "googleMapMax";
 	
-	private LocationNetwork locationNetworkShowSzczegoly;
-	private CellInfoGSM cellInfoGSMShowSzczegoly;
-	private CellInfoLte cellInfoLteShowSzczegoly;
+	private String googleMapStyle = GOOGLE_MAP_STYLE_MIN_WIDTH;
+	private String login = "";
+	private Location selectLocation;
+	private Location locationToDisplayDetails;
+	private User selectUser = null;
+	private Set<User>users = new HashSet<User>();
+	private GoogleMapComponentVisible googleMapVisible;
 	
-	private GoogleMaps googleMapType;
-	private boolean streetView;
-	private GoogleMapMode googleMapMode;
-	
-	
-	private Providers choicedProvider;
-	private LocalizationServices choicedLocalizationServices;
-	private OverlayVisibility overlayVisibilityFollow;
-	
-	private enum GoogleMapMode{
-		FOLLOW_USER,SINGLE_USER;
-	}
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////  ACTIONS   ////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	@PostConstruct
-	private void postConstruct(){
-		choicedProvider = providers[0];
-		choicedLocalizationServices = services[0];
-		overlayVisibilityFollow = googleMapFollowUsersController.getGpsVisibility();
-		
-		
-		googleMapType = GoogleMaps.HYBRID;
-		streetView = true;
-		panelDaneVisible = false;
-		googleMapMode = GoogleMapMode.FOLLOW_USER;
-		
-		userLoginOnline = restSessionManager.getUserOnlineLogins();
+	public void init(){
+		googleMapVisible = new GoogleMapComponentVisible();
+		googleMapVisible.setCircleGps(true);
+		googleMapVisible.setCircleNetworkNasz(true);
+		googleMapVisible.setCircleNetworkObcy(true);
+		googleMapVisible.setMarkerGps(true);
+		googleMapVisible.setMarkerNetworkNasz(true);
+		googleMapVisible.setMarkerNetworkObcy(true);
+		googleMapVisible.setPolygon(false);
 	}
 	
-	public void onPokazPolygonLocation(Area polygonModel){
-	    List<PolygonPoint>points = new ArrayList<PolygonPoint>( polygonModel.getPoints().values() );
-		String center = googleMapFollowUsersController.createCenter(getLatLngFirstPoint(points));
-		googleMapFollowUsersController.setCenter(center);
-	}
-	
-	public void onChooseProviderChange(){
-		if(choicedProvider == Providers.GPS)
-			overlayVisibilityFollow = googleMapFollowUsersController.getGpsVisibility();
-		else 
-			overlayVisibilityFollow = googleMapFollowUsersController.getNetworkNaszaUslugaVisibility();
-	}
-	
-	public void onChooseLocatiozacionServiceChange(){
-		if(choicedLocalizationServices == LocalizationServices.NASZ)
-			overlayVisibilityFollow = googleMapFollowUsersController.getNetworkNaszaUslugaVisibility();
-		else
-			overlayVisibilityFollow = googleMapFollowUsersController.getNetworkObcaUslugaVisibilty();
-	}
-	
-	public List<String> onAutoCompleteUser(String userLogin){
-		return userRepository.findLoginByLoginLike(userLogin);
+	public void onAddUserToFollow(){
+		try{
+			
+			if(isUserArleadyOnList(login)){
+				JsfMessageBuilder.errorMessage("Użytkownik jest już na liście");
+				return;
+			}
+			
+			User user = userRepository.findByLoginFetchArea(login);
+			List<Overlay>overlays = googleMapUserComponentService.lastLocation(user, googleMapVisible);
+			googleMapController.addOverlay(overlays);
+			users.add(user);
+			
+			JsfMessageBuilder.infoMessage("Udało się dodać uzytkownika do śledzenia");
+		} catch(Exception e){
+			JsfMessageBuilder.errorMessage("Błąd przy próbie dodania użytkownika");
+			logger.error(e);
+		}
 	}
 
-	public void onUserSelectToFollow(){
-		if(!isUserFollow(selectedLoginToFollow))
-			googleMapFollowUsersController.addUser(selectedLoginToFollow);
-		else 
-			JsfMessageBuilder.errorMessageFromProperties("userArleadyFollowed");
-	}
-	
-	public void onUserRemove(String login){
-		googleMapFollowUsersController.removeUser(login);
-		
-		if(selectedUserToShowData != null && login.equals( selectedUserToShowData.getLogin() )){
-			clearAndHideDanePanel();
+	public void onPoll(){
+		try{
+			for(User user : users){
+				if(restSessionManager.isUserOnline(user.getLogin()))
+					userLastLocationsService.updateUserLastLocation(user);
+			}
+			
+			if(!users.isEmpty()){
+				List<Overlay>overlays = googleMapUserComponentService.lastLocation(users, googleMapVisible);
+				googleMapController.replace(overlays);	
+			}
+		} catch(Exception e){
+			JsfMessageBuilder.errorMessage("Nie udało się odnowić lokalizacji");
+			logger.equals(e);
 		}
 	}
 	
-	public void onRowSelectedOstatnieLokacje(SelectEvent event){
-		Location location = (Location) event.getObject();
-		String center = googleMapFollowUsersController.createCenter(location.getLatitude(), location.getLongitude());
-		googleMapFollowUsersController.setCenter(center);
-		googleMapFollowUsersController.setZoom(15);
+	public void onRemoveUserFromFollow(User user){
+		try{
+			removeUserFromList(user);
+			removeUserFromGoogleMap(user);
+			JsfMessageBuilder.infoMessage("Udało się usunąć uzytkownika z listy śledzenia");
+		} catch(Exception e){
+			JsfMessageBuilder.errorMessage("Nie udało się usunąć uzytkownika z listy śledzenia");
+			logger.error(e);
+			e.printStackTrace();
+		}
+	}
+	
+	public void onChangeSetting(){
+		List<Overlay>overlays = googleMapUserComponentService.lastLocation(users, googleMapVisible);
+		googleMapController.replace(overlays);
+	}
+	
+	public void onShowLocation(){
+		String center = GoogleMapModel.center(selectLocation);
+		googleMapController.setCenter(center);
+	}
+	
+	public List<String> onAutocompleteLogin(String login){
+		List<String>logins = userRepository.findLoginByLoginLike(login);
+		return filterLogins(logins);
+	}
+	
+	public List<String> usersOnline(){
+		return restSessionManager.getUserOnlineLogins();
 	}
 
-	private void clearAndHideDanePanel(){
-		selectedUserToShowData = null;
-		panelDaneVisible = false;
+	public void onShowUserLastLocations(User user){
+		selectUser = user;
 	}
 	
-	public void onPokazDane(String login){
-		selectedUserToShowData = googleMapFollowUsersController.getUser(login);
-		panelDaneVisible = true;
+	public void onToggleMainPanel(ToggleEvent event){
+		if(googleMapStyle.equals(GOOGLE_MAP_STYLE_MIN_WIDTH))
+			googleMapStyle = GOOGLE_MAP_STYLE_MAX_WIDTH;
+		else
+			googleMapStyle = GOOGLE_MAP_STYLE_MIN_WIDTH;
 	}
 	
-	public boolean isUserFollow(String login){
-		for(User user : googleMapFollowUsersController.getUsersToFollow())
+	public void onShowPolygonLocation(Area area){
+		AreaPoint areaPoint = area.getPoints().get(1);
+		String center = GoogleMapModel.center(areaPoint.getLat(), areaPoint.getLng());
+		googleMapController.setCenter(center);
+	}
+	
+	public void onSetLocationToDipslayDetails(Location location){
+		if(location instanceof LocationNetwork){
+			LocationNetwork locationNetwork = (LocationNetwork)location;
+			locationNetwork.setWifiInfo( wifiInfoRepository.findByLocationId(location.getId()) );
+			locationNetwork.setCellInfoMobile( cellInfoMobileRepository.findByLocationId(location.getId()) );
+		}
+		
+		locationToDisplayDetails = location;
+	}
+	
+	public void onShowOnlineUserLastLocations(String login){
+		User user = userRepository.findByLogin(login);
+		List<Overlay>overlays = googleMapUserComponentService.lastLocation(user, GoogleMapComponentVisible.NO_POLYGON);
+		googleMapSingleUserDialogController.replace(overlays);
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////  UTILITIS  /////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private boolean isUserArleadyOnList(String login){
+		for(User user : users)
 			if(user.getLogin().equals(login))
 				return true;
 		
 		return false;
 	}
-
-    public void onTabChange(TabChangeEvent event) {
-    	String tabTitle = event.getTab().getTitle();
-    	
-    	if(tabTitle.equals("Aktualne Lokacje"))
-    		googleMapMode = GoogleMapMode.FOLLOW_USER;
-    	else if(tabTitle.equals("Historia Lokacji"))
-    		googleMapMode = GoogleMapMode.SINGLE_USER;
-    }
-
-    public List<Location>getSelectedUserToShowDataCurrentLocations(){
-    	List<Location>locations = new ArrayList<Location>();
-    	
-		if(selectedUserToShowData.getLastLocationGPS() != null)
-			locations.add(selectedUserToShowData.getLastLocationGPS());
-		if(selectedUserToShowData.getLastLocationNetworObcaUsluga() != null)
-			locations.add(selectedUserToShowData.getLastLocationNetworObcaUsluga());
-		if(selectedUserToShowData.getLastLocationNetworkNaszaUsluga() != null)
-		    locations.add(selectedUserToShowData.getLastLocationNetworkNaszaUsluga());
-    	
-    	return locations;
-    }
-    
-    public void onShowSzczegoly(Location location){
-    	clearLocationSzczegoly();
-    	setupLocationSzczegoly(location);
-    }
-    
-    public String getLocalizationServices(Location location){
-    	LocationNetwork locationNetwork = (LocationNetwork) location;
-    	return locationNetwork.getLocalizationServices().toString();
-    }
-    
-	private LatLng getLatLngFirstPoint(List<PolygonPoint>points){
-		PolygonPoint polygonPoint =  points.get(0);
-		return new LatLng(polygonPoint.getLat(), polygonPoint.getLng());
-	}
-    
-    private void setupLocationSzczegoly(Location location){
-    	if(location instanceof LocationNetwork)
-    		setupLocationNetworkSzczegoly(location);
-    }
-    
-    private void setupLocationNetworkSzczegoly(Location location){
-    	locationNetworkShowSzczegoly = (LocationNetwork)location;
-    	
-    	locationNetworkShowSzczegoly.setInfoWifi( wifiInfoRepository.findByLocationId(location.getId()) );
-    	locationNetworkShowSzczegoly.setCellInfoMobile( cellInfoMobileRepository.findByLocationId(location.getId()) );
-    	
-    	if(locationNetworkShowSzczegoly.getCellInfoMobile() instanceof CellInfoGSM)
-    		cellInfoGSMShowSzczegoly = (CellInfoGSM) locationNetworkShowSzczegoly.getCellInfoMobile();
-    	else if(locationNetworkShowSzczegoly.getCellInfoMobile() instanceof CellInfoLte)
-    		cellInfoLteShowSzczegoly = (CellInfoLte) locationNetworkShowSzczegoly.getCellInfoMobile();
-    }
-    
-    private void clearLocationSzczegoly(){
-    	cellInfoGSMShowSzczegoly = null;
-    	cellInfoLteShowSzczegoly = null;
-    	locationNetworkShowSzczegoly = null;
-    }
 	
-	public void onPollFollowMode(){
-		googleMapFollowUsersController.update();
-		userLoginOnline = restSessionManager.getUserOnlineLogins();
+	private <T> void addToListIfNotNull(List<T>list, T obj){
+		if(obj != null)
+			list.add(obj);
 	}
 	
-    public void onMarkerSelect(OverlaySelectEvent event) {
-
-    }
-    
-    //
-    //
-    //
-    
-	public CellInfoGSM getCellInfoGSMShowSzczegoly() {
-		return cellInfoGSMShowSzczegoly;
+	private List<String> filterLogins(List<String>logins){
+		List<String> filter = getLogins();
+		return logins.stream()
+				     .filter(s -> !(filter.contains(s)))
+				     .collect(Collectors.toList());
+	}
+	
+	private void removeUserFromList(User user){
+		cleanSelectedUserIfUserEquals(user);
+		users.remove(user);
+	}
+	
+	private void cleanSelectedUserIfUserEquals(User user){
+		if(selectUser != null && selectUser.equals(user))
+			selectUser = null;
+	}
+	
+	private void removeUserFromGoogleMap(User user){
+		OverlayIdentyfikator identyfikator = new OverlayIdentyfikatorBuilder().login(user.getLogin())
+                                                                              .build();
+		
+		googleMapController.removeOverlay(identyfikator);
 	}
 
-	public void setCellInfoGSMShowSzczegoly(CellInfoGSM cellInfoGSMShowSzczegoly) {
-		this.cellInfoGSMShowSzczegoly = cellInfoGSMShowSzczegoly;
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////  GETTERS SETTERS  ///////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	public List<String>getLogins(){
+		return users.stream()
+		            .map(u -> u.getLogin())
+		            .collect(Collectors.toList());
+	}
+	
+
+	public List<Location> selectUserLocations(){
+		List<Location>locations = new ArrayList<Location>();
+		
+		addToListIfNotNull(locations, selectUser.getLastLocationGPS());
+		addToListIfNotNull(locations, selectUser.getLastLocationNetworkNaszaUsluga());
+		addToListIfNotNull(locations, selectUser.getLastLocationNetworObcaUsluga());
+		
+		return locations;
+	}
+	
+	public LocalizationServices getLocalizationServices(Location location){
+		if(location instanceof LocationNetwork)
+			return ( (LocationNetwork)location ).getLocalizationServices();
+		
+		return null;
 	}
 
-	public CellInfoLte getCellInfoLteShowSzczegoly() {
-		return cellInfoLteShowSzczegoly;
+	public GoogleMapSingleUserDialogController getGoogleMapSingleUserDialogController() {
+		return googleMapSingleUserDialogController;
 	}
 
-	public void setCellInfoLteShowSzczegoly(CellInfoLte cellInfoLteShowSzczegoly) {
-		this.cellInfoLteShowSzczegoly = cellInfoLteShowSzczegoly;
+	public Location getLocationToDisplayDetails() {
+		return locationToDisplayDetails;
 	}
-    
-	public User getSelectedUserToShowData() {
-		return selectedUserToShowData;
-	}
-
-	public void setSelectedUserToShowData(User selectedUserToShowData) {
-		this.selectedUserToShowData = selectedUserToShowData;
+	
+	public Set<User> getUsers() {
+		return users;
 	}
 
-	public String getSelectedLoginToFollow() {
-		return selectedLoginToFollow;
+	public GoogleMapController getGoogleMapController() {
+		return googleMapController;
 	}
 
-	public void setSelectedLoginToFollow(String selectedLoginToFollow) {
-		this.selectedLoginToFollow = selectedLoginToFollow;
+	public String getLogin() {
+		return login;
 	}
 
-	public boolean isPanelDaneVisible() {
-		return panelDaneVisible;
+	public void setLogin(String login) {
+		this.login = login;
 	}
 
-
-	public void setPanelDaneVisible(boolean panelDaneVisible) {
-		this.panelDaneVisible = panelDaneVisible;
+	public User getSelectUser() {
+		return selectUser;
 	}
 
-	public Location getSelectedUserToShowDataLocation() {
-		return selectedUserToShowDataLocation;
+	public void setSelectUser(User selectUser) {
+		this.selectUser = selectUser;
 	}
 
-	public void setSelectedUserToShowDataLocation(
-			Location selectedUserToShowDataLocation) {
-		this.selectedUserToShowDataLocation = selectedUserToShowDataLocation;
+	public Location getSelectLocation() {
+		return selectLocation;
 	}
 
-	public List<String> getUserLoginOnline() {
-		return userLoginOnline;
+	public void setSelectLocation(Location selectLocation) {
+		this.selectLocation = selectLocation;
 	}
 
-	public LocationNetwork getLocationNetworkShowSzczegoly() {
-		return locationNetworkShowSzczegoly;
+	public GoogleMapComponentVisible getGoogleMapVisible() {
+		return googleMapVisible;
 	}
 
-	public void setLocationNetworkShowSzczegoly(
-			LocationNetwork locationNetworkShowSzczegoly) {
-		this.locationNetworkShowSzczegoly = locationNetworkShowSzczegoly;
+	public String getGoogleMapStyle() {
+		return googleMapStyle;
 	}
-
-	public GoogleMaps getGoogleMapType() {
-		return googleMapType;
-	}
-
-	public void setGoogleMapType(GoogleMaps googleMapType) {
-		this.googleMapType = googleMapType;
-	}
-
-	public boolean isStreetView() {
-		return streetView;
-	}
-
-	public void setStreetView(boolean streetView) {
-		this.streetView = streetView;
-	}
-
-	public GoogleMapMode getGoogleMapMode() {
-		return googleMapMode;
-	}
-
-	public Providers[] getProviders() {
-		return providers;
-	}
-
-	public Providers getChoicedProvider() {
-		return choicedProvider;
-	}
-
-	public void setChoicedProvider(Providers choicedProvider) {
-		this.choicedProvider = choicedProvider;
-	}
-
-	public LocalizationServices[] getServices() {
-		return services;
-	}
-
-	public LocalizationServices getChoicedLocalizationServices() {
-		return choicedLocalizationServices;
-	}
-
-	public void setChoicedLocalizationServices(
-			LocalizationServices choicedLocalizationServices) {
-		this.choicedLocalizationServices = choicedLocalizationServices;
-	}
-
-	public OverlayVisibility getOverlayVisibilityFollow() {
-		return overlayVisibilityFollow;
-	}
-
+	
 }

@@ -12,7 +12,7 @@
             <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
               
               <p:outputLabel for="console" value="Typ mapy" />
-              <p:selectOneMenu id="console" value="#{location.googleMapType}" style="width:125px">
+              <p:selectOneMenu id="console" value="#{location.googleMapController.googleMapType}" style="width:125px">
                 <p:ajax update=":gmap" />
                 
                 <f:selectItem itemLabel="Hybrid"   itemValue="HYBRID" />
@@ -22,13 +22,84 @@
               </p:selectOneMenu>
               
               <p:outputLabel for="check" value="Pokaz ulice" />
-              <p:selectBooleanCheckbox id="check" value="#{location.streetView}">
+              <p:selectBooleanCheckbox id="check" value="#{location.googleMapController.streetVisible}">
                 <p:ajax update=":gmap" />
               </p:selectBooleanCheckbox>
              
             </h:panelGrid>
           </h:form>
         </p:panel>
+
+        <p:panel header="Ustawienia widocznosci">
+         <h:form>
+         
+         <p:panelGrid columns="3" layout="grid">
+
+          <p:panel header="Widocznosc GPS">
+              <h:panelGrid columns="2">
+              
+                <p:outputLabel value="Marker"/>
+                <p:selectBooleanCheckbox value="#{location.googleMapVisible.markerGps}">
+                  <p:ajax event="change" listener="#{location.onChangeSetting}" update=":#{p:component('gmap')}"/>
+                </p:selectBooleanCheckbox>
+                
+                <p:outputLabel value="Circle"/>
+                <p:selectBooleanCheckbox value="#{location.googleMapVisible.circleGps}">
+                  <p:ajax event="change" listener="#{location.onChangeSetting}" update=":#{p:component('gmap')}"/>
+                </p:selectBooleanCheckbox>
+
+              </h:panelGrid>
+          </p:panel>
+          <p:panel header="Widocznosc Network (Nasz)">
+              <h:panelGrid columns="2">
+              
+                <p:outputLabel value="Marker"/>
+                <p:selectBooleanCheckbox value="#{location.googleMapVisible.markerNetworkNasz}">
+                  <p:ajax event="change" listener="#{location.onChangeSetting}" update=":#{p:component('gmap')}"/>
+                </p:selectBooleanCheckbox>
+                
+                <p:outputLabel value="Circle"/>
+                <p:selectBooleanCheckbox value="#{location.googleMapVisible.circleNetworkNasz}">
+                  <p:ajax event="change" listener="#{location.onChangeSetting}" update=":#{p:component('gmap')}"/>
+                </p:selectBooleanCheckbox>
+
+              </h:panelGrid>
+
+          </p:panel>
+          <p:panel header="Widocznosc Network (Obcy)">
+              <h:panelGrid columns="2">
+              
+                <p:outputLabel value="Marker"/>
+                <p:selectBooleanCheckbox value="#{location.googleMapVisible.markerNetworkObcy}">
+                  <p:ajax event="change" listener="#{location.onChangeSetting}" update=":#{p:component('gmap')}"/>
+                </p:selectBooleanCheckbox>
+                
+                <p:outputLabel value="Circle"/>
+                <p:selectBooleanCheckbox value="#{location.googleMapVisible.circleNetworkObcy}">
+                  <p:ajax event="change" listener="#{location.onChangeSetting}" update=":#{p:component('gmap')}"/>
+                </p:selectBooleanCheckbox>
+              </h:panelGrid>
+          </p:panel>
+         </p:panelGrid>
+         
+         <p:panel header="Ogolna widocznosc">
+           <h:panelGrid columns="2">
+           
+             <p:outputLabel value="Polygon"/>
+             <p:selectBooleanCheckbox value="#{location.googleMapVisible.polygon}">
+               <p:ajax event="change" listener="#{location.onChangeSetting}" update=":#{p:component('gmap')}"/>
+             </p:selectBooleanCheckbox>
+             
+           </h:panelGrid>
+         </p:panel>
+         
+         </h:form>
+        </p:panel>
+      </p:panelGrid>
+
+</ui:composition>
+
+<!--
         <p:panel header="Ustawienia widocznosci">
          <p:panelGrid columns="2" layout="grid">
           <p:panel header="Widocznosc sledzenia">
@@ -74,10 +145,6 @@
             
             </h:form>
           </p:panel>
-          <p:panel header="Widocznosc histori"></p:panel>
          </p:panelGrid>
         </p:panel>
-      </p:panelGrid>
-
-      
-</ui:composition>
+-->

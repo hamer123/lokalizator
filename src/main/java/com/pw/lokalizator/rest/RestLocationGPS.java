@@ -1,5 +1,6 @@
 package com.pw.lokalizator.rest;
 
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -13,6 +14,7 @@ import javax.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 
 import com.pw.lokalizator.model.RestSession;
+import com.pw.lokalizator.model.entity.Location;
 import com.pw.lokalizator.model.entity.LocationGPS;
 import com.pw.lokalizator.service.LocationService;
 
@@ -20,7 +22,12 @@ import com.pw.lokalizator.service.LocationService;
 public class RestLocationGPS {
 	@Inject
 	private LocationService locationService;
-	Logger logger = Logger.getLogger(RestLocationNetwork.class);
+	@Inject
+	Logger logger;
+	
+	
+	@Inject
+	Event<Location>locations;
 	
 	@POST()
 	@Path("/create")
@@ -31,6 +38,8 @@ public class RestLocationGPS {
 			RestSession session = (RestSession)request.getSession().getAttribute( RestSession.REST_SESSION_ATR );
 			long id = session.getUser().getId();
 			locationService.createLocationGPSUpdateUserCurrentLocationGPS(locationGPS, id);
+			
+			locations.fire(locationGPS);
 			
 			return Response.status( Response.Status.CREATED )
 					.build();

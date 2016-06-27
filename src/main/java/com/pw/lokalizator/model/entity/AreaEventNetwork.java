@@ -8,7 +8,13 @@ import javax.persistence.OneToOne;
 
 @Entity
 @NamedQueries(value ={
-		@NamedQuery(name = "AreaEventNetwork.findByAreaId", query = "SELECT a FROM AreaEventNetwork a WHERE a.area.id = :id")
+		@NamedQuery(name  = "AreaEventNetwork.findByAreaId", query = "SELECT a FROM AreaEventNetwork a WHERE a.area.id = :id"),
+		@NamedQuery(name  = "AreaEventNetwork.findAllWhereMailSendIsTrue",
+		            query = "SELECT a FROM AreaEventNetwork a WHERE a.mailSend = true"),
+		@NamedQuery(name  = "AreaEventNetwork.findAll",
+                    query = "SELECT a FROM AreaEventNetwork a"),
+        @NamedQuery(name  = "AreaEventNetwork.removeById",
+                    query = "DELETE FROM AreaEventNetwork a WHERE a.id =:id")
 })
 public class AreaEventNetwork extends AreaEvent{
 

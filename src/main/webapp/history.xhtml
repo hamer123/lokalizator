@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:lokalizator="http://java.sun.com/jsf/composite/lokalizator"> 
+
+    <h:head>  
+      <script src="https://maps.googleapis.com/maps/api/js"/>
+      <h:outputStylesheet library="css" name="locationView.css"/>
+      <h:outputStylesheet library="css" name="default.css"/>
+    </h:head>  
+      
+    <h:body styleClass="body"> 
+      <ui:insert name="menu" >
+	    <ui:include src="/WEB-INF/views/menu_templete.xhtml" />
+	  </ui:insert>
+	  
+	  <p:growl id="growl"/>
+
+        <p:gmap id="gmap" center="#{location.googleMapController.center}" zoom="#{location.googleMapController.zoom}" 
+                type="#{location.googleMapController.googleMapType}" streetView="#{location.googleMapController.streetVisible}"
+                model="#{location.googleMapController.googleMapModel}" 
+                styleClass="#{location.googleMapStyle}">
+          <p:ajax event="stateChange" listener="#{location.googleMapController.onGoogleMapStateChange}"/>
+          <p:ajax event="overlaySelect" listener="#{location.googleMapController.onOverlaySelect}" update="growl"/>
+        </p:gmap>
+
+      
+    </h:body>  
+</html>

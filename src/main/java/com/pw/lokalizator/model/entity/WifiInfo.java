@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @NamedQueries(value = {
-		@NamedQuery(name="WifiInfo.findByLocationId", query="SELECT l.infoWifi FROM LocationNetwork l WHERE l.id =:id")
+		@NamedQuery(name="WifiInfo.findByLocationId", query="SELECT l.wifiInfo FROM LocationNetwork l WHERE l.id =:id")
 })
 public class WifiInfo implements Serializable{
 	@Id
@@ -30,86 +30,159 @@ public class WifiInfo implements Serializable{
             pkColumnValue="INFO_WIFI_GEN"
             )
 	@GeneratedValue(strategy=GenerationType.TABLE, generator="INFO_WIFI_GEN")
-	@Column(name="ID")
+	@Column(name="id")
 	private long id;
-	@Column(name="FREQUENCY")
+	@Column(name="frequency")
 	private int frequency;
-	@Column(name="BSSID")
-	private String BSSID;
-	@Column(name="IP_ADDRESS")
+	@Column(name="bssid")
+	private String bssid;
+	@Column(name="ip_address")
 	private int ipAddress;
-	@Column(name="LINK_SPEED")
+	@Column(name="link_speed")
 	private int linkSpeed;
-	@Column(name="MAC_ADDRESS")
+	@Column(name="mac_address")
 	private String macAddress;
-	@Column(name="NETWORK_ID")
+	@Column(name="network_id")
 	private int networkId;
-	@Column(name="RSSI")
-	private int RSSI;
-	@Column(name="SSID")
-	private String SSID;
+	@Column(name="rssi")
+	private int rssi;
+	@Column(name="ssid")
+	private String ssid;
 	
 	public long getId() {
 		return id;
 	}
+
 	public void setId(long id) {
 		this.id = id;
 	}
+
 	public int getFrequency() {
 		return frequency;
 	}
+
 	public void setFrequency(int frequency) {
 		this.frequency = frequency;
 	}
-	public String getBSSID() {
-		return BSSID;
+
+	public String getBssid() {
+		return bssid;
 	}
-	public void setBSSID(String bSSID) {
-		BSSID = bSSID;
+
+	public void setBssid(String bssid) {
+		this.bssid = bssid;
 	}
+
 	public int getIpAddress() {
 		return ipAddress;
 	}
+
 	public void setIpAddress(int ipAddress) {
 		this.ipAddress = ipAddress;
 	}
+
 	public int getLinkSpeed() {
 		return linkSpeed;
 	}
+
 	public void setLinkSpeed(int linkSpeed) {
 		this.linkSpeed = linkSpeed;
 	}
+
 	public String getMacAddress() {
 		return macAddress;
 	}
+
 	public void setMacAddress(String macAddress) {
 		this.macAddress = macAddress;
 	}
+
 	public int getNetworkId() {
 		return networkId;
 	}
+
 	public void setNetworkId(int networkId) {
 		this.networkId = networkId;
 	}
-	public int getRSSI() {
-		return RSSI;
+
+	public int getRssi() {
+		return rssi;
 	}
-	public void setRSSI(int rSSI) {
-		RSSI = rSSI;
+
+	public void setRssi(int rssi) {
+		this.rssi = rssi;
 	}
-	public String getSSID() {
-		return SSID;
+
+	public String getSsid() {
+		return ssid;
 	}
-	public void setSSID(String sSID) {
-		SSID = sSID;
+
+	public void setSsid(String ssid) {
+		this.ssid = ssid;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((bssid == null) ? 0 : bssid.hashCode());
+		result = prime * result + frequency;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		result = prime * result + ipAddress;
+		result = prime * result + linkSpeed;
+		result = prime * result
+				+ ((macAddress == null) ? 0 : macAddress.hashCode());
+		result = prime * result + networkId;
+		result = prime * result + rssi;
+		result = prime * result + ((ssid == null) ? 0 : ssid.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		WifiInfo other = (WifiInfo) obj;
+		if (bssid == null) {
+			if (other.bssid != null)
+				return false;
+		} else if (!bssid.equals(other.bssid))
+			return false;
+		if (frequency != other.frequency)
+			return false;
+		if (id != other.id)
+			return false;
+		if (ipAddress != other.ipAddress)
+			return false;
+		if (linkSpeed != other.linkSpeed)
+			return false;
+		if (macAddress == null) {
+			if (other.macAddress != null)
+				return false;
+		} else if (!macAddress.equals(other.macAddress))
+			return false;
+		if (networkId != other.networkId)
+			return false;
+		if (rssi != other.rssi)
+			return false;
+		if (ssid == null) {
+			if (other.ssid != null)
+				return false;
+		} else if (!ssid.equals(other.ssid))
+			return false;
+		return true;
 	}
 	
 	@Override
 	public String toString() {
 		return "WifiInfo [id=" + id + ", frequency=" + frequency + ", BSSID="
-				+ BSSID + ", ipAddress=" + ipAddress + ", linkSpeed="
+				+ bssid + ", ipAddress=" + ipAddress + ", linkSpeed="
 				+ linkSpeed + ", macAddress=" + macAddress + ", networkId="
-				+ networkId + ", RSSI=" + RSSI + ", SSID=" + SSID + "]";
+				+ networkId + ", RSSI=" + rssi + ", SSID=" + ssid + "]";
 	}
 	
 }

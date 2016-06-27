@@ -11,6 +11,7 @@ import javax.inject.Named;
 import org.jboss.logging.Logger;
 
 import com.pw.lokalizator.jsf.utilitis.JsfMessageBuilder;
+import com.pw.lokalizator.model.LokalizatorSession;
 import com.pw.lokalizator.model.entity.User;
 import com.pw.lokalizator.repository.UserRepository;
 

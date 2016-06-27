@@ -7,25 +7,26 @@
       xmlns:c="http://java.sun.com/jsp/jstl/core"> 
 
    <h:form>
-     <p:dataTable id="polygonsTable" var="polygon" value="#{messageController.polygonList}"
-                  selectionMode="single" selection="#{messageController.selectedPolygonModel}" rowKey="#{polygon.id}">
-        <p:ajax event="rowSelect" listener="#{messageController.onPolygonSelect}" 
+     <p:dataTable id="areaTable" var="area" value="#{messageController.areaList}"
+                  selectionMode="single" selection="#{messageController.selectedArea}" rowKey="#{area.id}">
+        <p:ajax event="rowSelect" listener="#{messageController.onAreaSelect}" 
                 update=":#{p:component('options')} :#{p:component('messages')} :#{p:component('messageBody')}"/>
                 
         <p:column headerText="Nazwa">
-          <h:outputText value="#{polygon.name}" />
+          <h:outputText value="#{area.name}" />
         </p:column>
         
         <p:column headerText="Target login">
-          <h:outputText value="#{polygon.target.login}" />
+          <h:outputText value="#{area.target.login}" />
         </p:column>
         
         <p:column headerText="Typ sledzenia">
-          <h:outputText value="#{polygon.polygonFollowType}" />
+          <h:outputText value="#{area.areaFollowType}" />
         </p:column> 
         
-        <p:column headerText="Pokaz wiadomosci">
-          <p:commandButton value="POKAZ"/>
+        <p:column headerText="Pokaz obszar">
+          <p:commandButton value="POKAZ" oncomplete="showGoogleMapDialog()" update=":#{p:component('locationDialog')}"
+                           actionListener="#{messageController.onDisplayAreaInDialog(area)}"/>
         </p:column>
      </p:dataTable>
    </h:form>

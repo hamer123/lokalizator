@@ -30,6 +30,8 @@ import com.pw.lokalizator.model.enums.AreaFollows;
 @Entity
 @Table(name="area")
 @NamedQueries(value={
+	          @NamedQuery(name="Area.findByProviderId", 
+    		              query="SELECT a FROM Area a WHERE a.provider.id = :id"),
 		      @NamedQuery(name="Area.findByTargetId", 
 		    		      query="SELECT a FROM Area a WHERE a.target.id = :id"),
 		      @NamedQuery(name="Area.removeById",
@@ -42,6 +44,9 @@ import com.pw.lokalizator.model.enums.AreaFollows;
 		                  query="SELECT a FROM Area a JOIN FETCH a.target WHERE a.provider.id =:id")
 })
 public class Area {
+	
+	public static final String AREA_updateAktywnyById = "UPDATE Area a SET a.aktywny =:aktywny WHERE a.id =:id";
+	
     @TableGenerator
     (
        name="areaGenerator", 
@@ -62,7 +67,7 @@ public class Area {
     
 	@OneToMany(mappedBy = "area", orphanRemoval = true, fetch=FetchType.LAZY, cascade = {CascadeType.ALL})
 	@MapKey(name="number")
-	private Map<Integer,PolygonPoint>points = new HashMap<Integer, PolygonPoint>();
+	private Map<Integer,AreaPoint>points = new HashMap<Integer, AreaPoint>();
 	
 	@NotNull
 	@OneToOne
@@ -70,8 +75,15 @@ public class Area {
 	private User target;
 	
 	@NotNull
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@ManyToOne
 	private User provider;
+	
+	@NotNull
+	@Column(name = "AKTYWNY")
+	private boolean aktywny;
+	
+	@Column(name = "color")
+	private String color;
 	
 	@NotNull
 	@Enumerated(EnumType.STRING)
@@ -82,6 +94,9 @@ public class Area {
 	
 	@OneToMany(mappedBy = "area", orphanRemoval = true, fetch = FetchType.LAZY,  cascade = {})
 	private List<AreaEventGPS>areaEventGPSs;
+	
+	@OneToOne(orphanRemoval = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+	private AreaMessageMail areaMessageMail;
 	
 	public Area(){}
 	
@@ -107,10 +122,10 @@ public class Area {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public Map<Integer, PolygonPoint> getPoints() {
+	public Map<Integer, AreaPoint> getPoints() {
 		return points;
 	}
-	public void setPoints(Map<Integer, PolygonPoint> points) {
+	public void setPoints(Map<Integer, AreaPoint> points) {
 		this.points = points;
 	}
 	public User getTarget() {
@@ -125,10 +140,10 @@ public class Area {
 	public void setProvider(User provider) {
 		this.provider = provider;
 	}
-	public AreaFollows getPolygonFollowType() {
+	public AreaFollows getAreaFollowType() {
 		return polygonFollowType;
 	}
-	public void setPolygonFollowType(AreaFollows polygonFollowType) {
+	public void setAreaFollowType(AreaFollows polygonFollowType) {
 		this.polygonFollowType = polygonFollowType;
 	}
 
@@ -146,6 +161,38 @@ public class Area {
 
 	public void setAreaEventGPSs(List<AreaEventGPS> areaEventGPSs) {
 		this.areaEventGPSs = areaEventGPSs;
+	}
+
+	public boolean isAktywny() {
+		return aktywny;
+	}
+
+	public void setAktywny(boolean aktywny) {
+		this.aktywny = aktywny;
+	}
+
+	public AreaFollows getPolygonFollowType() {
+		return polygonFollowType;
+	}
+
+	public void setPolygonFollowType(AreaFollows polygonFollowType) {
+		this.polygonFollowType = polygonFollowType;
+	}
+
+	public AreaMessageMail getAreaMessageMail() {
+		return areaMessageMail;
+	}
+
+	public void setAreaMessageMail(AreaMessageMail areaMessageMail) {
+		this.areaMessageMail = areaMessageMail;
+	}
+
+	public String getColor() {
+		return color;
+	}
+
+	public void setColor(String color) {
+		this.color = color;
 	}
 	
 }

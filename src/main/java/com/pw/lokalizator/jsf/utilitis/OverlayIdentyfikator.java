@@ -9,11 +9,11 @@ import com.pw.lokalizator.model.enums.Overlays;
 import com.pw.lokalizator.model.enums.Providers;
 
 public class OverlayIdentyfikator {
-	
 	private long id;
 	private String login;
 	private Providers providerType;
 	private LocalizationServices localizationServices;
+	private Overlays overlay;
 
 	public OverlayIdentyfikator(Location location){
 		this.id = location.getId();
@@ -23,9 +23,17 @@ public class OverlayIdentyfikator {
 			this.localizationServices = getLocalizationServicesFromLocation(location);
 	}
 	
-
+	public OverlayIdentyfikator(Location location, Overlays overlay){
+		this.id = location.getId();
+		this.login = location.getUser().getLogin();
+		this.providerType = location.getProviderType();
+		this.overlay = overlay;
+		if(location.getProviderType() == Providers.NETWORK)
+			this.localizationServices = getLocalizationServicesFromLocation(location);
+	}
 	
-	public OverlayIdentyfikator(Providers providerType, LocalizationServices localizationServices, String login, long id){
+	private OverlayIdentyfikator(Overlays overlay, Providers providerType, LocalizationServices localizationServices, String login, long id){
+		this.overlay = overlay;
 		this.id = id;
 		this.login = login;
 		this.providerType = providerType;
@@ -40,13 +48,17 @@ public class OverlayIdentyfikator {
 	public Pattern createPattern(){
 		StringBuilder regex = new StringBuilder();
 		
-		regex.append(getProviderTypeSection());
-		regex.append("_");
-		regex.append(getLocalizationServicesSection());
-		regex.append("_");
-		regex.append(getLoginSection());
-		regex.append("_");
-		regex.append(getIdSection());
+		regex.append(getOverlaySection())
+		     .append("_")
+		     .append(getProviderTypeSection())
+		     .append("_")
+		     .append(getLocalizationServicesSection())
+		     .append("_")
+		     .append(getLoginSection())
+		     .append("_")
+		     .append(getIdSection());
+		
+//		System.out.println(regex.toString());
 		
 		return Pattern.compile(regex.toString());
 	}
@@ -54,7 +66,9 @@ public class OverlayIdentyfikator {
 	public String createIdentyfikator(){
 		StringBuilder identyfikator = new StringBuilder();
 		
-		identyfikator.append(providerType)
+		identyfikator.append(overlay)
+		  .append("_")
+		  .append(providerType)
 		  .append("_")
 		  .append(localizationServices)
 		  .append("_")
@@ -62,7 +76,7 @@ public class OverlayIdentyfikator {
 		  .append("_")
 		  .append(id);
 		
-		System.out.println(identyfikator.toString());
+//		System.out.println(identyfikator.toString());
 		
 		return identyfikator.toString();
 	}
@@ -72,6 +86,13 @@ public class OverlayIdentyfikator {
 			return ".+";
 		else
 			return String.valueOf(id);
+	}
+	
+	private String getOverlaySection(){
+		if(overlay == null)
+			return ".+";
+		
+		return overlay.toString();
 	}
 	
 	private String getLocalizationServicesSection(){
@@ -124,6 +145,7 @@ public class OverlayIdentyfikator {
 		private String login;
 		private LocalizationServices localizationServices;
 		private Providers providerType;
+		private Overlays overlay;
 		
 		public OverlayIdentyfikatorBuilder id(long id){
 			this.id = id;
@@ -140,13 +162,19 @@ public class OverlayIdentyfikator {
 			return this;
 		}
 		
-		public OverlayIdentyfikatorBuilder overlayType(LocalizationServices localizationServices){
+		public OverlayIdentyfikatorBuilder localzationServiceType(LocalizationServices localizationServices){
 			this.localizationServices = localizationServices;
+			return this;
+		}
+		
+		public OverlayIdentyfikatorBuilder overlayType(Overlays overlay){
+			this.overlay = overlay;
 			return this;
 		}
 		
 		public OverlayIdentyfikator build(){
 			return new OverlayIdentyfikator(
+					overlay,
 					providerType,
 					localizationServices,
 					login,

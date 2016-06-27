@@ -39,11 +39,11 @@ public class LocationRepositoryImpl implements LocationRepository{
 		return em.merge(entity);
 	}
 
-	public void remove(Location entity) {
+	public void delete(Location entity) {
 		em.remove(entity);
 	}
 
-	public void remove(Long id) {
+	public void delete(Long id) {
 		em.createNamedQuery("Location.deleteById", Location.class).executeUpdate();
 	}
 

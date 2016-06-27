@@ -29,13 +29,13 @@ public class CellInfoMobileRepositoryImpl implements CellInfoMobileRepository{
 	}
 
 	@Override
-	public void remove(CellInfoMobile entity) {
+	public void delete(CellInfoMobile entity) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void remove(Long id) {
+	public void delete(Long id) {
 		// TODO Auto-generated method stub
 		
 	}

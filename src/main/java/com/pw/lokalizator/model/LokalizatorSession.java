@@ -1,4 +1,4 @@
-package com.pw.lokalizator.controller;
+package com.pw.lokalizator.model;
 
 import java.io.IOException;
 import java.io.Serializable;

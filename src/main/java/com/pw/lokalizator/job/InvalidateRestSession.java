@@ -1,19 +1,14 @@
-package com.pw.lokalizator.singleton;
+package com.pw.lokalizator.job;
 
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
-
-import javax.ejb.AccessTimeout;
 import javax.ejb.EJB;
 import javax.ejb.Schedule;
 import javax.ejb.Singleton;
-import javax.ejb.Stateless;
-import javax.ejb.Timeout;
-import javax.ejb.Timer;
 
 import org.jboss.resteasy.logging.Logger;
 
 import com.pw.lokalizator.model.RestSession;
+import com.pw.lokalizator.singleton.RestSessionManager;
 
 @Singleton
 public class InvalidateRestSession {
@@ -21,7 +16,7 @@ public class InvalidateRestSession {
 	private RestSessionManager restSessionSimulator;
 	Logger logger = Logger.getLogger(InvalidateRestSession.class);
 	
-	@Schedule(minute="*/5",hour="*", persistent=false)
+	@Schedule(minute="*/1",hour="*", persistent=false)
 	public void timeoutRestSession(){
 		logger.info("[InvalidateRestSession] InvalidateRestSession job has started");
 		
@@ -33,9 +28,9 @@ public class InvalidateRestSession {
 	}
 	
 	public boolean isPassedTime(Date date){
-		final long timeout = 5 * 60 * 1000; // 5min
+		final long oneMinute = 1 * 60 * 1000;
 		long currentTime = new Date().getTime();
 		
-		return currentTime - timeout > date.getTime();
+		return currentTime - oneMinute > date.getTime();
 	}
 }

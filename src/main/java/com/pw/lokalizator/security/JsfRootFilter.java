@@ -12,8 +12,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import com.pw.lokalizator.model.LokalizatorSession;
 
-import com.pw.lokalizator.controller.LokalizatorSession;
 
 /**
  * Servlet Filter implementation class JsfRootFilter
@@ -23,7 +23,9 @@ import com.pw.lokalizator.controller.LokalizatorSession;
 @WebFilter(
 		urlPatterns = {"/location.xhtml", 
 				       "/area.xhtml" , 
-				       "/message.xhtml"
+				       "/message.xhtml",
+				       "/history.xhtml",
+				       "/logout.xhtml"
 				       }
 		)
 

@@ -18,11 +18,14 @@ import javax.ejb.ConcurrencyManagementType;
 import javax.ejb.Lock;
 import javax.ejb.LockType;
 import javax.ejb.Singleton;
+import javax.interceptor.Interceptor;
+import javax.interceptor.Interceptors;
 
 import org.jboss.resteasy.logging.Logger;
 
 import com.pw.lokalizator.model.RestSession;
 import com.pw.lokalizator.model.entity.User;
+import com.pw.lokalizator.service.inceptor.RestSessionLastUsedInceptor;
 
 @Singleton
 @ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)
@@ -31,15 +34,16 @@ public class RestSessionManager {
 	private Map<String,RestSession>restSessions = new ConcurrentHashMap<String,RestSession>();
 	
 	public RestSession getRestSession(String token){
-		return restSessions.get(token);
+		RestSession restSession = restSessions.get(token);
+		
+		if(restSession == null)
+			throw new SecurityException("Nie poprawny token");
+		
+		return restSession;
 	}
 	
 	public Set<String>tokens(){
 		return restSessions.keySet();
-	}
-	
-	public boolean isTokenArleadyUse(String token){
-		return restSessions.keySet().contains(token);
 	}
 	
 	public String getTokenForLogin(String login){
@@ -51,7 +55,6 @@ public class RestSessionManager {
 	}
 	
 	public void addRestSession(String token, User user){
-
 		RestSession session = new RestSession(user);
 		restSessions.put(token, session);
 		logger.info("[RestSessionSimulator] nowa RESTSession :"  + user.getLogin());
@@ -80,27 +83,19 @@ public class RestSessionManager {
 	}
 	
 	public boolean isUserOnline(String login){
-		Optional<RestSession> optionalRestSession = restSessions
-				.values()
-				.stream()
-				.filter( rs -> rs.getUser().getLogin().equals(login))
-				.findFirst();
-		
 		try{
-			RestSession restSession = optionalRestSession.get();
-			long time = 2 * 60 * 1000; //2min
+			Optional<RestSession> optionalRestSession = restSessions
+					.values()
+					.stream()
+					.filter( rs -> rs.getUser().getLogin().equals(login))
+					.findFirst();
 			
-			if(olderTwoMinutesThanCurrentDate(restSession.getLastUsed()))
-				return true;
+			optionalRestSession.get();			
+			return true;
 		}catch(NoSuchElementException e){
+			//
 		}
 		
 		return false;
-	}
-	
-	private boolean olderTwoMinutesThanCurrentDate(Date date){
-		Date now = new Date();
-		long twoMin = 2 * 60 * 1000;
-		return now.getTime() - twoMin < date.getTime(); 
 	}
 }

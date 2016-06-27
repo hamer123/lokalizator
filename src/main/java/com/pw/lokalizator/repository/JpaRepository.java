@@ -10,8 +10,8 @@ import javax.ejb.Local;
 public interface JpaRepository<T, ID extends Serializable> {
 	T create(T entity);
 	T save(T entity);
-	void remove(T entity);
-	void remove(ID id);
+	void delete(T entity);
+	void delete(ID id);
 	T findById(ID id);
 	List<T> findAll();
 }

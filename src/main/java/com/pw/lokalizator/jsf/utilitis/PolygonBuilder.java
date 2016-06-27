@@ -13,12 +13,11 @@ import org.primefaces.model.map.Polygon;
 
 import com.pw.lokalizator.jsf.utilitis.OverlayIdentyfikator.OverlayIdentyfikatorBuilder;
 import com.pw.lokalizator.model.entity.Area;
-import com.pw.lokalizator.model.entity.PolygonPoint;
+import com.pw.lokalizator.model.entity.AreaPoint;
+import com.pw.lokalizator.model.enums.Overlays;
 import com.pw.lokalizator.utilitis.PropertiesReader;
 
 public class PolygonBuilder {
-	private static Logger LOG = Logger.getLogger(CircleBuilder.class);
-	
 	private static String POLYGON_STROKE_COLOR;
 	private static String POLYGON_FILL_COLOR;
 	private static double POLYGON_FILL_OPACITY;
@@ -55,28 +54,43 @@ public class PolygonBuilder {
 		polygon.setStrokeOpacity(POLYGON_STROKE_OPACITY);
 	}
 	
-	private static Polygon createPolygonInstance(Area polygonModel){
+	private static void setupPolygonView(Polygon polygon, Area area){
+		setPolzgonFillColor(polygon, area.getColor());
+		polygon.setFillOpacity(POLYGON_FILL_OPACITY);
+		polygon.setStrokeColor(POLYGON_STROKE_COLOR);
+		polygon.setStrokeOpacity(POLYGON_STROKE_OPACITY);
+	}
+	
+	private static void setPolzgonFillColor(Polygon polygon, String color){
+		if(color.startsWith("#"))
+			polygon.setFillColor(color);
+		else
+			polygon.setFillColor("#" + color);
+	}
+	
+	private static Polygon createPolygonInstance(Area area){
 		Polygon polygon = new Polygon();
-		setupPolygonView(polygon);
-		polygon.setData(polygonModel);
+		setupPolygonView(polygon, area);
+		polygon.setData(area);
 		
-		OverlayIdentyfikator identyfikator = new OverlayIdentyfikatorBuilder().login(polygonModel.getProvider().getLogin())
-				                                                              .id(polygonModel.getId())
+		OverlayIdentyfikator identyfikator = new OverlayIdentyfikatorBuilder().login(area.getProvider().getLogin())
+				                                                              .id(area.getId())
+				                                                              .overlayType(Overlays.POLYGON)
 				                                                              .build();
 		polygon.setId(identyfikator.createIdentyfikator());
 		
-		List<LatLng>pathList = createPaths(polygonModel.getPoints());
+		List<LatLng>pathList = createPaths(area.getPoints());
 		polygon.setPaths(pathList);
 		
 		return polygon;
 	}
 	
-	private static List<LatLng> createPaths(Map<Integer, PolygonPoint> polygonPointsMap){
+	private static List<LatLng> createPaths(Map<Integer, AreaPoint> polygonPointsMap){
 		List<LatLng>latlngList = new ArrayList<>();
 		
 		List<Integer>numberList = getSortedPointNumber( polygonPointsMap.keySet() );
 		for(int number : numberList){
-			PolygonPoint polygonPoint = polygonPointsMap.get(number);
+			AreaPoint polygonPoint = polygonPointsMap.get(number);
 			LatLng latLng = new LatLng(polygonPoint.getLat(), polygonPoint.getLng());
 			latlngList.add(latLng);
 		}

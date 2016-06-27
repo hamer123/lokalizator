@@ -30,13 +30,13 @@ public class WifiInfoRepositoryImpl implements WifiInfoRepository {
 	}
 
 	@Override
-	public void remove(WifiInfo entity) {
+	public void delete(WifiInfo entity) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void remove(Long id) {
+	public void delete(Long id) {
 		// TODO Auto-generated method stub
 		
 	}

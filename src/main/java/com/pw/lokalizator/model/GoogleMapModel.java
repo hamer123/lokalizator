@@ -12,12 +12,17 @@ import javax.ws.rs.NotFoundException;
 
 import org.jboss.resteasy.logging.Logger;
 import org.primefaces.model.map.Circle;
+import org.primefaces.model.map.LatLng;
 import org.primefaces.model.map.MapModel;
 import org.primefaces.model.map.Marker;
 import org.primefaces.model.map.Overlay;
 import org.primefaces.model.map.Polygon;
 import org.primefaces.model.map.Polyline;
 import org.primefaces.model.map.Rectangle;
+
+import com.pw.lokalizator.jsf.utilitis.OverlayIdentyfikator;
+import com.pw.lokalizator.model.entity.Location;
+import com.pw.lokalizator.model.enums.Overlays;
 
 public class GoogleMapModel implements MapModel, Serializable{
 
@@ -30,16 +35,6 @@ public class GoogleMapModel implements MapModel, Serializable{
     private List<Circle> circles;
         
     private List<Rectangle> rectangles;
-	
-	private final static String MARKER_ID_PREFIX = "marker";
-	
-	private final static String POLYLINE_ID_PREFIX = "polyline_";
-	
-	private final static String POLYGON_ID_PREFIX = "polygon_";
-        
-	private final static String CIRCLE_ID_PREFIX = "circle_";
-	
-    private final static String RECTANGLE_ID_PREFIX = "rectangle_";
 
 	public GoogleMapModel(List<Marker> markers, List<Polyline> polylines,
 			List<Polygon> polygons, List<Circle> circles,
@@ -81,50 +76,139 @@ public class GoogleMapModel implements MapModel, Serializable{
 
 	public void addOverlay(Overlay overlay) {
 		if(overlay instanceof Marker) {
-			overlay.setId(MARKER_ID_PREFIX + UUID.randomUUID().toString());
 			markers.add((Marker) overlay);
 		}
 		else if(overlay instanceof Polyline) {
-			overlay.setId(POLYLINE_ID_PREFIX + UUID.randomUUID().toString());
 			polylines.add((Polyline) overlay);
 		}
 		else if(overlay instanceof Polygon) {
-			overlay.setId(POLYGON_ID_PREFIX + UUID.randomUUID().toString());
 			polygons.add((Polygon) overlay);
 		}
 		else if(overlay instanceof Circle) {
-			overlay.setId(CIRCLE_ID_PREFIX + UUID.randomUUID().toString());
 			circles.add((Circle) overlay);
 		}
 		else if(overlay instanceof Rectangle) {
-			overlay.setId(RECTANGLE_ID_PREFIX + UUID.randomUUID().toString());
 			rectangles.add((Rectangle) overlay);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	public Overlay findOverlay(String id) {
-		List list = null;
+		List list = getOverlayList(id);
 		
-		if(id.startsWith(MARKER_ID_PREFIX))
-			list = markers;
-		else if(id.startsWith(POLYLINE_ID_PREFIX))
-			list = polylines;
-		else if(id.startsWith(POLYGON_ID_PREFIX))
-			list = polygons;
-		else if(id.startsWith(CIRCLE_ID_PREFIX))
-			list = circles;
-		else if(id.startsWith(RECTANGLE_ID_PREFIX))
-			list = rectangles;
+		if(list != null){
+			for(Iterator iterator = list.iterator(); iterator.hasNext();) {
+				Overlay overlay = (Overlay) iterator.next();
+				if(overlay.getId().equals(id))
+					return overlay;
+			}
+		}
+		return null;
+	}
+	
+	public void removeOverlay(OverlayIdentyfikator identyfikator){
+		List<Overlay>list = getOverlayList(identyfikator.createIdentyfikator());
+		Pattern pattern = identyfikator.createPattern();
 		
-		for(Iterator iterator = list.iterator(); iterator.hasNext();) {
-			Overlay overlay = (Overlay) iterator.next();
-			
-			if(overlay.getId().equals(id))
-				return overlay;
+		if(list != null){
+			removeOverlayFromList(list, identyfikator);
+		} else {
+			removeOverlayFromList(markers, identyfikator);
+			removeOverlayFromList(polylines, identyfikator);
+			removeOverlayFromList(polygons, identyfikator);
+			removeOverlayFromList(circles, identyfikator);
+			removeOverlayFromList(rectangles, identyfikator);
+		}
+	}
+	
+	public List<Overlay> findOverlay(OverlayIdentyfikator identyfikator){
+		List<Overlay>list = getOverlayList(identyfikator.createIdentyfikator());
+		List<Overlay>overlays = new ArrayList<Overlay>();
+		Pattern pattern = identyfikator.createPattern();
+		
+		if(list != null){
+			overlays.addAll( findOverlayFromList(list, identyfikator) );
+		} else {
+			overlays.addAll( findOverlayFromList(markers, identyfikator) );
+			overlays.addAll( findOverlayFromList(polylines, identyfikator) );
+			overlays.addAll( findOverlayFromList(polygons, identyfikator) );
+			overlays.addAll( findOverlayFromList(circles, identyfikator) );
+			overlays.addAll( findOverlayFromList(rectangles, identyfikator) );
 		}
 		
-		return null;
+		return overlays;
+	}
+	
+	private <T extends Overlay> List<Overlay> findOverlayFromList(List<T>list, OverlayIdentyfikator identyfikator){
+		List<Overlay>overlays = new ArrayList<Overlay>();
+		Pattern pattern = identyfikator.createPattern();
+		
+		for(Overlay overlay : list){
+			Matcher matcher = pattern.matcher(overlay.getId());
+			
+			if(matcher.matches())
+				overlays.add(overlay);
+		}
+			
+		return overlays;
+	}
+	
+	private <T extends Overlay> void removeOverlayFromList(List<T>list, OverlayIdentyfikator identyfikator){
+		Pattern pattern = identyfikator.createPattern();
+		Iterator<T>it = list.iterator();
+		
+		while(it.hasNext()){
+			T overlay = it.next();
+			Matcher matcher = pattern.matcher(overlay.getId());
+			
+			if(matcher.matches()){
+				it.remove();
+			}
+		}
+	}
+	
+	private List<Overlay> getOverlayList(String id){
+		List list = null;
+		
+		if(id.startsWith(Overlays.MARKER.toString()))
+			list = markers;
+		else if(id.startsWith(Overlays.POLYLINE.toString()))
+			list = polylines;
+		else if(id.startsWith(Overlays.POLYGON.toString()))
+			list = polygons;
+		else if(id.startsWith(Overlays.CIRCLE.toString()))
+			list = circles;
+		else if(id.startsWith(Overlays.RECTANGLE.toString()))
+			list = rectangles;
+		
+		return list;
+	}
+	
+	
+	public static String center(LatLng latLng){
+		return   latLng.getLat() 
+			   + ", " 
+			   + latLng.getLng();
+	}
+	
+	public static String center(double lat, double lng){
+		return   lat 
+			   + ", " 
+			   + lng;
+	}
+	
+	public static String center(Location location){
+		return   location.getLatitude()
+			   + ", " 
+			   + location.getLongitude();
+	}
+	
+	public void clear(){
+		markers.clear();
+		polylines.clear();
+		polygons.clear();
+		circles.clear();
+		rectangles.clear();
 	}
 	
 	public static class GoogleMapModelBuilder{
