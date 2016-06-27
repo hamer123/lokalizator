@@ -23,6 +23,7 @@ import com.pw.lokalizator.model.enums.LocalizationServices;
 import com.pw.lokalizator.model.enums.Providers;
 import com.pw.lokalizator.repository.LocationGPSRepository;
 import com.pw.lokalizator.repository.LocationNetworkRepository;
+import com.pw.lokalizator.repository.UserRepository;
 import com.pw.lokalizator.service.GoogleMapUserComponentService;
 import com.pw.lokalizator.service.LocationService;
 
@@ -33,6 +34,8 @@ public class LocationHistoryController implements Serializable{
 	private LocationNetworkRepository locationNetworkRepository;
 	@Inject
 	private LocationGPSRepository locationGPSRepository;
+	@Inject
+	private UserRepository userRepository;
 	@Inject
 	private GoogleMapController googleMapController;
 	@Inject
@@ -68,6 +71,10 @@ public class LocationHistoryController implements Serializable{
 		}
 	}
 	
+	public List<String> onAutoCompleteLogin(String login){
+		return userRepository.findLoginByLoginLike(login);
+	}
+	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////   UTILITIS    ////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,6 +107,13 @@ public class LocationHistoryController implements Serializable{
 	/////////////////////////////////////////////////////   GETTERS SETTERS    /////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	public Providers[] providers(){
+		return Providers.values();
+	}
+	
+	public LocalizationServices[] localizationServices(){
+		return LocalizationServices.values();
+	}
 	
 	public String getLogin() {
 		return login;

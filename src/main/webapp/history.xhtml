@@ -3,31 +3,72 @@
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:c="http://java.sun.com/jsp/jstl/core"
-      xmlns:lokalizator="http://java.sun.com/jsf/composite/lokalizator"> 
+      xmlns:p="http://primefaces.org/ui"> 
 
-    <h:head>  
-      <script src="https://maps.googleapis.com/maps/api/js"/>
-      <h:outputStylesheet library="css" name="locationView.css"/>
-      <h:outputStylesheet library="css" name="default.css"/>
-    </h:head>  
-      
-    <h:body styleClass="body"> 
-      <ui:insert name="menu" >
+<h:head>
+  <title>Historia</title>
+  <h:outputStylesheet library="css" name="default.css"/>
+  <script src="https://maps.googleapis.com/maps/api/js"/>
+</h:head> 
+
+<h:body styleClass="body"> 
+
+     <ui:insert name="menu" >
 	    <ui:include src="/WEB-INF/views/menu_templete.xhtml" />
 	  </ui:insert>
-	  
-	  <p:growl id="growl"/>
-
-        <p:gmap id="gmap" center="#{location.googleMapController.center}" zoom="#{location.googleMapController.zoom}" 
-                type="#{location.googleMapController.googleMapType}" streetView="#{location.googleMapController.streetVisible}"
-                model="#{location.googleMapController.googleMapModel}" 
-                styleClass="#{location.googleMapStyle}">
-          <p:ajax event="stateChange" listener="#{location.googleMapController.onGoogleMapStateChange}"/>
-          <p:ajax event="overlaySelect" listener="#{location.googleMapController.onOverlaySelect}" update="growl"/>
-        </p:gmap>
-
+	 
+	 <h:form>
+       <p:growl id="growl"/>
+     </h:form>
+     
+     <p:gmap id="gmap" model="#{locationHistory.googleMapController.googleMapModel}" style="width:100%;height:500px" 
+             center="#{locationHistory.googleMapController.center}" zoom="#{locationHistory.googleMapController.zoom}"
+             type="#{locationHistory.googleMapController.googleMapType}">
+     </p:gmap>
+     
+     <p:panel header="Historia Lokacji">
+        <p:panelGrid columns="2" layout="grid">
       
-    </h:body>  
+            <p:panel header="Wyszukiwanie">
+               <h:form>
+                  <h:panelGrid columns="3" cellpadding="5">
+          
+                     <p:outputLabel value="Login"/>
+                     <p:autoComplete id="login" completeMethod="#{locationHistory.onAutoCompleteLogin}" value="#{locationHistory.login}" 
+                                     required="true" forceSelection="true"/>
+                     <p:message for="login"/>
+             
+                     <p:outputLabel value="Od kiedy"/>
+                     <p:calendar id="older" value="#{locationHistory.older}" pattern="MM/dd/yyyy HH:mm:ss" effect="fold" required="true" locale="pl"/>
+                     <p:message for="older"/>
+             
+                     <p:outputLabel value="Do kiedy"/>
+                     <p:calendar id="younger" value="#{locationHistory.younger}" pattern="MM/dd/yyyy HH:mm:ss" effect="fold" required="true" locale="pl"/>
+                     <p:message for="younger"/>
+             
+                     <p:outputLabel value="Provider"/>
+                     <p:selectOneMenu id="provider" value="#{locationHistory.provider}">
+                        <f:selectItems value="#{locationHistory.providers()}"/>
+                     </p:selectOneMenu>
+                     <p:message for="provider"/>
+              
+                     <p:outputLabel value="Usluga lokalizacji"/>
+                     <p:selectOneMenu id="service" value="#{locationHistory.localizationServices}">
+                        <f:selectItems value="#{locationHistory.localizationServices()}"/>
+                     </p:selectOneMenu>
+                     <p:message for="service"/>
+          
+                 </h:panelGrid>
+                 
+                 <p:commandButton value="POKAZ" actionListener="#{locationHistory.onShowRoute}" update=":#{p:component('gmap')} :#{p:component('growl')}"/>
+              </h:form>
+           </p:panel>
+           
+           <p:panel header="????">
+           </p:panel>
+           
+        </p:panelGrid>
+     </p:panel>
+    
+</h:body> 
 </html>
