@@ -1,23 +1,22 @@
 package com.pw.lokalizator.controller;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
-
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Default;
-import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-
 import org.primefaces.event.map.OverlaySelectEvent;
 import org.primefaces.event.map.StateChangeEvent;
-import org.primefaces.model.map.LatLng;
+import org.primefaces.model.map.Circle;
+import org.primefaces.model.map.Marker;
 import org.primefaces.model.map.Overlay;
+import org.primefaces.model.map.Polygon;
 
 import com.pw.lokalizator.jsf.utilitis.JsfMessageBuilder;
 import com.pw.lokalizator.jsf.utilitis.OverlayIdentyfikator;
 import com.pw.lokalizator.model.GoogleMapModel;
+import com.pw.lokalizator.model.entity.Area;
 import com.pw.lokalizator.model.entity.Location;
 import com.pw.lokalizator.model.enums.GoogleMaps;
 
@@ -62,14 +61,29 @@ public class GoogleMapController implements Serializable{
 		addOverlay(overlays);
 	}
 	
+	public void clear(){
+		googleMapModel.clear();
+	}
+	
 	public void onGoogleMapStateChange(StateChangeEvent event){
 		center = GoogleMapModel.center(event.getCenter());
         zoom = event.getZoomLevel();
 	}
 	
 	public void onOverlaySelect(OverlaySelectEvent event){
-		Location location = (Location) event.getOverlay().getData();
-		JsfMessageBuilder.infoMessage( message(location) );
+		Object overlay = event.getOverlay();
+		
+		if(overlay instanceof Marker){
+			Location location = (Location) event.getOverlay().getData();
+			JsfMessageBuilder.infoMessage( messageMarker(location) );
+		} else if(overlay instanceof Circle){
+			Location location = (Location) event.getOverlay().getData();
+			JsfMessageBuilder.infoMessage( messageCircle(location) );
+		} else if(overlay instanceof Polygon){
+			Area area = (Area) event.getOverlay().getData();
+			JsfMessageBuilder.infoMessage( messagePolygon(area) );	
+		}
+
 	}
 	
 	public GoogleMapModel getGoogleMapModel() {
@@ -111,8 +125,25 @@ public class GoogleMapController implements Serializable{
 	public void setGoogleMapType(GoogleMaps googleMapType) {
 		this.googleMapType = googleMapType;
 	}
+	
+	private String messagePolygon(Area area){
+		return   "Obszar sledzenia: "
+			   + area.getName()
+			   + " Target: "
+			   + area.getTarget().getLogin()
+			   + " Typ: "
+			   + area.getAreaFollowType()
+			   + " Aktywny: "
+			   + area.isAktywny();
+	}
+	
+	private String messageCircle(Location location){
+		return  messageMarker(location) + 
+				" Dokładność: " + 
+				location.getAccuracy();
+	}
 
-	private String message(Location location){
+	private String messageMarker(Location location){
 		return  location.getProviderType() +
 				" " + 
 	            location.getUser().getLogin() +

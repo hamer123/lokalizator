@@ -12,7 +12,6 @@ import com.pw.lokalizator.model.entity.LocationNetwork;
 import com.pw.lokalizator.model.enums.LocalizationServices;
 import com.pw.lokalizator.model.enums.Overlays;
 import com.pw.lokalizator.model.enums.Providers;
-import com.pw.lokalizator.utilitis.PropertiesReader;
 
 public class CircleBuilder {
 	private static String GPS_CIRCLE_COLOR;

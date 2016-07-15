@@ -108,7 +108,6 @@ public class GoogleMapModel implements MapModel, Serializable{
 	
 	public void removeOverlay(OverlayIdentyfikator identyfikator){
 		List<Overlay>list = getOverlayList(identyfikator.createIdentyfikator());
-		Pattern pattern = identyfikator.createPattern();
 		
 		if(list != null){
 			removeOverlayFromList(list, identyfikator);
@@ -124,7 +123,6 @@ public class GoogleMapModel implements MapModel, Serializable{
 	public List<Overlay> findOverlay(OverlayIdentyfikator identyfikator){
 		List<Overlay>list = getOverlayList(identyfikator.createIdentyfikator());
 		List<Overlay>overlays = new ArrayList<Overlay>();
-		Pattern pattern = identyfikator.createPattern();
 		
 		if(list != null){
 			overlays.addAll( findOverlayFromList(list, identyfikator) );

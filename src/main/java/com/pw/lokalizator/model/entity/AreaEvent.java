@@ -12,6 +12,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
 
 @MappedSuperclass
 public abstract class AreaEvent implements Serializable{
@@ -27,16 +28,22 @@ public abstract class AreaEvent implements Serializable{
 	@Id
 	private long id;
     
+    @NotNull
     @ManyToOne
     private Area area;
     
+    @NotNull
     private String message;
     
+    @NotNull
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
     
     @Column(name = "mail_send")
     private boolean mailSend;
+    
+//    @NotNull
+    private String url;
 
 	public long getId() {
 		return id;
@@ -76,6 +83,14 @@ public abstract class AreaEvent implements Serializable{
 
 	public void setMailSend(boolean mailSend) {
 		this.mailSend = mailSend;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 	public abstract Location getLocation();

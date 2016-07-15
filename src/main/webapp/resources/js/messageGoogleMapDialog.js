@@ -1,6 +1,6 @@
 
 function showGoogleMapDialog(){
-	PF('location').show();
+PF('location').show();
 }
 
 function hideDialog(){

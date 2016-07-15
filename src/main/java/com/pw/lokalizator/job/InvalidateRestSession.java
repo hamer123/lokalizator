@@ -1,24 +1,26 @@
 package com.pw.lokalizator.job;
 
 import java.util.Date;
-import javax.ejb.EJB;
+
 import javax.ejb.Schedule;
 import javax.ejb.Singleton;
+import javax.inject.Inject;
 
-import org.jboss.resteasy.logging.Logger;
+import org.jboss.logging.Logger;
 
 import com.pw.lokalizator.model.RestSession;
 import com.pw.lokalizator.singleton.RestSessionManager;
 
 @Singleton
 public class InvalidateRestSession {
-	@EJB
+	@Inject
 	private RestSessionManager restSessionSimulator;
-	Logger logger = Logger.getLogger(InvalidateRestSession.class);
+	@Inject
+	private Logger logger;
 	
 	@Schedule(minute="*/1",hour="*", persistent=false)
 	public void timeoutRestSession(){
-		logger.info("[InvalidateRestSession] InvalidateRestSession job has started");
+		logger.info("[InvalidateRestSession] job has started");
 		
 		for(String token : restSessionSimulator.tokens()){
 			RestSession restSession = restSessionSimulator.getRestSession(token);

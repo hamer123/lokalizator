@@ -33,13 +33,6 @@ public class LocationNetworkRepositoryImpl implements LocationNetworkRepository{
 	}
 
 	@Override
-	public void delete(Long id) {
-		em.createQuery("DELETE FROM LocationNetwork l WHERE l.id =:id")
-		  .setParameter("id", id)
-		  .executeUpdate();
-	}
-
-	@Override
 	public LocationNetwork findById(Long id) {
 		return em.find(LocationNetwork.class, id);
 	}
@@ -51,20 +44,22 @@ public class LocationNetworkRepositoryImpl implements LocationNetworkRepository{
 	}
 
 	@Override
-	public List<LocationNetwork> findByUserLoginAndDateAndServiceEqualsNaszOrderByDateDesc(String login, Date younger, Date older) {
+	public List<LocationNetwork> findByLoginAndDateForServiceNaszOrderByDate(String login, Date younger, Date older, int maxResults) {
 		return em.createNamedQuery("findByUserLoginAndDateYoungerThanAndOlderThanAndServiceEqualsNaszOrderByDateDesc", LocationNetwork.class)
 				 .setParameter("login", login)
 				 .setParameter("younger", younger, TemporalType.TIMESTAMP)
 				 .setParameter("older", older, TemporalType.TIMESTAMP)
+				 .setMaxResults(maxResults)
 				 .getResultList();
 	}
 
 	@Override
-	public List<LocationNetwork> findByUserLoginAndDateAndServiceEqualsObcyOrderByDateDesc(String login, Date younger, Date older) {
+	public List<LocationNetwork> findByLoginAndDateForServiceObcyOrderByDate(String login, Date younger, Date older, int maxResults) {
 		return em.createNamedQuery("findByUserLoginAndDateYoungerThanAndOlderThanAndServiceEqualsObcyOrderByDateDesc", LocationNetwork.class)
 				 .setParameter("login", login)
 				 .setParameter("younger", younger, TemporalType.TIMESTAMP)
 				 .setParameter("older", older, TemporalType.TIMESTAMP)
+				 .setMaxResults(maxResults)
 				 .getResultList();
 	}
 

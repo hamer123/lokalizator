@@ -1,10 +1,12 @@
 package com.pw.lokalizator.repository.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TemporalType;
 
 import com.pw.lokalizator.model.entity.AreaEventGPS;
 import com.pw.lokalizator.model.entity.AreaEventNetwork;
@@ -32,12 +34,6 @@ public class AreaEventNetworkRepositoryImpl implements AreaEventNetworkRepositor
 	}
 
 	@Override
-	public void delete(Long id) {
-		em.createNamedQuery("AreaEventNetwork.removeById")
-		  .executeUpdate();
-	}
-
-	@Override
 	public AreaEventNetwork findById(Long id) {
 		return em.find(AreaEventNetwork.class, id);
 	}
@@ -58,6 +54,14 @@ public class AreaEventNetworkRepositoryImpl implements AreaEventNetworkRepositor
 	@Override
 	public List<AreaEventNetwork> findAllWhereMailSendIsTrue() {
 		return em.createNamedQuery("AreaEventNetwork.findAllWhereMailSendIsTrue", AreaEventNetwork.class)
+				 .getResultList();
+	}
+
+	@Override
+	public List<AreaEventNetwork> findByAreaIdAndDate(long id, Date from) {
+		return em.createNamedQuery("AreaEventNetwork.findByAreaIdAndDate", AreaEventNetwork.class)
+				 .setParameter("id", id)
+				 .setParameter("from", from, TemporalType.TIMESTAMP)
 				 .getResultList();
 	}
 

@@ -1,6 +1,8 @@
 package com.pw.lokalizator.model.entity;
 
 
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +27,7 @@ import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
 import com.pw.lokalizator.model.enums.AreaFollows;
 
 @Entity
@@ -38,13 +41,16 @@ import com.pw.lokalizator.model.enums.AreaFollows;
 		                  query="DELETE FROM Area a WHERE a.id = :id"),
 		      @NamedQuery(name="Area.findAll",
 		                  query="SELECT a FROM Area a"),
-		      @NamedQuery(name="Area.findIdAndNameAndFollowTypeAndTargetIdAndTargetLoginByProviderId",
-		                  query="SELECT new com.pw.lokalizator.model.entity.Area(a.id, a.name, a.polygonFollowType, t.id, t.login) FROM Area a INNER JOIN a.target t WHERE a.provider.id =:id"),
+//		      @NamedQuery(name="Area.findIdAndNameAndFollowTypeAndTargetIdAndTargetLoginByProviderId",
+//		                  query="SELECT new com.pw.lokalizator.model.entity.Area(a.id, a.name, a.polygonFollowType, t.id, t.login) FROM Area a INNER JOIN a.target t WHERE a.provider.id =:id"),
 		      @NamedQuery(name="Area.findWithEagerFetchPointsAndTargetByProviderId",
-		                  query="SELECT a FROM Area a JOIN FETCH a.target WHERE a.provider.id =:id")
+		                  query="SELECT a FROM Area a JOIN FETCH a.target WHERE a.provider.id =:id"),
+		      @NamedQuery(name="Area.findByAktywny",
+		    		      query="SELECT a FROM Area a WHERE a.aktywny =:aktywny"),
+		      @NamedQuery(name="Area.findIdByProviderIdAndAktywny", 
+		                  query="SELECT a.id FROM Area a WHERE a.provider.id =:id AND a.aktywny =:active")
 })
 public class Area {
-	
 	public static final String AREA_updateAktywnyById = "UPDATE Area a SET a.aktywny =:aktywny WHERE a.id =:id";
 	
     @TableGenerator
@@ -65,12 +71,8 @@ public class Area {
     @Column
 	private String name;
     
-	@OneToMany(mappedBy = "area", orphanRemoval = true, fetch=FetchType.LAZY, cascade = {CascadeType.ALL})
-	@MapKey(name="number")
-	private Map<Integer,AreaPoint>points = new HashMap<Integer, AreaPoint>();
-	
 	@NotNull
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(unique = false)
 	private User target;
 	
@@ -78,8 +80,7 @@ public class Area {
 	@ManyToOne
 	private User provider;
 	
-	@NotNull
-	@Column(name = "AKTYWNY")
+	@Column(name = "active")
 	private boolean aktywny;
 	
 	@Column(name = "color")
@@ -89,26 +90,19 @@ public class Area {
 	@Enumerated(EnumType.STRING)
 	private AreaFollows polygonFollowType;
 	
-	@OneToMany(mappedBy = "area", orphanRemoval = true, fetch = FetchType.LAZY,  cascade = {})
+	@OneToMany(mappedBy = "area", orphanRemoval = true, fetch = FetchType.LAZY,  cascade = {CascadeType.REMOVE})
 	private List<AreaEventNetwork>areaEventNetworks;
 	
-	@OneToMany(mappedBy = "area", orphanRemoval = true, fetch = FetchType.LAZY,  cascade = {})
+	@OneToMany(mappedBy = "area", orphanRemoval = true, fetch = FetchType.LAZY,  cascade = {CascadeType.REMOVE})
 	private List<AreaEventGPS>areaEventGPSs;
 	
+	@NotNull
 	@OneToOne(orphanRemoval = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
 	private AreaMessageMail areaMessageMail;
 	
-	public Area(){}
-	
-	public Area(long id, String name, AreaFollows polygonFollows, long targetID, String targetLogin){
-		this.id = id;
-		this.name = name;
-		this.polygonFollowType = polygonFollows;
-		User target = new User();
-		target.setId(targetID);
-		target.setLogin(targetLogin);
-		this.target = target;
-	}
+	@OneToMany(mappedBy = "area", orphanRemoval = true, fetch=FetchType.LAZY, cascade = {CascadeType.ALL})
+	@MapKey(name="number")
+	private Map<Integer,AreaPoint>points = new HashMap<Integer, AreaPoint>();
 	
 	public long getId() {
 		return id;
@@ -195,4 +189,23 @@ public class Area {
 		this.color = color;
 	}
 	
+	public boolean contains(Location location){
+		Path2D path2d = createPath(getPoints());
+		Point2D point2d = new Point2D.Double(location.getLatitude(), location.getLongitude());
+		return path2d.contains(point2d);
+	}
+	
+	private Path2D createPath(Map<Integer, AreaPoint>points){
+		Path2D path = new Path2D.Double();
+		
+		AreaPoint firstPoint = points.get(0);
+		path.moveTo(firstPoint.getLat(), firstPoint.getLng());
+		
+		for(int index = 1; index < points.size(); index++){
+			AreaPoint point = points.get(index);
+			path.lineTo(point.getLat(), point.getLng());
+		}		
+		
+		return path;
+	}
 }

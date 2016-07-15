@@ -14,8 +14,11 @@ import javax.persistence.TableGenerator;
 @Entity
 @Table(name="polygonpoint")
 @NamedQueries(value={
-		@NamedQuery(name="PolygonPoint.findByPolygonModelId",
-				    query="SELECT pp FROM AreaPoint pp WHERE pp.area.id =:id")
+		@NamedQuery(name  = "AreaPoint.findByPolygonModelId",
+				    query = "SELECT pp FROM AreaPoint pp WHERE pp.area.id =:id"),
+		@NamedQuery(name  = "AreaPoint.findByAreaIdOrderByNumber",
+		            query = "SELECT p FROM AreaPoint p WHERE p.area.id =:id ORDER BY p.number DESC")
+		
 })
 public class AreaPoint {
     @TableGenerator(

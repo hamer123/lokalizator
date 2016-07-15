@@ -1,10 +1,12 @@
 package com.pw.lokalizator.repository.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TemporalType;
 
 import com.pw.lokalizator.model.entity.AreaEventGPS;
 import com.pw.lokalizator.repository.AreaEventGPSRepository;
@@ -32,20 +34,14 @@ public class AreaEventGPSRepositoryImpl implements AreaEventGPSRepository{
 	}
 
 	@Override
-	public void delete(Long id) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public AreaEventGPS findById(Long id) {
 		return em.find(AreaEventGPS.class, id);
 	}
 
 	@Override
 	public List<AreaEventGPS> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+		return em.createQuery("SELECT a FROM AreaEventGPS a", AreaEventGPS.class)
+				 .getResultList();
 	}
 
 	@Override
@@ -58,6 +54,14 @@ public class AreaEventGPSRepositoryImpl implements AreaEventGPSRepository{
 	@Override
 	public List<AreaEventGPS> findAllWhereMailSendIsTrue() {
 		return em.createNamedQuery("AreaEventGPS.findAllWhereMailSendIsTrue", AreaEventGPS.class)
+				 .getResultList();
+	}
+
+	@Override
+	public List<AreaEventGPS> findByAreaIdAndDate(long id, Date from) {
+		return em.createNamedQuery("AreaEventGPS.findByAreaIdAndDate", AreaEventGPS.class)
+				 .setParameter("id", id)
+				 .setParameter("from", from, TemporalType.TIMESTAMP)
 				 .getResultList();
 	}
 

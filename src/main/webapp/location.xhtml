@@ -18,10 +18,11 @@
 	    <ui:include src="/WEB-INF/views/menu_templete.xhtml" />
 	  </ui:insert>
 	  
-	  <p:growl id="growl" showDetail="true"/>
+	  <p:growl id="growl"/>
 	  
 	  <h:form id="poll">
-        <p:poll interval="60" listener="#{location.onPoll}" update=":#{p:component('gmap')} :#{p:component('usersOnline')}" />
+        <p:poll interval="60" listener="#{location.onPoll}" 
+                update=":#{p:component('gmap')} :#{p:component('usersOnline')} :#{p:component('daneUser')} :#{p:component('growl')}" />
       </h:form>
    
       <p:outputPanel id="gmap_follow">

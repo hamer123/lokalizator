@@ -24,7 +24,8 @@
 	  <properties>
 	     <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect" />
 	     <property name="hibernate.hbm2ddl.auto" value="update"/>
-		 <property name="hibernate.show_sql" value="true"/>
+		 <property name="hibernate.show_sql" value="true"/>		 
+<!--  		 <property name="javax.persistence.sql-load-script-source" value="META-INF/sql/import.sql" />-->
 	  </properties>
 	</persistence-unit>
 </persistence>

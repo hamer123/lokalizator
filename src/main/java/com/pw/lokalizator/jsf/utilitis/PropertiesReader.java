@@ -1,4 +1,4 @@
-package com.pw.lokalizator.utilitis;
+package com.pw.lokalizator.jsf.utilitis;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

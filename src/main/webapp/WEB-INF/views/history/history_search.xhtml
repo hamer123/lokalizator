@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<ui:composition  xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:o="http://omnifaces.org/ui"> 
+      
+      <h:form>
+         <h:panelGrid columns="3" cellpadding="5" id="searchPanel">
+          
+            <p:outputLabel value="Login"/>
+            <p:autoComplete id="login" completeMethod="#{locationHistory.onAutoCompleteLogin}" value="#{locationHistory.login}" 
+                            required="true" forceSelection="true"/>
+            <p:message for="login"/>
+             
+            <p:outputLabel value="Od kiedy"/>
+            <p:calendar id="older" value="#{locationHistory.older}" pattern="MM/dd/yyyy HH:mm:ss" effect="fold" required="true" 
+                        locale="pl" binding="#{olderDate}"/>
+            <p:message for="older"/>
+             
+            <p:outputLabel value="Do kiedy"/>
+            <p:calendar id="younger" value="#{locationHistory.younger}" pattern="MM/dd/yyyy HH:mm:ss" effect="fold" required="true" locale="pl">
+              <f:validator validatorId="dateRangeValidator"/>
+              <f:attribute name="from" value="#{olderDate}"/>
+            </p:calendar>
+            <p:message for="younger"/>
+             
+            <p:outputLabel id="output"  value="Max ilosc rekordow #{locationHistory.maxRekords}"/>
+            <p:slider for="maxRekords" display="output" displayTemplate="Max ilosc rekordow {value}" maxValue="1000" minValue="2"/>
+            <h:inputHidden id="maxRekords" value="#{locationHistory.maxRekords}"/>
+             
+            <p:outputLabel value="Provider"/>
+            <p:selectOneMenu id="provider" value="#{locationHistory.provider}">
+               <p:ajax update=":#{p:component('service')}"/>
+               <f:selectItems value="#{locationHistory.providers()}"/>
+            </p:selectOneMenu>
+            <p:message for="provider"/>
+ 
+            <p:outputLabel for="service" value="Usluga lokalizacji"/>
+            <p:selectOneMenu id="service" value="#{locationHistory.localizationServices}" disabled="#{locationHistory.provider != 'NETWORK'}">
+                <f:selectItems value="#{locationHistory.localizationServices()}"/>
+            </p:selectOneMenu>
+            <p:message for="service"/>
+          
+            <o:validateOrder components="older younger" message="Daty sa nie poprawnie wybrane"/>
+         </h:panelGrid>
+                 
+         <p:commandButton value="POKAZ" actionListener="#{locationHistory.onShowRoute}" 
+                          update=":#{p:component('gmap')} :#{p:component('growl')} :#{p:component('routeLocations')} 
+                                  :#{p:component('option_form')}"/>
+      </h:form>
+</ui:composition>

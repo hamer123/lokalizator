@@ -1,11 +1,8 @@
 package com.pw.lokalizator.security;
 
 import java.io.IOException;
-import java.security.Principal;
-
 import javax.ejb.EJB;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
@@ -13,13 +10,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
-
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpServerConnection;
 import org.jboss.logging.Logger;
-import org.omg.CORBA.CTX_RESTRICT_SCOPE;
 
-import com.pw.lokalizator.model.entity.User;
 
 @Provider
 @PreMatching
@@ -39,7 +31,13 @@ public class RESTRequestFilter implements ContainerRequestFilter{
           
         // IMPORTANT!!! First, Acknowledge any pre-flight test from browsers for this case before validating the headers (CORS stuff)
         if (requestCtx.getRequest().getMethod().equals( "OPTIONS" )) {
-            requestCtx.abortWith(Response.status( Response.Status.OK ).build() );
+            requestCtx.abortWith(Response
+            		.status( Response.Status.OK )
+//            		.header("Access-Control-Allow-Origin", "http://localhost:63342/untitled")
+//            		.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+//            		.header("Access-Control-Allow-Headers", "X-PINGOTHER, Content-Type")
+            		.build() 
+            		);
             return;
         }
         

@@ -36,7 +36,7 @@ import com.pw.lokalizator.model.enums.LocalizationServices;
 public class LocationNetwork extends Location implements Serializable{
 	
 	@OneToOne( orphanRemoval = true, cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.LAZY)
-	@JoinColumn(name="CELL_INFO_NETWORK_ID")
+	@JoinColumn(name="cell_info_id")
 	
 	@XmlElementRefs(value = {
 			@XmlElementRef(name = "cellInfoLte", type = CellInfoLte.class, required = true),

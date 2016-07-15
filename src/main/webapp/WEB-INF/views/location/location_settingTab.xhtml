@@ -25,6 +25,9 @@
               <p:selectBooleanCheckbox id="check" value="#{location.googleMapController.streetVisible}">
                 <p:ajax update=":gmap" />
               </p:selectBooleanCheckbox>
+              
+              <p:outputLabel for="area_event" value="Powiadomienia o sledzeniu" />
+              <p:selectBooleanCheckbox id="area_event" value="#{location.checkAreaEvent}"/>
              
             </h:panelGrid>
           </h:form>
@@ -32,10 +35,9 @@
 
         <p:panel header="Ustawienia widocznosci">
          <h:form>
-         
-         <p:panelGrid columns="3" layout="grid">
+         <p:panelGrid columns="4" layout="grid">
 
-          <p:panel header="Widocznosc GPS">
+          <p:panel header="GPS">
               <h:panelGrid columns="2">
               
                 <p:outputLabel value="Marker"/>
@@ -50,7 +52,7 @@
 
               </h:panelGrid>
           </p:panel>
-          <p:panel header="Widocznosc Network (Nasz)">
+          <p:panel header="Network (Nasz)">
               <h:panelGrid columns="2">
               
                 <p:outputLabel value="Marker"/>
@@ -66,7 +68,7 @@
               </h:panelGrid>
 
           </p:panel>
-          <p:panel header="Widocznosc Network (Obcy)">
+          <p:panel header="Network (Obcy)">
               <h:panelGrid columns="2">
               
                 <p:outputLabel value="Marker"/>
@@ -80,71 +82,26 @@
                 </p:selectBooleanCheckbox>
               </h:panelGrid>
           </p:panel>
-         </p:panelGrid>
-         
-         <p:panel header="Ogolna widocznosc">
+          
+          <p:panel header="Arena">
            <h:panelGrid columns="2">
            
-             <p:outputLabel value="Polygon"/>
-             <p:selectBooleanCheckbox value="#{location.googleMapVisible.polygon}">
+             <p:outputLabel value="Aktywne areny"/>
+             <p:selectBooleanCheckbox value="#{location.googleMapVisible.activePolygon}">
+               <p:ajax event="change" listener="#{location.onChangeSetting}" update=":#{p:component('gmap')}"/>
+             </p:selectBooleanCheckbox>
+             
+             <p:outputLabel value="Nie aktywne areny"/> 
+             <p:selectBooleanCheckbox value="#{location.googleMapVisible.notActivePolygon}">
                <p:ajax event="change" listener="#{location.onChangeSetting}" update=":#{p:component('gmap')}"/>
              </p:selectBooleanCheckbox>
              
            </h:panelGrid>
-         </p:panel>
-         
+          </p:panel>
+         </p:panelGrid>
+            
          </h:form>
         </p:panel>
       </p:panelGrid>
 
 </ui:composition>
-
-<!--
-        <p:panel header="Ustawienia widocznosci">
-         <p:panelGrid columns="2" layout="grid">
-          <p:panel header="Widocznosc sledzenia">
-          
-            <h:form>
-              <h:panelGrid id="widocznoscProvidera" columns="2" style="margin-bottom:10px" cellpadding="5">
-                <p:outputLabel value="Wybierz providera:"/>
-                <p:selectOneMenu value="#{location.choicedProvider}">
-                  <p:ajax event="change" listener="#{location.onChooseProviderChange}" update=":#{p:component('widocznoscProvidera')} :#{p:component('panalFollowWidocznoscChoice')}"/>
-                  <f:selectItems value="#{location.providers}"/>
-                </p:selectOneMenu>
-                
-                <p:outputLabel value="Wybierz usluge:" rendered="#{location.choicedProvider == 'NETWORK'}"/>
-                <p:selectOneMenu value="#{location.choicedLocalizationServices}" rendered="#{location.choicedProvider == 'NETWORK'}">
-                  <p:ajax event="change" listener="#{location.onChooseLocatiozacionServiceChange}" update=":#{p:component('widocznoscProvidera')} :#{p:component('panalFollowWidocznoscChoice')}"/>
-                  <f:selectItems value="#{location.services}"/>
-                </p:selectOneMenu>
-              
-              </h:panelGrid>
-              
-            </h:form>
-            
-            <h:form>
-            <h:panelGrid id="panalFollowWidocznoscChoice" columns="2">
-              
-              <h:outputText value="Circle" />
-              <p:selectBooleanCheckbox value="#{location.overlayVisibilityFollow.circleVisible}">
-                <p:ajax event="change" listener="#{googleMapControllerFollowMode.render}" update=":#{p:component('gmap')}"/>
-              </p:selectBooleanCheckbox>
-
-              <h:outputText value="Marker" />
-              <p:selectBooleanCheckbox value="#{location.overlayVisibilityFollow.markerVisible}">
-                <p:ajax event="change" listener="#{googleMapControllerFollowMode.render}" update=":#{p:component('gmap')}"/>
-              </p:selectBooleanCheckbox>
-              
-              <h:outputText value="Polygon (brak podzialu na providery)"/>
-              <p:selectBooleanCheckbox value="#{googleMapControllerFollowMode.polygonVisible}">
-                <p:ajax event="change" listener="#{googleMapControllerFollowMode.render}" update=":#{p:component('gmap')}"/>
-              </p:selectBooleanCheckbox>
-              
-              
-            </h:panelGrid>
-            
-            </h:form>
-          </p:panel>
-         </p:panelGrid>
-        </p:panel>
--->

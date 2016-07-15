@@ -6,7 +6,8 @@ public class GoogleMapComponentVisible {
 	
 	static
 	{
-		NO_POLYGON.setPolygon(false);
+		NO_POLYGON.setActivePolygon(false);
+		NO_POLYGON.setNotActivePolygon(false);
 		NO_POLYGON.setCircleGps(true);
 		NO_POLYGON.setCircleNetworkNasz(true);
 		NO_POLYGON.setCircleNetworkObcy(true);
@@ -15,7 +16,8 @@ public class GoogleMapComponentVisible {
 		NO_POLYGON.setMarkerNetworkObcy(true);
 	}
 	
-	private boolean polygon;
+	private boolean activePolygon;
+	private boolean notActivePolygon;
 	private boolean markerGps;
 	private boolean markerNetworkNasz;
 	private boolean markerNetworkObcy;
@@ -23,11 +25,18 @@ public class GoogleMapComponentVisible {
 	private boolean circleNetworkNasz;
 	private boolean circleNetworkObcy;
 	
-	public boolean isPolygon() {
-		return polygon;
+
+	public boolean isNotActivePolygon() {
+		return notActivePolygon;
 	}
-	public void setPolygon(boolean polygon) {
-		this.polygon = polygon;
+	public void setNotActivePolygon(boolean notActivePolygon) {
+		this.notActivePolygon = notActivePolygon;
+	}
+	public boolean isActivePolygon() {
+		return activePolygon;
+	}
+	public void setActivePolygon(boolean activePolygon) {
+		this.activePolygon = activePolygon;
 	}
 	public boolean isMarkerGps() {
 		return markerGps;

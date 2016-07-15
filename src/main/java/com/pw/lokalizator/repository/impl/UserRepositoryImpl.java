@@ -1,42 +1,20 @@
 package com.pw.lokalizator.repository.impl;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.Dependent;
-import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
-
 import com.pw.lokalizator.model.entity.Area;
-import com.pw.lokalizator.model.entity.Location;
-import com.pw.lokalizator.model.entity.LocationGPS;
-import com.pw.lokalizator.model.entity.LocationNetwork;
 import com.pw.lokalizator.model.entity.User;
-import com.pw.lokalizator.model.enums.Roles;
 import com.pw.lokalizator.repository.UserRepository;
 
 @Stateless
 public class UserRepositoryImpl implements UserRepository{
 	@PersistenceContext
 	private EntityManager em;
-	
-//	private static final String USER_updateLastLocationNetworkNaszaUslugaById = "UPDATE User u SET u.lastLocationNetworkNaszaUsluga =:location WHERE u.id =:userId";
-	private static final String USER_updateLastLocationNetworkObcaUslugaById  = "UPDATE User u SET u.lastLocationNetworObcaUsluga =:location WHERE u.id =:userId";
-	private static final String USER_updateLastLocationGPSById                = "UPDATE User u SET u.lastLocationGPS =:location WHERE u.id =:userId";
 
-	
-	
 	public User create(User entity) {
 		em.persist(entity);
 		return entity;
@@ -50,10 +28,10 @@ public class UserRepositoryImpl implements UserRepository{
 		em.remove(entity);
 	}
 	
-	public void delete(Long id) {
-		em.createNamedQuery("USER.deleteByID")
-		   .setParameter("id", id)
-		   .executeUpdate();
+	public int delete(Long id) {
+		return em.createNamedQuery("USER.deleteByID")
+		         .setParameter("id", id)
+		         .executeUpdate();
 	}
 	
 	public User findById(Long id) {
@@ -105,30 +83,6 @@ public class UserRepositoryImpl implements UserRepository{
 		return em.createNamedQuery("USER.findUsersById", User.class)
 		         .setParameter("id", id)
 		         .getResultList();
-	}
-
-	@Override
-	public int updateCurrentLocationNetworkNaszaUsluga(long locationId, long userId) {
-		return em.createNamedQuery("User.Native.updateUserLastLocationNetworkNaszaUslugaById")
-				 .setParameter("locationId", locationId)
-				 .setParameter("userId", userId)
-				 .executeUpdate();
-	}
-
-	@Override
-	public int updateCurrentLocationNetworkObcaUsluga(long locationId, long userId) {
-		return em.createQuery(USER_updateLastLocationNetworkObcaUslugaById)
-				 .setParameter("locationId", locationId)
-				 .setParameter("userId", userId)
-				 .executeUpdate();
-	}
-
-	@Override
-	public int updateCurrentLocationGPS(long locationId, long userId) {
-		return em.createQuery(USER_updateLastLocationGPSById)
-				 .setParameter("locationId", locationId)
-				 .setParameter("userId", userId)
-				 .executeUpdate();
 	}
 
 	@Override

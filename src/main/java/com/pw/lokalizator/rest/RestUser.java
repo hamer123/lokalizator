@@ -1,5 +1,7 @@
 package com.pw.lokalizator.rest;
 
+import java.util.Date;
+
 import javax.ejb.EJB;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
@@ -14,7 +16,11 @@ import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.logging.Logger;
 
+import com.pw.lokalizator.model.entity.Address;
+import com.pw.lokalizator.model.entity.Location;
+import com.pw.lokalizator.model.entity.LocationGPS;
 import com.pw.lokalizator.model.entity.User;
+import com.pw.lokalizator.model.enums.Providers;
 import com.pw.lokalizator.security.HTTPHeaderNames;
 import com.pw.lokalizator.security.SecurityService;
 
@@ -65,10 +71,20 @@ public class RestUser {
 			       .build();
 	}
 	
+	@Path("/test")
 	@GET
+	@Produces( value = {MediaType.APPLICATION_JSON} )
 	public Response test(){
+		Location location = new LocationGPS();
+		Address address = new Address();
+		address.setCity("ZD");
+		address.setStreet("qwe");
+		location.setAddress(address);
+		location.setProviderType(Providers.GPS);
+		location.setDate(new Date());
+		
 		return Response.status( Response.Status.OK )
-				       .entity("TEST REST EASY")
+				       .entity(location)
 				       .build();
 	}
 	

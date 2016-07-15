@@ -9,7 +9,7 @@ import com.pw.lokalizator.jsf.utilitis.OverlayIdentyfikator.OverlayIdentyfikator
 import com.pw.lokalizator.model.enums.Overlays;
 import com.pw.lokalizator.model.enums.Providers;
 
-public class TestOverlayIdentyfikator {
+public class OverlayIdentyfikatorTest {
 	
 	private OverlayIdentyfikator identyfikator;
 	
@@ -33,4 +33,14 @@ public class TestOverlayIdentyfikator {
 		String regex = "MARKER_GPS_null_hamer123_123";
 	    assertEquals(regex, identyfikator.createIdentyfikator());
 	}
+	
+	@Test
+	public void testFields(){
+		assertEquals("hamer123", identyfikator.getLogin());
+		assertEquals(Providers.GPS, identyfikator.getProviderType());
+		assertEquals(123L, identyfikator.getId());
+		assertEquals(Overlays.MARKER, identyfikator.getOverlay());
+		assertEquals(null, identyfikator.getLocalizationServices());
+	}
+	
 }

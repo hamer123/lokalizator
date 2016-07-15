@@ -1,8 +1,6 @@
 package com.pw.lokalizator.model.entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -15,23 +13,20 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.NamedNativeQueries;
-import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
-import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.pw.lokalizator.model.enums.Roles;
+
+
 
 @Entity
 @Table(name ="user")
@@ -43,7 +38,7 @@ import com.pw.lokalizator.model.enums.Roles;
 		  @NamedQuery(name="USER.findByLogin", query="SELECT u FROM User u WHERE u.login =:login"),
 		  @NamedQuery(name="USER.findByLoginAndPassword", query="SELECT u FROM User u WHERE u.login = :login AND u.password =:password"),
 		  @NamedQuery(name="USER.findLoginByLoginLike", query="SELECT u.login FROM User u WHERE u.login LIKE :login"),
-		  @NamedQuery(name="USER.findUserWithPolygonsByLogin", query="SELECT u FROM User u INNER JOIN FETCH u.polygons WHERE u.login =:login"),
+		  @NamedQuery(name="USER.findUserWithPolygonsByLogin", query="SELECT u FROM User u INNER JOIN FETCH u.areas WHERE u.login =:login"),
 		  @NamedQuery(name="USER.findUsersById", query="SELECT u FROM User u WHERE u.id IN (:id)"),
 		  @NamedQuery(name="USER.findUserWithSecurityByLoginAndPassword", 
 		              query="SELECT new com.pw.lokalizator.model.entity.User(u.id, u.login, u.password, u.email, u.phone, u.rola) "
@@ -52,10 +47,6 @@ import com.pw.lokalizator.model.enums.Roles;
 		              query="SELECT u FROM User u LEFT JOIN FETCH u.lastLocationGPS LEFT JOIN FETCH u.lastLocationNetworkNaszaUsluga LEFT JOIN FETCH u.lastLocationNetworObcaUsluga "
 		              	  + "WHERE u.login =:login")
 		})
-@NamedNativeQueries(value = {
-		@NamedNativeQuery(name="User.Native.updateUserLastLocationNetworkNaszaUslugaById", 
-				          query="UPDATE user SET LAST_LOC_NET_NASZA_ID =:locationId WHERE id =:userId")
-})
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
 public class User implements Serializable {
@@ -71,32 +62,33 @@ public class User implements Serializable {
 	private long id;
 	
 	@XmlElement
-	@Column(unique=true, updatable=false, nullable=false, length=16)
+	@Column(name="login", unique=true, updatable=false, nullable=false, length=16)
 	private String login;
 	
 	@XmlElement
-	@Column(unique=false, nullable=false, length=16)
+	@Column(name="password", unique=false, nullable=false, length=16)
 	private String password;
 
-	@Column(unique=true, length=50)
+	@Column(name="email", unique=true, length=50)
 	private String email;
 
-	@Column(name="PHONE")
+	@Column(name="phone")
 	private String phone;
 	
 	@Enumerated(EnumType.STRING)
+	@Column(name = "rola")
 	private Roles rola;
 	
 	@OneToOne
-	@JoinColumn(updatable = true, name = "LAST_LOC_GPS")
+	@JoinColumn(updatable = true, name = "last_location_gps_id")
 	private LocationGPS lastLocationGPS;
 	
 	@OneToOne
-	@JoinColumn(updatable = true, name = "LAST_LOC_NET_NASZA_ID")
+	@JoinColumn(updatable = true, name = "last_location_network_nasz_id")
 	private LocationNetwork lastLocationNetworkNaszaUsluga;
 	
 	@OneToOne
-	@JoinColumn(updatable = true, name = "LAST_LOC_NET_OBCA_ID")
+	@JoinColumn(updatable = true, name = "last_location_network_obcy_id")
 	private LocationNetwork lastLocationNetworObcaUsluga;
 	
 	@OneToMany(mappedBy="user", orphanRemoval = true, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
@@ -106,7 +98,7 @@ public class User implements Serializable {
 	private List<LocationNetwork> locationNetwork;
 	
 	@OneToMany(mappedBy = "provider", orphanRemoval = true, fetch= FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-	private List<Area>polygons;
+	private List<Area>areas;
 	
 	public User(){}
 	
@@ -160,11 +152,11 @@ public class User implements Serializable {
 	}
 
 	public List<Area> getArea() {
-		return polygons;
+		return areas;
 	}
 
 	public void setArea(List<Area> polygons) {
-		this.polygons = polygons;
+		this.areas = polygons;
 	}
 
 	public List<LocationGPS> getLocationGPS() {
@@ -216,5 +208,13 @@ public class User implements Serializable {
 	public void setRola(Roles rola) {
 		this.rola = rola;
 	}
-	
+
+	public List<Area> getAreas() {
+		return areas;
+	}
+
+	public void setAreas(List<Area> areas) {
+		this.areas = areas;
+	}
+
 }

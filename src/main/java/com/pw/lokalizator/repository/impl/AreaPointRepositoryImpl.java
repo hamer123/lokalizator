@@ -1,12 +1,15 @@
 package com.pw.lokalizator.repository.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 import com.pw.lokalizator.model.entity.AreaPoint;
 import com.pw.lokalizator.repository.AreaPointRepository;
@@ -33,12 +36,6 @@ public class AreaPointRepositoryImpl implements AreaPointRepository{
 	}
 
 	@Override
-	public void delete(Long id) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 	public AreaPoint findById(Long id) {
 		return em.find(AreaPoint.class, id);
@@ -54,9 +51,22 @@ public class AreaPointRepositoryImpl implements AreaPointRepository{
 	@Override
 	@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 	public List<AreaPoint> findByAreaId(long id) {
-		return em.createNamedQuery("PolygonPoint.findByPolygonModelId", AreaPoint.class)
+		return em.createNamedQuery("AreaPoint.findByPolygonModelId", AreaPoint.class)
 		  .setParameter("id", id)
 		  .getResultList();
+	}
+
+	@Override
+	public Map<Integer, AreaPoint> findByAreaIdOrderByNumberMapToNumber(long id) {
+		List<AreaPoint>areaPoints = em.createNamedQuery("AreaPoint.findByAreaIdOrderByNumber", AreaPoint.class)
+				                      .setParameter("id", id)
+				                      .getResultList();
+		
+		Map<Integer,AreaPoint>map = new HashMap<>();
+		for(AreaPoint areaPoint : areaPoints)
+			map.put(areaPoint.getNumber(), areaPoint);
+				                                    
+		return map;
 	}
 
 }

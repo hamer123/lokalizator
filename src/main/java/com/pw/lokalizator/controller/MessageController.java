@@ -46,11 +46,8 @@ public class MessageController implements Serializable{
 	private AreaEventNetworkRepository areaEventNetworkRepository;
 	@Inject
 	private AreaPointRepository areaPointRepository;
-	
-	private GoogleMapModel dialogMap;
-	private String dialogMapCenter;
-	private int dialogMapZoom;
-	
+	@Inject
+	private GoogleMapController dialogMap;
 	
 	private Area selectedArea;
 	private List<Area> areaList;
@@ -60,8 +57,7 @@ public class MessageController implements Serializable{
 	private void postConstruct(){
 		long id = lokalizatorSession.getUser().getId();
 		areaList = areaRepository.findWithEagerFetchPointsAndTargetByProviderId(id); 
-		
-		dialogMapZoom = 15;
+		dialogMap.setZoom(15);
 	}
 	
 	public void onAreaSelect(SelectEvent event){
@@ -98,25 +94,24 @@ public class MessageController implements Serializable{
 	}
 	
 	public void onDisplayLocationInDialog(AreaEvent areaEvent){
-		dialogMap = new GoogleMapModel();
-		dialogMap.addOverlay( CircleBuilder.createCircle( areaEvent.getLocation() ) );
-		dialogMap.addOverlay( MarkerBuilder.createMarker( areaEvent.getLocation() ) );
-		
+		dialogMap.clear();
 		Location location = areaEvent.getLocation();
-		dialogMapCenter = GoogleMapModel.center(location);
+		dialogMap.addOverlay(CircleBuilder.createCircle(location));
+		dialogMap.addOverlay(MarkerBuilder.createMarker(location));
+		dialogMap.setCenter(GoogleMapModel.center((location)));
 	}
 	
 	public void onDisplayAreaInDialog(Area area){
 		List<AreaPoint>areaPoints = areaPointRepository.findByAreaId(area.getId());
-		area.setPoints(getAreaPoint(areaPoints));
-		
+		dialogMap.clear();
+		area.setPoints(mapAreaPoint(areaPoints));
 		Polygon polygon = PolygonBuilder.create(area);
-		
-		dialogMap =  new GoogleMapModel();
 		dialogMap.addOverlay(polygon);
+		AreaPoint areaPoint = areaPoints.get(0);
+		dialogMap.setCenter(GoogleMapModel.center(areaPoint.getLat(), areaPoint.getLng()));
 	}
 	
-	private Map<Integer, AreaPoint> getAreaPoint(List<AreaPoint>areaPoints){
+	private Map<Integer, AreaPoint> mapAreaPoint(List<AreaPoint>areaPoints){
 		Map<Integer, AreaPoint>map = new HashMap<Integer, AreaPoint>();
 		
 		for(int i = 0; i < areaPoints.size(); i++){
@@ -142,16 +137,62 @@ public class MessageController implements Serializable{
 		return areaList;
 	}
 
-	public GoogleMapModel getDialogMap() {
+	public LokalizatorSession getLokalizatorSession() {
+		return lokalizatorSession;
+	}
+
+	public void setLokalizatorSession(LokalizatorSession lokalizatorSession) {
+		this.lokalizatorSession = lokalizatorSession;
+	}
+
+	public AreaRepository getAreaRepository() {
+		return areaRepository;
+	}
+
+	public void setAreaRepository(AreaRepository areaRepository) {
+		this.areaRepository = areaRepository;
+	}
+
+	public AreaEventGPSRepository getAreaEventGPSRepository() {
+		return areaEventGPSRepository;
+	}
+
+	public void setAreaEventGPSRepository(
+			AreaEventGPSRepository areaEventGPSRepository) {
+		this.areaEventGPSRepository = areaEventGPSRepository;
+	}
+
+	public AreaEventNetworkRepository getAreaEventNetworkRepository() {
+		return areaEventNetworkRepository;
+	}
+
+	public void setAreaEventNetworkRepository(
+			AreaEventNetworkRepository areaEventNetworkRepository) {
+		this.areaEventNetworkRepository = areaEventNetworkRepository;
+	}
+
+	public AreaPointRepository getAreaPointRepository() {
+		return areaPointRepository;
+	}
+
+	public void setAreaPointRepository(AreaPointRepository areaPointRepository) {
+		this.areaPointRepository = areaPointRepository;
+	}
+
+	public GoogleMapController getDialogMap() {
 		return dialogMap;
 	}
 
-	public String getDialogMapCenter() {
-		return dialogMapCenter;
+	public void setDialogMap(GoogleMapController dialogMap) {
+		this.dialogMap = dialogMap;
 	}
 
-	public int getDialogMapZoom() {
-		return dialogMapZoom;
+	public void setAreaList(List<Area> areaList) {
+		this.areaList = areaList;
+	}
+
+	public void setAreaEvents(List<AreaEvent> areaEvents) {
+		this.areaEvents = areaEvents;
 	}
 
 }

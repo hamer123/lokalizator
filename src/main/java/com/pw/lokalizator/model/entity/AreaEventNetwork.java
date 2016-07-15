@@ -14,7 +14,9 @@ import javax.persistence.OneToOne;
 		@NamedQuery(name  = "AreaEventNetwork.findAll",
                     query = "SELECT a FROM AreaEventNetwork a"),
         @NamedQuery(name  = "AreaEventNetwork.removeById",
-                    query = "DELETE FROM AreaEventNetwork a WHERE a.id =:id")
+                    query = "DELETE FROM AreaEventNetwork a WHERE a.id =:id"),
+        @NamedQuery(name  = "AreaEventNetwork.findByAreaIdAndDate",
+                    query = "SELECT a FROM AreaEventNetwork a WHERE a.area.id =:id AND a.date > :from")
 })
 public class AreaEventNetwork extends AreaEvent{
 

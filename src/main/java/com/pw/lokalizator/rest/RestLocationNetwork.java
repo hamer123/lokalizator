@@ -22,7 +22,8 @@ import com.pw.lokalizator.service.LocationService;
 public class RestLocationNetwork {
 	@Inject
 	private LocationService locationService;
-	Logger logger = Logger.getLogger(RestLocationNetwork.class);
+	@Inject
+	Logger logger;
 	
 	@POST()
 	@Path("/create")

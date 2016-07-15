@@ -43,29 +43,28 @@ public abstract class Location implements Serializable{
   		  pkColumnValue="LOCATIO_NETWORK_ID"
   		  )
     @GeneratedValue(strategy=GenerationType.TABLE, generator="LOCATION_GEN")
-    @Column(name="ID")
     private long id;
 	
 	@XmlElement
-	@Column(name="LATITUDE", nullable=false, updatable = false)
+	@Column(name="latitude", nullable=false, updatable = false)
 	private double latitude;
 	
-	@Column(name="LONGTITUDE", nullable=false, updatable = false)
+	@Column(name="longtitude", nullable=false, updatable = false)
 	@XmlElement
 	private double longitude;
 	
 	@ManyToOne
-	@JoinColumn(name="USER_ID")
+	@JoinColumn(name="user_id")
 	private User user;
 	
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name="DATE", nullable=false, updatable = false)
+	@Column(name="date", nullable=false, updatable = false)
 	@XmlElement
 	private Date date;
 	
 	@XmlElement
 	@Enumerated(EnumType.STRING)
-	@Column(name="PROVIDER_TYPE", nullable=false, updatable = false)
+	@Column(name="provider_type", nullable=false, updatable = false)
 	private Providers providerType;
 	
 	@XmlElement
@@ -73,7 +72,7 @@ public abstract class Location implements Serializable{
 	private Address address;
 	
 	@XmlElement
-	@Column(name = "ACCURACY", nullable = false, updatable = false)
+	@Column(name = "accuracy", nullable = false, updatable = false)
 	private double accuracy;
 	
 	@Column(name = "event_check")

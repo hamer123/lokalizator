@@ -10,17 +10,17 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "cellInfoLte")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CellInfoLte extends CellInfoMobile{
-	@Column(name="CI")
+	@Column(name="ci")
     private int ci;
-	@Column(name="MCC")
+	@Column(name="mcc")
     private int mcc;
-	@Column(name="MNC")
+	@Column(name="mnc")
     private int mnc;
-	@Column(name="PCI")
+	@Column(name="pci")
     private int pci;
-	@Column(name="TAC")
+	@Column(name="tac")
     private int tac;
-	@Column(name="TIMING_ADVANCE")
+	@Column(name="timing_advance")
 	private int timingAdvance;
     
 	public int getCi() {

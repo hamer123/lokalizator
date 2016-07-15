@@ -1,11 +1,16 @@
 package com.pw.lokalizator.controller;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 import javax.enterprise.context.Dependent;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.validator.ValidatorException;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -14,7 +19,9 @@ import org.jboss.logging.Logger;
 import org.primefaces.model.map.Overlay;
 
 import com.pw.lokalizator.jsf.utilitis.JsfMessageBuilder;
+import com.pw.lokalizator.model.GoogleMapModel;
 import com.pw.lokalizator.model.LokalizatorSession;
+import com.pw.lokalizator.model.Route;
 import com.pw.lokalizator.model.entity.Location;
 import com.pw.lokalizator.model.entity.LocationGPS;
 import com.pw.lokalizator.model.entity.LocationNetwork;
@@ -26,6 +33,7 @@ import com.pw.lokalizator.repository.LocationNetworkRepository;
 import com.pw.lokalizator.repository.UserRepository;
 import com.pw.lokalizator.service.GoogleMapUserComponentService;
 import com.pw.lokalizator.service.LocationService;
+import com.pw.lokalizator.service.RouteService;
 
 @Named("locationHistory")
 @ViewScoped
@@ -41,13 +49,19 @@ public class LocationHistoryController implements Serializable{
 	@Inject
 	private GoogleMapUserComponentService googleMapUserComponentService;
 	@Inject
+	private RouteService routeService;
+	@Inject
 	private Logger logger;
 	
+	private int maxRekords = 1000;
 	private Date older;
 	private Date younger;
 	private String login;
 	private Providers provider;
-	private LocalizationServices localizationServices; 
+	private LocalizationServices localizationServices;
+	
+	private Route route;
+	private Location location;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////   ACTIONS    /////////////////////////////////////////////////////////////////////////////////
@@ -56,23 +70,31 @@ public class LocationHistoryController implements Serializable{
 	public void onShowRoute(){
 		try{
 			List<Location>locations = findLocations();
-			
 			if(locations.size() < 2){
 				JsfMessageBuilder.errorMessage("Nie mozna utworzyc sciezki, za malo lokacji");
+				googleMapController.clear();
 				return;
 			}
-			
-			List<Overlay>overlays = googleMapUserComponentService.route(locations);
-			googleMapController.addOverlay(overlays);	
-			
+			route = googleMapUserComponentService.route(locations);
+			googleMapController.replace(route.overlays());
 		} catch(Exception e){
 			JsfMessageBuilder.errorMessage("Nie mozna utworzyc sciezki");
 			logger.error(e);
 		}
 	}
 	
+	public void onLocationSelect(){
+		 googleMapController.setCenter( GoogleMapModel.center(location) );
+	}
+	
 	public List<String> onAutoCompleteLogin(String login){
 		return userRepository.findLoginByLoginLike(login);
+	}
+	
+	public void onCalculateRouteLenght(){
+		double lenghtDouble = routeService.calculateLenghtMeters(route);
+		String lenght = new DecimalFormat("#.##").format(lenghtDouble);
+		JsfMessageBuilder.infoMessage(lenght + " meters");
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -93,20 +115,35 @@ public class LocationHistoryController implements Serializable{
 	
 	private List<LocationNetwork> findLocationNetwork(){
 		if(localizationServices == LocalizationServices.NASZ){
-			return locationNetworkRepository.findByUserLoginAndDateAndServiceEqualsNaszOrderByDateDesc(login, younger, older);
+			return locationNetworkRepository.
+					findByLoginAndDateForServiceNaszOrderByDate(login, younger, older, maxRekords);
 		} else {
-			return locationNetworkRepository.findByUserLoginAndDateAndServiceEqualsObcyOrderByDateDesc(login, younger, older);
+			return locationNetworkRepository.
+					findByLoginAndDateForServiceObcyOrderByDate(login, younger, older, maxRekords);
 		}
 	}
 	
 	private List<LocationGPS> findLocationGPS(){
-		return locationGPSRepository.findByUserLoginAndDateOrderByDateDesc(login, younger, older);
+		return locationGPSRepository.
+				findByLoginAndDateOrderByDate(login, younger, older, maxRekords);
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////   GETTERS SETTERS    /////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	@SuppressWarnings("unchecked")
+	public List<Location> getLocations() {
+		if(route != null)
+			return (List<Location>) route.getPolyline().getData();
+		
+		return new ArrayList<>();
+	}
+	
+	public Route getRoute() {
+		return route;
+	}
+
 	public Providers[] providers(){
 		return Providers.values();
 	}
@@ -115,6 +152,22 @@ public class LocationHistoryController implements Serializable{
 		return LocalizationServices.values();
 	}
 	
+	public int getMaxRekords() {
+		return maxRekords;
+	}
+
+	public void setMaxRekords(int maxRekords) {
+		this.maxRekords = maxRekords;
+	}
+
+	public void setLocation(Location location) {
+		this.location = location;
+	}
+
+	public Location getLocation() {
+		return location;
+	}
+
 	public String getLogin() {
 		return login;
 	}

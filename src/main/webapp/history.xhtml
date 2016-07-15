@@ -8,7 +8,7 @@
 <h:head>
   <title>Historia</title>
   <h:outputStylesheet library="css" name="default.css"/>
-  <script src="https://maps.googleapis.com/maps/api/js"/>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCs17b5OinBtGu-5P4VLLLV-yYuaMn2T4c"/>
 </h:head> 
 
 <h:body styleClass="body"> 
@@ -25,46 +25,27 @@
              center="#{locationHistory.googleMapController.center}" zoom="#{locationHistory.googleMapController.zoom}"
              type="#{locationHistory.googleMapController.googleMapType}">
      </p:gmap>
-     
+
+
      <p:panel header="Historia Lokacji">
         <p:panelGrid columns="2" layout="grid">
       
-            <p:panel header="Wyszukiwanie">
-               <h:form>
-                  <h:panelGrid columns="3" cellpadding="5">
-          
-                     <p:outputLabel value="Login"/>
-                     <p:autoComplete id="login" completeMethod="#{locationHistory.onAutoCompleteLogin}" value="#{locationHistory.login}" 
-                                     required="true" forceSelection="true"/>
-                     <p:message for="login"/>
-             
-                     <p:outputLabel value="Od kiedy"/>
-                     <p:calendar id="older" value="#{locationHistory.older}" pattern="MM/dd/yyyy HH:mm:ss" effect="fold" required="true" locale="pl"/>
-                     <p:message for="older"/>
-             
-                     <p:outputLabel value="Do kiedy"/>
-                     <p:calendar id="younger" value="#{locationHistory.younger}" pattern="MM/dd/yyyy HH:mm:ss" effect="fold" required="true" locale="pl"/>
-                     <p:message for="younger"/>
-             
-                     <p:outputLabel value="Provider"/>
-                     <p:selectOneMenu id="provider" value="#{locationHistory.provider}">
-                        <f:selectItems value="#{locationHistory.providers()}"/>
-                     </p:selectOneMenu>
-                     <p:message for="provider"/>
-              
-                     <p:outputLabel value="Usluga lokalizacji"/>
-                     <p:selectOneMenu id="service" value="#{locationHistory.localizationServices}">
-                        <f:selectItems value="#{locationHistory.localizationServices()}"/>
-                     </p:selectOneMenu>
-                     <p:message for="service"/>
-          
-                 </h:panelGrid>
-                 
-                 <p:commandButton value="POKAZ" actionListener="#{locationHistory.onShowRoute}" update=":#{p:component('gmap')} :#{p:component('growl')}"/>
-              </h:form>
-           </p:panel>
-           
-           <p:panel header="????">
+           <p:outputPanel>
+              <p:panel header="Wyszukiwanie">
+                <ui:insert>
+                  <ui:include src="WEB-INF/views/history/history_search.xhtml" />
+                </ui:insert>
+              </p:panel>
+              <p:panel id="option" header="Opcie dodatkowe">
+                 <ui:insert>
+                   <ui:include src="WEB-INF/views/history/history_option.xhtml" />
+                 </ui:insert>
+              </p:panel>
+           </p:outputPanel> 
+           <p:panel header="Utworzone sciezka">
+             <ui:insert>
+               <ui:include src="WEB-INF/views/history/history_route.xhtml" />
+             </ui:insert>
            </p:panel>
            
         </p:panelGrid>

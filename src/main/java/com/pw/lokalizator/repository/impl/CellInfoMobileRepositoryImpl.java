@@ -35,12 +35,6 @@ public class CellInfoMobileRepositoryImpl implements CellInfoMobileRepository{
 	}
 
 	@Override
-	public void delete(Long id) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public CellInfoMobile findById(Long id) {
 		// TODO Auto-generated method stub
 		return null;

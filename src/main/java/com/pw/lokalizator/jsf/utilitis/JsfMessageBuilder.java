@@ -3,8 +3,6 @@ package com.pw.lokalizator.jsf.utilitis;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
-import com.pw.lokalizator.utilitis.PropertiesReader;
-
 public class JsfMessageBuilder {
 	
 	private static final String MESSAGE_PROPERTIES_NAME = "message.properties";

@@ -12,7 +12,6 @@ import com.pw.lokalizator.model.entity.LocationGPS;
 import com.pw.lokalizator.model.entity.LocationNetwork;
 import com.pw.lokalizator.model.enums.LocalizationServices;
 import com.pw.lokalizator.model.enums.Overlays;
-import com.pw.lokalizator.utilitis.PropertiesReader;
 
 public class PolylineBuilder {
 	private static String GPS_POLYLINE_COLOR;
@@ -30,7 +29,7 @@ public class PolylineBuilder {
 		Polyline polyline = new Polyline();
 		
 		polyline.setId( id(locations.get(0)) );
-		polyline.setData (locations );
+		polyline.setData ( locations );
 		polyline.setPaths( path(locations) );
 		polyline.setStrokeColor( color(polyline, locations.get(0)) );
 		polyline.setStrokeOpacity( POLYLINE_STROKE_OPACITY );

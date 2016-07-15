@@ -17,7 +17,7 @@
                        <p:commandButton value="Dodaj do sledzenia" styleClass="components" actionListener="#{location.onAddUserToFollow}" 
                                         update=":#{p:component('followUsersTable')} :#{p:component('growl')} :#{p:component('gmap')}"/>
                     </p:row>
-                    <p:dataTable id="followUsersTable" var="user" value="#{location.users}" rows="5" paginator="true" style="margin-top: 15px">
+                    <p:dataTable id="followUsersTable" var="user" value="#{location.users.values()}" rows="5" paginator="true" style="margin-top: 15px">
                        <p:column headerText="login">
                            <h:outputText value="#{user.login}" />
                        </p:column>
@@ -85,7 +85,8 @@
                    
                    <p:column headerText="Szczegoly">
                      <p:commandButton value="POKAZ" actionListener="#{location.onSetLocationToDipslayDetails(cur_location)}" 
-                                      oncomplete="PF('LocationDetails').show();" update=":#{p:component('details')}"/>
+                                      oncomplete="PF('LocationDetails').show();" update=":#{p:component('details')}"
+                                      disabled="#{cur_location.providerType != 'NETWORK'}"/>
                    </p:column>
                  </p:dataTable>
                 </h:form>
@@ -102,7 +103,8 @@
                      <h:outputText value="#{user_polygon.target.login}" />
                    </p:column>
                    <p:column headerText="Pokaz">
-                     <p:commandButton value="POKAZ" actionListener="#{location.onShowPolygonLocation(user_polygon)}" update=":#{p:component('gmap')}"/>
+                     <p:commandButton value="POKAZ" actionListener="#{location.onShowPolygonLocation(user_polygon)}" 
+                                      update=":#{p:component('gmap')} :#{p:component('growl')}"/>
                    </p:column>
                  </p:dataTable>
                </p:panel>

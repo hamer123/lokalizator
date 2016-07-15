@@ -33,13 +33,6 @@ public class LocationGPSRepositoryImpl implements LocationGPSRepository{
 	}
 
 	@Override
-	public void delete(Long id) {
-		em.createQuery("DELETE FROM LocationGPS l WHERE l.id =:id")
-		  .setParameter("id", id)
-		  .executeUpdate();
-	}
-
-	@Override
 	public LocationGPS findById(Long id) {
 		return em.find(LocationGPS.class, id);
 	}
@@ -51,11 +44,12 @@ public class LocationGPSRepositoryImpl implements LocationGPSRepository{
 	}
 
 	@Override
-	public List<LocationGPS> findByUserLoginAndDateOrderByDateDesc(String login, Date younger, Date older) {
+	public List<LocationGPS> findByLoginAndDateOrderByDate(String login, Date younger, Date older, int maxResults) {
 		return em.createNamedQuery("findByUserLoginAndDateYoungerThanOlderThanOrderByDateDesc", LocationGPS.class)
 				.setParameter("login", login)
 				 .setParameter("younger", younger, TemporalType.TIMESTAMP)
 				 .setParameter("older", older, TemporalType.TIMESTAMP)
+				 .setMaxResults(maxResults)
 				 .getResultList();
 	}
 

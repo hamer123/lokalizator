@@ -17,13 +17,13 @@ import javax.xml.bind.annotation.XmlTransient;
 public class SignalStrength implements Serializable{
 
 	@XmlElement
-	@Column(name="ASSUS_LEVEL", nullable = true)
+	@Column(name="assus_level", nullable = true)
 	private int assusLevel;
 	@XmlElement
-	@Column(name="DBM", nullable = true)
+	@Column(name="dbm", nullable = true)
 	private int dbm;
 	@XmlElement
-	@Column(name="SIGNAL_LEVEL", nullable = true)
+	@Column(name="signal_level", nullable = true)
 	private int level;
 	
 	public int getAssusLevel() {

@@ -15,7 +15,6 @@ import com.pw.lokalizator.jsf.utilitis.OverlayIdentyfikator.OverlayIdentyfikator
 import com.pw.lokalizator.model.entity.Area;
 import com.pw.lokalizator.model.entity.AreaPoint;
 import com.pw.lokalizator.model.enums.Overlays;
-import com.pw.lokalizator.utilitis.PropertiesReader;
 
 public class PolygonBuilder {
 	private static String POLYGON_STROKE_COLOR;

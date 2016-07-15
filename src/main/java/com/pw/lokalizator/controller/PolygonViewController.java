@@ -126,7 +126,7 @@ public class PolygonViewController implements Serializable{
 	
 	public void onRemoveArea(Area area){
 		try{
-			areaRepository.delete(area.getId());
+			areaRepository.removeById(area.getId());
 			areaList.remove(area);
 			JsfMessageBuilder.infoMessage("Udalo sie usunac polygon");
 		} catch(Exception e) {

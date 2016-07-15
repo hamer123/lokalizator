@@ -10,5 +10,5 @@ import com.pw.lokalizator.model.entity.LocationGPS;
 @Local
 public interface LocationGPSRepository extends JpaRepository<LocationGPS, Long>{
 
-	List<LocationGPS> findByUserLoginAndDateOrderByDateDesc(String login, Date younger, Date older);
+	List<LocationGPS> findByLoginAndDateOrderByDate(String login, Date younger, Date older, int maxResults);
 }

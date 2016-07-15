@@ -6,12 +6,10 @@ import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-
 import com.pw.lokalizator.model.entity.LocationGPS;
 import com.pw.lokalizator.model.entity.LocationNetwork;
 import com.pw.lokalizator.model.entity.User;
 import com.pw.lokalizator.model.enums.LocalizationServices;
-import com.pw.lokalizator.repository.LocationRepository;
 import com.pw.lokalizator.repository.UserRepository;
 import com.pw.lokalizator.service.LocationService;
 
@@ -19,9 +17,6 @@ import com.pw.lokalizator.service.LocationService;
 public class LocationServiceImpl implements LocationService{
 	@Inject
 	private UserRepository userRepository;
-	@Inject
-	private LocationRepository locationRepository;
-	
 	@PersistenceContext
 	private EntityManager em;
 	
@@ -29,10 +24,8 @@ public class LocationServiceImpl implements LocationService{
 	public void createLocationNetworkUpdateUserCurrentLocationNetwork(
 			LocationNetwork locationNetwork, long userId) {
 		User user = userRepository.findById(userId);
-		
 		locationNetwork.setUser(user);
-		locationNetwork = (LocationNetwork) locationRepository.create(locationNetwork);
-		
+		em.persist(locationNetwork);
 		updateUserCurrentLocationNetwork(locationNetwork, user);
 	}
 
@@ -40,10 +33,8 @@ public class LocationServiceImpl implements LocationService{
 	public void createLocationGPSUpdateUserCurrentLocationGPS(
 			LocationGPS locationGPS, long userId) {
 		User user = userRepository.findById(userId);
-		
 		locationGPS.setUser(user);
-		locationGPS = (LocationGPS) locationRepository.create(locationGPS);
-		
+		em.persist(locationGPS);
 		user.setLastLocationGPS(locationGPS);
 	}
 	

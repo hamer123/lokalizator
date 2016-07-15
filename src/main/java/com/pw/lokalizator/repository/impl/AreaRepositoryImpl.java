@@ -31,12 +31,6 @@ public class AreaRepositoryImpl implements AreaRepository{
 	}
 
 	@Override
-	public void delete(Long id) {
-		Area area = em.find(Area.class, id);
-		em.remove(area);
-	}
-
-	@Override
 	public Area findById(Long id) {
 		return em.find(Area.class, id);
 	}
@@ -53,13 +47,6 @@ public class AreaRepositoryImpl implements AreaRepository{
 		         .setParameter("id", id)
 		         .getResultList();
 	}
-
-//	@Override
-//	public List<Area> findIdAndNameAndFollowTypeAndTargetIdAndTargetLoginByProviderId(long id) {
-//		return em.createNamedQuery("Area.findIdAndNameAndFollowTypeAndTargetIdAndTargetLoginByProviderId", Area.class)
-//				 .setParameter("id", id)
-//				 .getResultList();
-//	}
 
 	@Override
 	public List<Area> findWithEagerFetchPointsAndTargetByProviderId(long id) {
@@ -86,6 +73,27 @@ public class AreaRepositoryImpl implements AreaRepository{
 		return em.createNamedQuery("Area.findByProviderId", Area.class)
 				  .setParameter("id", id)
 				  .getResultList();
+	}
+
+	@Override
+	public List<Area> finbByActive(boolean active) {
+		return em.createNamedQuery("Area.findByAktywny", Area.class)
+				 .setParameter("aktywny", active)
+				 .getResultList();
+	}
+
+	@Override
+	public List<Long> findIdByProviderIdAndActive(long id, boolean active) {
+		return em.createNamedQuery("Area.findIdByProviderIdAndAktywny", Long.class)
+				 .setParameter("id", id)
+				 .setParameter("active", active)
+				 .getResultList();
+	}
+
+	@Override
+	public void removeById(long id) {
+		Area area = em.find(Area.class, id);
+		em.remove(area);
 	}
 
 }

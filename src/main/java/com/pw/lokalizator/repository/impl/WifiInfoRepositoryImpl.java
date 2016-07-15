@@ -36,12 +36,6 @@ public class WifiInfoRepositoryImpl implements WifiInfoRepository {
 	}
 
 	@Override
-	public void delete(Long id) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public WifiInfo findById(Long id) {
 		// TODO Auto-generated method stub
 		return null;
