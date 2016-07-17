@@ -154,7 +154,7 @@ public class PolygonViewController implements Serializable{
 		googleMapController.setCenter( GoogleMapModel.center(latLng) );
 	}
 	
-	public void onPathRemove(LatLng latLng, int index){
+	public void onPathRemove(LatLng latLng){
 		removePathFromPolygon(latLng);
 	}
 	

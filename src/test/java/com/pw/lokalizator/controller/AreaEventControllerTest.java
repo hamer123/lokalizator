@@ -1,6 +1,7 @@
 package com.pw.lokalizator.controller;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -37,5 +38,9 @@ public class AreaEventControllerTest {
 		spy.setGoogleMapController(googleMapController);
 	}
 	
+	@Test
+	public void test(){
+		
+	}
 	
 }

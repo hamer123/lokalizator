@@ -71,8 +71,7 @@ public class LocationHistoryController implements Serializable{
 		try{
 			List<Location>locations = findLocations();
 			if(locations.size() < 2){
-				JsfMessageBuilder.errorMessage("Nie mozna utworzyc sciezki, za malo lokacji");
-				googleMapController.clear();
+				notEnoughLocation();
 				return;
 			}
 			route = googleMapUserComponentService.route(locations);
@@ -126,6 +125,12 @@ public class LocationHistoryController implements Serializable{
 	private List<LocationGPS> findLocationGPS(){
 		return locationGPSRepository.
 				findByLoginAndDateOrderByDate(login, younger, older, maxRekords);
+	}
+	
+	private void notEnoughLocation(){
+		JsfMessageBuilder.errorMessage("Nie mozna utworzyc sciezki, za malo lokacji");
+		googleMapController.clear();
+		route = null;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -20,10 +20,11 @@
 	  <class>com.pw.lokalizator.model.entity.AreaEventGPS</class>
 	  <class>com.pw.lokalizator.model.entity.AreaEvent</class>
 	  <class>com.pw.lokalizator.model.entity.AreaMessageMail</class>
+	  <class>com.pw.lokalizator.model.entity.UserSetting</class>
 	  
 	  <properties>
 	     <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect" />
-	     <property name="hibernate.hbm2ddl.auto" value="create"/>
+	     <property name="hibernate.hbm2ddl.auto" value="update"/>
 		 <property name="hibernate.show_sql" value="true"/>		 
 <!--  		 <property name="javax.persistence.sql-load-script-source" value="META-INF/sql/import.sql" />-->
 	  </properties>

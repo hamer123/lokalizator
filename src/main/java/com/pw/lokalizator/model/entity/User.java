@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -60,6 +61,10 @@ public class User implements Serializable {
             )
 	@GeneratedValue(strategy=GenerationType.TABLE, generator="userGen")
 	private long id;
+	
+	@Column(name = "user_setting", nullable = false)
+	@Embedded
+	private UserSetting userSetting;
 	
 	@XmlElement
 	@Column(name="login", unique=true, updatable=false, nullable=false, length=16)

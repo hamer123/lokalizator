@@ -3,38 +3,61 @@
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:h="http://java.sun.com/jsf/html" 
-      xmlns:p="http://primefaces.org/ui"> 
+      xmlns:p="http://primefaces.org/ui">
+  
 <h:head>
-  <title>HOME</title>
+  <title>TEST ONLY</title>
   <script src="https://maps.googleapis.com/maps/api/js"/>
+  <f:event listener="#{indexController.begin}" type="preRenderView"/>
 </h:head> 
 <h:body>
-  <p:layout fullPage="true">
+<h:form>
+<p:steps>
+    <p:menuitem value="Personal" />
+    <p:menuitem value="Seat Selection" />
+    <p:menuitem value="Payment" />
+    <p:menuitem value="Confirmation" />
+</p:steps>
  
-    <p:layoutUnit position="north" size="80" resizable="true" collapsible="true">
-        <ui:insert name="menu" >
-	      <ui:include src="/WEB-INF/views/menu_templete.xhtml" />
-	    </ui:insert>
-    </p:layoutUnit>
+<h3>Interactive</h3>
+<p:steps activeIndex="0" styleClass="custom" readonly="false" >
+    <p:menuitem value="Personal" url="login.xhtml" />
+    <p:menuitem value="Seat Selection" url="#"/>
+    <p:menuitem value="Payment" url="#"/>
+    <p:menuitem value="Confirmation" url="#"/>
+</p:steps>
+???:
+<h:outputText value="#{indexController.index}" />
+<h:outputText value="#{googleMapController.zoom}" />
+</h:form>
+<style type="text/css">
+.ui-steps .ui-steps-item {
+    width: 24%;
+}
  
-    <p:layoutUnit position="south" size="100" header="Bottom" resizable="true" closable="true" collapsible="true">
-        <h:outputText value="South unit content." />
-    </p:layoutUnit>
+.ui-state-highlight {
+    text-shadow: none !important;
+}
  
- <!--
-    <p:layoutUnit position="west" size="0" header="Left" resizable="true" closable="true" collapsible="true">
-        <h:outputText value="West unit content." />
-    </p:layoutUnit>
+.ui-steps.custom {
+    margin-bottom: 30px;
+}
  
-    <p:layoutUnit position="east" size="0" header="Right" resizable="true" closable="true" collapsible="true" effect="drop">
-        <h:outputText value="Right unit content." />
-    </p:layoutUnit>
+.ui-steps.custom .ui-steps-item .ui-menuitem-link {
+    height: 10px;
+    padding: 0 1em;
+}
  
--->
-    <p:layoutUnit position="center">
-         <p:gmap center="41.381542, 2.122893" zoom="15" type="HYBRID" style="width:100%;height:500px" />
-    </p:layoutUnit>
-    
-  </p:layout>
+.ui-steps.custom .ui-steps-item .ui-steps-number {
+    background-color: #0081c2;
+    color: #FFFFFF;
+    display: inline-block;
+    width: 30px;
+    border-radius: 10px;
+    margin-top: -10px;
+    margin-bottom: 10px;
+}
+</style>
+
 </h:body> 
 </html>
