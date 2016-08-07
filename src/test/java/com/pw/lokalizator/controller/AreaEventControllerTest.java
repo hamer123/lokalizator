@@ -23,7 +23,7 @@ public class AreaEventControllerTest {
 	@Mock
 	private GoogleMapUserComponentService googleMapUserComponentService;
 	@Mock
-	private GoogleMapController googleMapController;
+	private UserGoogleMapController googleMapController;
 	
 	private AreaEventController spy;
 	

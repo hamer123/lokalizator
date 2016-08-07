@@ -5,6 +5,7 @@
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:p="http://primefaces.org/ui"
       xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:o="http://omnifaces.org/ui"
       xmlns:lokalizator="http://java.sun.com/jsf/composite/lokalizator"> 
 
     <h:head>  
@@ -26,13 +27,23 @@
                 update=":#{p:component('gmap')} :#{p:component('usersOnline')} :#{p:component('daneUser')} :#{p:component('growl')}" />
       </h:form>
    
-      <p:outputPanel id="gmap_follow">
+      <p:outputPanel id="gmap_follow" >
         <p:gmap id="gmap" center="#{location.googleMapController.center}" zoom="#{location.googleMapController.zoom}" 
                 type="#{location.googleMapController.googleMapType}" streetView="#{location.googleMapController.streetVisible}"
                 model="#{location.googleMapController.googleMapModel}" 
                 styleClass="#{location.googleMapStyle}">
           <p:ajax event="stateChange" listener="#{location.googleMapController.onGoogleMapStateChange}"/>
           <p:ajax event="overlaySelect" listener="#{location.googleMapController.onOverlaySelect}" update="growl"/>
+          <p:gmapInfoWindow rendered="#{location.googleMapController.lastSelectedOverlay.class.name eq 'org.primefaces.model.map.Marker'}">
+            <p:outputPanel style="text-align: center; display: block; margin: auto">
+              <h:panelGrid columns="1">
+				<o:graphicImage value="#{avatarService.content(location.locationFromLastSelectedOverlay().user.avatar.uuid)}" width="120" height="150"/>
+                <h:outputText value="#{location.locationFromLastSelectedOverlay().user.login}" />
+                <h:outputText value="#{location.locationFromLastSelectedOverlay().date}" />
+                <h:outputText value="#{location.locationFromLastSelectedOverlay().providerType}" />
+              </h:panelGrid>
+            </p:outputPanel>
+          </p:gmapInfoWindow>
         </p:gmap>
       </p:outputPanel>
       <p:panel id="mainPanel" header="Panel sledzenia uzytkownikow i danych" toggleable="true" toggleSpeed="500" widgetVar="panel">
@@ -55,6 +66,8 @@
       
       <ui:insert>
         <ui:include src="/WEB-INF/views/location/location_googleMapDialog.xhtml" />
+        <ui:include src="/WEB-INF/views/location/location_userViewSettingDialog.xhtml" />
+        <ui:include src="/WEB-INF/views/location/location_userData.xhtml" />
       </ui:insert>
       
     </h:body>  

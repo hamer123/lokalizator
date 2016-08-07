@@ -3,61 +3,19 @@
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:h="http://java.sun.com/jsf/html" 
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:o="http://omnifaces.org/ui">
   
 <h:head>
   <title>TEST ONLY</title>
-  <script src="https://maps.googleapis.com/maps/api/js"/>
-  <f:event listener="#{indexController.begin}" type="preRenderView"/>
 </h:head> 
 <h:body>
 <h:form>
-<p:steps>
-    <p:menuitem value="Personal" />
-    <p:menuitem value="Seat Selection" />
-    <p:menuitem value="Payment" />
-    <p:menuitem value="Confirmation" />
-</p:steps>
- 
-<h3>Interactive</h3>
-<p:steps activeIndex="0" styleClass="custom" readonly="false" >
-    <p:menuitem value="Personal" url="login.xhtml" />
-    <p:menuitem value="Seat Selection" url="#"/>
-    <p:menuitem value="Payment" url="#"/>
-    <p:menuitem value="Confirmation" url="#"/>
-</p:steps>
-???:
-<h:outputText value="#{indexController.index}" />
-<h:outputText value="#{googleMapController.zoom}" />
+   <h:commandButton action="#{jpaTest.onAction}" value="Action" />
+   <h:commandButton action="#{jpaTest.onFind}" value="Find" />
+   <p:graphicImage value="images/jbosscorp_logo.png"/>
+   <o:graphicImage value="#{jpaTest.image()}" width="400" height="320"/>
+   <o:graphicImage value="#{jpaTest.image()}" width="400" height="320"/>
 </h:form>
-<style type="text/css">
-.ui-steps .ui-steps-item {
-    width: 24%;
-}
- 
-.ui-state-highlight {
-    text-shadow: none !important;
-}
- 
-.ui-steps.custom {
-    margin-bottom: 30px;
-}
- 
-.ui-steps.custom .ui-steps-item .ui-menuitem-link {
-    height: 10px;
-    padding: 0 1em;
-}
- 
-.ui-steps.custom .ui-steps-item .ui-steps-number {
-    background-color: #0081c2;
-    color: #FFFFFF;
-    display: inline-block;
-    width: 30px;
-    border-radius: 10px;
-    margin-top: -10px;
-    margin-bottom: 10px;
-}
-</style>
-
 </h:body> 
 </html>

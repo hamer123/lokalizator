@@ -25,7 +25,7 @@
                 <p:outputLabel for="userName" value="User Name:" />
                 <p:inputText id="userName" value="#{lokalizatorSecurityController.login}"
                     required="true" label="User name">
-                    <f:validateLength minimum="6" />
+                    <f:validateLength minimum="4" />
                 </p:inputText>
                 <p:message for="userName" display="icon" />
 
@@ -33,12 +33,12 @@
                 <p:password id="password"
                     value="#{lokalizatorSecurityController.password}" required="true"
                     label="Password">
-                    <f:validateLength minimum="6" />
+                    <f:validateLength minimum="4" />
                 </p:password>
                 <p:message for="password" display="icon" />
                 
                 <p:commandButton value="Login" update="panel messages" action="#{lokalizatorSecurityController.login()}" />
-                <p:button value="Create" outcome="create" styleClass="button"/>
+                <p:button value="Create" outcome="/account/create/personalData" styleClass="button"/>
             </h:panelGrid>
         </p:panel>
         

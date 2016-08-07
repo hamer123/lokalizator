@@ -2,10 +2,12 @@ package com.pw.lokalizator.repository.impl;
 
 import java.util.List;
 import java.util.Set;
+
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
+
 import com.pw.lokalizator.model.entity.Area;
 import com.pw.lokalizator.model.entity.User;
 import com.pw.lokalizator.repository.UserRepository;
@@ -43,8 +45,8 @@ public class UserRepositoryImpl implements UserRepository{
 				 .getResultList();
 	}
 
-	public User findUserWithSecurityByLoginAndPassword(String login, String password) {
-		return em.createNamedQuery("USER.findUserWithSecurityByLoginAndPassword", User.class)
+	public User findUserFeatchDefaultSettingByLoginAndPassword(String login, String password) {
+		return em.createNamedQuery("USER.findUserFeatchDefaultSettingByLoginAndPassword", User.class)
 		         .setParameter("login", login)
 		         .setParameter("password", password)
 		         .getSingleResult();
@@ -74,7 +76,7 @@ public class UserRepositoryImpl implements UserRepository{
 		User user =  em.createNamedQuery("USER.findByLogin", User.class)
 				       .setParameter("login", login)
 				       .getSingleResult();
-		user.getArea().size();
+		user.getAreas().size();
 		return user;
 	}
 
@@ -119,10 +121,17 @@ public class UserRepositoryImpl implements UserRepository{
 			       .setParameter("login", login)
 			       .getSingleResult();
 		
-		List<Area>areas = user.getArea();
+		List<Area>areas = user.getAreas();
 		for(Area area : areas)
 			area.getPoints().size();
 		
 		return user;
+	}
+
+	@Override
+	public User findByEmail(String email) {
+		return em.createNamedQuery("USER.findByEmail", User.class)
+				 .setParameter("email", email)
+				 .getSingleResult();
 	}
 }

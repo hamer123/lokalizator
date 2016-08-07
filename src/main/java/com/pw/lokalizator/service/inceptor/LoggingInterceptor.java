@@ -15,11 +15,11 @@ public class LoggingInterceptor {
 	
 	@AroundInvoke
 	public Object logMethod(InvocationContext ic)throws Exception{
-		logger.info("START " + ic.getTarget().toString() + " >>> " + ic.getMethod().getName());
+		logger.info("before " + ic.getTarget().toString() + " " + ic.getMethod().getName() + "()");
 		try{
 			return ic.proceed();
 		}finally{
-			logger.info("END " + ic.getTarget().toString() + " >>> " + ic.getMethod().getName());
+			logger.info("after " + ic.getTarget().toString() + " " + ic.getMethod().getName() + "()");
 		}
 	}
 }

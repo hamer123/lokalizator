@@ -28,6 +28,11 @@
               
               <p:outputLabel for="area_event" value="Powiadomienia o sledzeniu" />
               <p:selectBooleanCheckbox id="area_event" value="#{location.checkAreaEvent}"/>
+              
+              <p:outputLabel value="Włącz tworzenie trasy"/>
+              <p:selectBooleanCheckbox value="#{location.createRoutes}">
+                <p:ajax event="change" listener="#{location.onChangeCreateRoutes()}" update=":#{p:component('gmap')}"/>
+              </p:selectBooleanCheckbox>
              
             </h:panelGrid>
           </h:form>
@@ -50,6 +55,11 @@
                   <p:ajax event="change" listener="#{location.onChangeSetting}" update=":#{p:component('gmap')}"/>
                 </p:selectBooleanCheckbox>
 
+                <p:outputLabel value="Trasa"/>
+                <p:selectBooleanCheckbox value="#{location.googleMapVisible.gpsRoute}">
+                  <p:ajax event="change" listener="#{location.onChangeSetting}" update=":#{p:component('gmap')}"/>
+                </p:selectBooleanCheckbox>
+                
               </h:panelGrid>
           </p:panel>
           <p:panel header="Network (Nasz)">
@@ -65,6 +75,11 @@
                   <p:ajax event="change" listener="#{location.onChangeSetting}" update=":#{p:component('gmap')}"/>
                 </p:selectBooleanCheckbox>
 
+                <p:outputLabel value="Trasa"/>
+                <p:selectBooleanCheckbox value="#{location.googleMapVisible.networkNaszRoute}">
+                  <p:ajax event="change" listener="#{location.onChangeSetting}" update=":#{p:component('gmap')}"/>
+                </p:selectBooleanCheckbox>
+                
               </h:panelGrid>
 
           </p:panel>
@@ -80,6 +95,12 @@
                 <p:selectBooleanCheckbox value="#{location.googleMapVisible.circleNetworkObcy}">
                   <p:ajax event="change" listener="#{location.onChangeSetting}" update=":#{p:component('gmap')}"/>
                 </p:selectBooleanCheckbox>
+                
+                <p:outputLabel value="Trasa"/>
+                <p:selectBooleanCheckbox value="#{location.googleMapVisible.networkObcyRoute}">
+                  <p:ajax event="change" listener="#{location.onChangeSetting}" update=":#{p:component('gmap')}"/>
+                </p:selectBooleanCheckbox>
+                
               </h:panelGrid>
           </p:panel>
           

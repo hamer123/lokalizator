@@ -27,4 +27,5 @@ public interface GoogleMapUserComponentService {
 	Polygon polygon(Area area, GoogleMapComponentVisible visible);
 	Position position(Location location);
 	Route route(List<Location>locations);
+	Route routeNoMarkers(List<Location>locations);
 }

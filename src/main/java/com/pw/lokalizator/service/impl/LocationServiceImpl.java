@@ -21,8 +21,7 @@ public class LocationServiceImpl implements LocationService{
 	private EntityManager em;
 	
 	@Override
-	public void createLocationNetworkUpdateUserCurrentLocationNetwork(
-			LocationNetwork locationNetwork, long userId) {
+	public void createLocationNetworkUpdateUserCurrentLocationNetwork(LocationNetwork locationNetwork, long userId) {
 		User user = userRepository.findById(userId);
 		locationNetwork.setUser(user);
 		em.persist(locationNetwork);
@@ -30,8 +29,7 @@ public class LocationServiceImpl implements LocationService{
 	}
 
 	@Override
-	public void createLocationGPSUpdateUserCurrentLocationGPS(
-			LocationGPS locationGPS, long userId) {
+	public void createLocationGPSUpdateUserCurrentLocationGPS(LocationGPS locationGPS, long userId) {
 		User user = userRepository.findById(userId);
 		locationGPS.setUser(user);
 		em.persist(locationGPS);

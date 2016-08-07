@@ -9,17 +9,12 @@
 }
 
 .body{
-	
 	background-image: url("../images/loginBackground.png");
 	background-size: 100% auto;
 }
 
-.panel_center{
-	position: absolute;
-    top:400;
-    bottom: 0;
-    left: 320;
-    right: 0;
-
-    margin: auto;
+body{
+	background-image: url("../images/loginBackground.png");
+	background-size: 100% auto;
 }
+

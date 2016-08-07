@@ -41,8 +41,6 @@ import com.pw.lokalizator.model.enums.AreaFollows;
 		                  query="DELETE FROM Area a WHERE a.id = :id"),
 		      @NamedQuery(name="Area.findAll",
 		                  query="SELECT a FROM Area a"),
-//		      @NamedQuery(name="Area.findIdAndNameAndFollowTypeAndTargetIdAndTargetLoginByProviderId",
-//		                  query="SELECT new com.pw.lokalizator.model.entity.Area(a.id, a.name, a.polygonFollowType, t.id, t.login) FROM Area a INNER JOIN a.target t WHERE a.provider.id =:id"),
 		      @NamedQuery(name="Area.findWithEagerFetchPointsAndTargetByProviderId",
 		                  query="SELECT a FROM Area a JOIN FETCH a.target WHERE a.provider.id =:id"),
 		      @NamedQuery(name="Area.findByAktywny",
@@ -72,12 +70,12 @@ public class Area {
 	private String name;
     
 	@NotNull
-	@ManyToOne
+	@ManyToOne(optional = false)
 	@JoinColumn(unique = false)
 	private User target;
 	
 	@NotNull
-	@ManyToOne
+	@ManyToOne(optional = false)
 	private User provider;
 	
 	@Column(name = "active")

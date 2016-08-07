@@ -14,20 +14,8 @@ import com.pw.lokalizator.model.enums.Overlays;
 import com.pw.lokalizator.model.enums.Providers;
 
 public class MarkerBuilder {
-	private static Logger LOG = Logger.getLogger(MarkerBuilder.class);
 	
-	private static String GPS_MARKER_ICON_URL;
-	private static String NETWORK_MARKER_OBCA_USLUGA_ICON_URL;
-	private static String NETWORK_MARKER_NASZA_USLUGA_ICON_URL;
-	
-	static{
-		PropertiesReader propertiesReader = new PropertiesReader("lokalizator");
-		findProperties(propertiesReader);
-	}
-	
-	private MarkerBuilder(){
-		
-	}
+	private MarkerBuilder(){}
 	
 	private static Marker createMarkerInstance(Location location){
 		Marker marker = new Marker(new LatLng(location.getLatitude(), location.getLongitude()));
@@ -36,6 +24,7 @@ public class MarkerBuilder {
 		marker.setDraggable(false);
 		marker.setClickable(true);
 		marker.setTitle(createTitle(location));
+	
 		OverlayIdentyfikator identyfikator = new OverlayIdentyfikator(location, Overlays.MARKER);
 		marker.setId(identyfikator.createIdentyfikator());
 		
@@ -54,13 +43,13 @@ public class MarkerBuilder {
 	private static String chooseIcon(Location location){
 		switch(location.getProviderType()){
 		case GPS:
-			return GPS_MARKER_ICON_URL;
+			return Icon.GPS_MARKER_ICON_URL;
 		case NETWORK:
 			LocationNetwork locationNetwork = (LocationNetwork)location;
 			if(locationNetwork.getLocalizationServices() == LocalizationServices.NASZ)
-				return NETWORK_MARKER_NASZA_USLUGA_ICON_URL;
+				return Icon.NETWORK_MARKER_NASZA_USLUGA_ICON_URL;
 			else if(locationNetwork.getLocalizationServices() == LocalizationServices.OBCY)
-				return NETWORK_MARKER_OBCA_USLUGA_ICON_URL;
+				return Icon.NETWORK_MARKER_OBCA_USLUGA_ICON_URL;
 		default:
 			throw new IllegalArgumentException("Nie ma dla takiego providera icony");
 		}
@@ -78,15 +67,32 @@ public class MarkerBuilder {
 	public static Marker createMarker(Location location){
 		return createMarkerInstance(location);
 	}
-	
-	private static void findProperties(PropertiesReader propertiesReader){
-		findMarkerIconUrl(propertiesReader);
-	}
-	
-	private static void findMarkerIconUrl(PropertiesReader propertiesReader){
-		GPS_MARKER_ICON_URL = propertiesReader.findPropertyByName("GPS_MARKER_ICON_URL");
-		NETWORK_MARKER_NASZA_USLUGA_ICON_URL = propertiesReader.findPropertyByName("NETWORK_MARKER_NASZA_USLUGA_ICON_URL");
-		NETWORK_MARKER_OBCA_USLUGA_ICON_URL  = propertiesReader.findPropertyByName("NETWORK_MARKER_OBCA_USLUGA_ICON_URL");
+
+	public static class Icon{
+		public static String GPS_MARKER_ICON_URL;
+		public static String NETWORK_MARKER_OBCA_USLUGA_ICON_URL;
+		public static String NETWORK_MARKER_NASZA_USLUGA_ICON_URL;
+		public static String START_ROUTE_ICON_URL;
+		public static String END_ROUTE_ICON_URL;
+		
+		static{
+			PropertiesReader propertiesReader = new PropertiesReader("lokalizator");
+			findProperties(propertiesReader);
+		}
+		
+		private Icon(){}
+		
+		private static void findMarkerIconUrl(PropertiesReader propertiesReader){
+			GPS_MARKER_ICON_URL = propertiesReader.findPropertyByName("GPS_MARKER_ICON_URL");
+			NETWORK_MARKER_NASZA_USLUGA_ICON_URL = propertiesReader.findPropertyByName("NETWORK_MARKER_NASZA_USLUGA_ICON_URL");
+			NETWORK_MARKER_OBCA_USLUGA_ICON_URL  = propertiesReader.findPropertyByName("NETWORK_MARKER_OBCA_USLUGA_ICON_URL");
+		    START_ROUTE_ICON_URL = propertiesReader.findPropertyByName("START_ROUTE_ICON_URL");
+		    END_ROUTE_ICON_URL = propertiesReader.findPropertyByName("END_ROUTE_ICON_URL");
+		}
+		
+		private static void findProperties(PropertiesReader propertiesReader){
+			findMarkerIconUrl(propertiesReader);
+		}
 	}
 }
 

@@ -18,11 +18,11 @@
                                 
           <h:form>
           
-            <p:commandButton value="GPS"  update=":#{p:component('_gmap')}"
-                             actionListener="#{location.googleMapSingleUserDialogController.onShowGPSLastLocation}"/>
-            <p:commandButton value="NETWORK (OBCY)" update=":#{p:component('_gmap')}"
+            <p:commandButton value="GPS"  update=":#{p:component('_gmap')}" disabled="#{!location.googleMapSingleUserDialogController.isGPSLastLocationExist()}"
+                             actionListener="#{location.googleMapSingleUserDialogController.onShowGPSLastLocation()}"/>
+            <p:commandButton value="NETWORK (OBCY)" update=":#{p:component('_gmap')}" disabled="#{!location.googleMapSingleUserDialogController.isNetworkObcyLastLocationExist()}"
                              actionListener="#{location.googleMapSingleUserDialogController.onShowNetworkObcyLastLocation()}"/>
-            <p:commandButton value="NETWORK (NASZ)" update=":#{p:component('_gmap')}"
+            <p:commandButton value="NETWORK (NASZ)" update=":#{p:component('_gmap')}" disabled="#{!location.googleMapSingleUserDialogController.isNetworkNaszLastLocationExist()}"
                              actionListener="#{location.googleMapSingleUserDialogController.onShowNetworkNaszLastLocation()}"/>
           </h:form>
          

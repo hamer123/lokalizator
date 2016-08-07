@@ -2,32 +2,23 @@ package com.pw.lokalizator.controller;
 
 import java.io.Serializable;
 import java.util.Map;
-
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.RequestScoped;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.management.RuntimeErrorException;
-
 import org.omnifaces.cdi.Param;
 import org.primefaces.model.map.Polygon;
-
 import com.pw.lokalizator.model.GoogleMapModel;
 import com.pw.lokalizator.model.Position;
 import com.pw.lokalizator.model.entity.Area;
 import com.pw.lokalizator.model.entity.AreaEvent;
-import com.pw.lokalizator.model.entity.AreaEventNetwork;
 import com.pw.lokalizator.model.entity.AreaPoint;
 import com.pw.lokalizator.model.entity.Location;
-import com.pw.lokalizator.model.entity.User;
 import com.pw.lokalizator.model.enums.Providers;
 import com.pw.lokalizator.repository.AreaEventGPSRepository;
 import com.pw.lokalizator.repository.AreaEventNetworkRepository;
 import com.pw.lokalizator.repository.AreaPointRepository;
-import com.pw.lokalizator.repository.AreaRepository;
-import com.pw.lokalizator.repository.LocationGPSRepository;
-import com.pw.lokalizator.repository.LocationNetworkRepository;
+import com.pw.lokalizator.serivce.qualifier.UserGoogleMap;
 import com.pw.lokalizator.service.GoogleMapUserComponentService;
 
 @Named
@@ -41,7 +32,7 @@ public class AreaEventController implements Serializable{
 	private AreaPointRepository areaPointRepository;
 	@Inject
 	private GoogleMapUserComponentService googleMapUserComponentService;
-	@Inject
+	@Inject @UserGoogleMap
 	private GoogleMapController googleMapController;
 	
 	@Param(name = "id") @Inject
@@ -171,12 +162,6 @@ public class AreaEventController implements Serializable{
 	public void setValidParams(boolean validParams) {
 		this.validParams = validParams;
 	}
-	public GoogleMapController getGoogleMapController() {
-		return googleMapController;
-	}
-	public void setGoogleMapController(GoogleMapController googleMapController) {
-		this.googleMapController = googleMapController;
-	}
 	public String getMsgError() {
 		return msgError;
 	}
@@ -196,4 +181,13 @@ public class AreaEventController implements Serializable{
 			GoogleMapUserComponentService googleMapUserComponentService) {
 		this.googleMapUserComponentService = googleMapUserComponentService;
 	}
+
+	public GoogleMapController getGoogleMapController() {
+		return googleMapController;
+	}
+
+	public void setGoogleMapController(GoogleMapController googleMapController) {
+		this.googleMapController = googleMapController;
+	}
+	
 }

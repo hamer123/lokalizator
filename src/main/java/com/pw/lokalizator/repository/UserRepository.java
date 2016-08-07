@@ -11,7 +11,7 @@ import com.pw.lokalizator.model.entity.LocationNetwork;
 import com.pw.lokalizator.model.entity.User;
 @Local
 public interface UserRepository extends JpaRepository<User, Long> {
-	User findUserWithSecurityByLoginAndPassword(String login, String password);
+	User findUserFeatchDefaultSettingByLoginAndPassword(String login, String password);
 	User findByLogin(String login);
 	List<User> findByLogin(List<String> logins);
 	User findByLoginFetchArea(String login);
@@ -21,4 +21,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findById(Set<Long>id);
     List<User> findByIdFetchEagerLastLocations(Set<Long>id);
     User findByIdFetchEagerLastLocations(String login);
+    User findByEmail(String email);
 }

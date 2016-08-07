@@ -1,0 +1,34 @@
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+    <script src="resources/js/home.js"></script>
+  </head>
+  <body>
+    <div data-ng-init="eu=' Dodaj cos?'" data-ng-controller="myCtrl" data-ng-app="myApp">
+      <input type="text" data-ng-model="yourName" placeholder="Enter a name here">
+      <p data-ng-bind="yourName"></p> {{eu}}
+      <h1>Hello, {{ yourName }}!</h1>
+      <p data-ng-init="kolor='red'" style="background-color:{{kolor}}">{{firstName}}</p>
+      <p data-w3-test></p>
+      <p data-test></p>
+      
+      <ul data-ng-controller="myCtrl">
+        <li data-ng-repeat="x in personals">
+          {{x.name}}
+        </li>
+      </ul>
+      <ul data-ng-controller="myCtrl">
+        <li data-ng-repeat="x in personals">
+          {{x.surname}}
+        </li>
+      </ul>
+      
+     <form name="f">
+       Email:
+       <input type="email" name="a" data-ng-model="">
+       <span data-ng-show="f.a.$error.email">Not a valid e-mail address</span>
+     </form>
+
+    </div>
+  </body>
+</html>

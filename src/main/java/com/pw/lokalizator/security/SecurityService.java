@@ -51,7 +51,7 @@ public class SecurityService {
 	}
 	
 	public String createRestSessionReturnToken(String login, String password){
-		User user = userRepository.findUserWithSecurityByLoginAndPassword(login, password);
+		User user = userRepository.findUserFeatchDefaultSettingByLoginAndPassword(login, password);
 		String token = restSessionManager.getTokenForLogin(login);
 		
 		if(token == null){

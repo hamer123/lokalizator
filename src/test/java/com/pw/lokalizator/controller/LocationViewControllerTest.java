@@ -10,7 +10,9 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.faces.context.FacesContext;
+import javax.inject.Inject;
 
+import org.jboss.logging.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,21 +42,41 @@ import com.pw.lokalizator.model.entity.User;
 import com.pw.lokalizator.model.enums.Providers;
 import com.pw.lokalizator.repository.AreaEventGPSRepository;
 import com.pw.lokalizator.repository.AreaEventNetworkRepository;
+import com.pw.lokalizator.repository.AreaRepository;
+import com.pw.lokalizator.repository.CellInfoMobileRepository;
 import com.pw.lokalizator.repository.UserRepository;
+import com.pw.lokalizator.repository.WifiInfoRepository;
+import com.pw.lokalizator.serivce.qualifier.DialogUserLocationGoogleMap;
+import com.pw.lokalizator.serivce.qualifier.UserGoogleMap;
+import com.pw.lokalizator.service.GoogleMapUserComponentService;
 import com.pw.lokalizator.singleton.RestSessionManager;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LocationViewControllerTest {
 	@Mock
-	LokalizatorSession lokalizatorSession;
+	private UserRepository userRepository;
 	@Mock
-	RestSessionManager restSessionManager;
+	private WifiInfoRepository wifiInfoRepository;
 	@Mock
-	GoogleMapController googleMapController;
+	private CellInfoMobileRepository cellInfoMobileRepository;
 	@Mock
-	AreaEventGPSRepository areaEventGpsRep;
+	private AreaRepository areaRepository;
 	@Mock
-	AreaEventNetworkRepository areaEventNetRep;
+	private AreaEventNetworkRepository areaEventNetworkRepository;
+	@Mock
+	private AreaEventGPSRepository areaEventGPSRepository;
+	@Mock @UserGoogleMap
+	private GoogleMapController googleMapController;
+	@Mock @DialogUserLocationGoogleMap
+	private DialogUserLocationGoogleMapController googleMapSingleUserDialogController;
+	@Mock
+	private GoogleMapUserComponentService googleMapUserComponentService;
+	@Mock
+	private RestSessionManager restSessionManager;
+	@Mock
+	private LokalizatorSession lokalizatorSession;
+	@Mock
+	private Logger logger;
 	
 	private LocationViewController spy;
 	
@@ -64,8 +86,8 @@ public class LocationViewControllerTest {
 		spy.setRestSessionManager(restSessionManager);
 		spy.setLokalizatorSession(lokalizatorSession);
 		spy.setGoogleMapController(googleMapController);
-		spy.setAreaEventGPSRepository(areaEventGpsRep);
-		spy.setAreaEventNetworkRepository(areaEventNetRep);
+		spy.setAreaEventGPSRepository(areaEventGPSRepository);
+		spy.setAreaEventNetworkRepository(areaEventNetworkRepository);
 
 		//init user set
 		Map<String,User>users = new HashMap<>();
@@ -116,30 +138,12 @@ public class LocationViewControllerTest {
 		user.setLogin("qwerty");
 		users.put(user.getLogin(), user);
 		//exectue
-		spy.removeUserFromList(user);
+		spy.removeUserFromFollow(user);
 		//verify
-		Mockito.verify(spy, Mockito.times(1)).cleanSelectedUserIfUserEquals(user);
+		Mockito.verify(spy, Mockito.times(1)).removeUserFromFollow(user);
 		assertNull(spy.getSelectUser());
 		assertEquals(false, spy.getUsers().values().contains(user));
 	}
-	
-//	@Test
-//	public void removeUserFromGoogleMapTest(){
-//	  //init
-//	  GoogleMapController mock = Mockito.mock(GoogleMapController.class);
-//	  spy.setGoogleMapController(mock);
-//	
-//	  User user = new User();
-//	  user.setLogin("hamer123");
-//	  OverlayIdentyfikator identyfikator = new OverlayIdentyfikatorBuilder()
-//	                                           .login(user.getLogin())
-//                                               .build();
-//	  //execute
-//	  spy.removeUserFromGoogleMap(user);
-//	  //verify
-//	  assertNotNull(mock);
-//      //	Mockito.verify(mock).removeOverlay(identyfikator);
-//	}
 	
 	@Test
 	public void refreshLastLocationsShouldChangeReferencesStats(){
@@ -179,7 +183,7 @@ public class LocationViewControllerTest {
 		//skip
 	}
 	
-	@Test
+//	@Test
 	public void checkAreaEventShouldReturnListWithOneRecord(){
 		//init
 		long time = System.currentTimeMillis() - spy.ONE_MINUTE;
@@ -194,8 +198,8 @@ public class LocationViewControllerTest {
 		events.add(event);
 		
 		//when
-		Mockito.when(areaEventGpsRep.findByAreaIdAndDate(Mockito.eq(1L), Mockito.any())).thenReturn(events);
-		Mockito.when(areaEventNetRep.findByAreaIdAndDate(Mockito.anyLong(), Mockito.any())).thenReturn(new ArrayList<AreaEventNetwork>());
+		Mockito.when(areaEventGPSRepository.findByAreaIdAndDate(Mockito.eq(1L), Mockito.any())).thenReturn(events);
+		Mockito.when(areaEventGPSRepository.findByAreaIdAndDate(Mockito.anyLong(), Mockito.any())).thenReturn(new ArrayList<AreaEventGPS>());
 		
 		//execute
 		List<AreaEvent>result = spy.checkAreaEvent();
@@ -203,10 +207,13 @@ public class LocationViewControllerTest {
 		//verify
 		assertEquals(1, result.size());
 		assertTrue(result.get(0).equals(event));
-		assertNotNull(areaEventGpsRep);
+		assertNotNull(areaEventGPSRepository);
 		
 	}
 	
+	@Test
+	public void removeUserComponentsFromGoogleMapShouldRemoveComponents(){
+	}
 	
 	
 }

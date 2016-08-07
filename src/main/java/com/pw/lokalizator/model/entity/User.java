@@ -33,20 +33,29 @@ import com.pw.lokalizator.model.enums.Roles;
 @Table(name ="user")
 @NamedQueries(
 		value = {
-		  @NamedQuery(name="USER.findAll", query = "SELECT u FROM User u"),
-		  @NamedQuery(name="USER.findByLogins", query = "SELECT u FROM User u WHERE u.login IN (:logins)"),
-		  @NamedQuery(name="USER.deleteByID", query="DELETE FROM User u WHERE u.id = :id"),
-		  @NamedQuery(name="USER.findByLogin", query="SELECT u FROM User u WHERE u.login =:login"),
-		  @NamedQuery(name="USER.findByLoginAndPassword", query="SELECT u FROM User u WHERE u.login = :login AND u.password =:password"),
-		  @NamedQuery(name="USER.findLoginByLoginLike", query="SELECT u.login FROM User u WHERE u.login LIKE :login"),
-		  @NamedQuery(name="USER.findUserWithPolygonsByLogin", query="SELECT u FROM User u INNER JOIN FETCH u.areas WHERE u.login =:login"),
-		  @NamedQuery(name="USER.findUsersById", query="SELECT u FROM User u WHERE u.id IN (:id)"),
-		  @NamedQuery(name="USER.findUserWithSecurityByLoginAndPassword", 
-		              query="SELECT new com.pw.lokalizator.model.entity.User(u.id, u.login, u.password, u.email, u.phone, u.rola) "
-		  		           +"From User u WHERE u.login =:login AND u.password =:password"),
-		  @NamedQuery(name="USER.findByIdFetchEagerLastLocations", 
+		  @NamedQuery(name ="USER.findAll", 
+				      query="SELECT u FROM User u"),
+		  @NamedQuery(name ="USER.findByLogins", 
+		              query="SELECT u FROM User u WHERE u.login IN (:logins)"),
+		  @NamedQuery(name ="USER.deleteByID", 
+		              query="DELETE FROM User u WHERE u.id = :id"),
+		  @NamedQuery(name ="USER.findByLogin", 
+		              query="SELECT u FROM User u WHERE u.login =:login"),
+		  @NamedQuery(name ="USER.findByLoginAndPassword",
+		              query="SELECT u FROM User u WHERE u.login = :login AND u.password =:password"),
+		  @NamedQuery(name ="USER.findLoginByLoginLike",
+		              query="SELECT u.login FROM User u WHERE u.login LIKE :login"),
+		  @NamedQuery(name ="USER.findUserWithPolygonsByLogin", 
+		              query="SELECT u FROM User u INNER JOIN FETCH u.areas WHERE u.login =:login"),
+		  @NamedQuery(name ="USER.findUsersById",
+		              query="SELECT u FROM User u WHERE u.id IN (:id)"),
+		  @NamedQuery(name ="USER.findUserFeatchDefaultSettingByLoginAndPassword", 
+		              query="SELECT u FROM User u LEFT JOIN FETCH u.userSetting WHERE u.login =:login AND u.password =:password"),
+		  @NamedQuery(name ="USER.findByIdFetchEagerLastLocations", 
 		              query="SELECT u FROM User u LEFT JOIN FETCH u.lastLocationGPS LEFT JOIN FETCH u.lastLocationNetworkNaszaUsluga LEFT JOIN FETCH u.lastLocationNetworObcaUsluga "
-		              	  + "WHERE u.login =:login")
+		              	  + "WHERE u.login =:login"),
+		  @NamedQuery(name ="USER.findByEmail",
+		              query="SELECT u FROM User u WHERE u.email =:email")
 		})
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
@@ -62,8 +71,8 @@ public class User implements Serializable {
 	@GeneratedValue(strategy=GenerationType.TABLE, generator="userGen")
 	private long id;
 	
-	@Column(name = "user_setting", nullable = false)
-	@Embedded
+	@OneToOne(optional = false, orphanRemoval = true, fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
+	@JoinColumn(name = "user_setting")
 	private UserSetting userSetting;
 	
 	@XmlElement
@@ -74,7 +83,7 @@ public class User implements Serializable {
 	@Column(name="password", unique=false, nullable=false, length=16)
 	private String password;
 
-	@Column(name="email", unique=true, length=50)
+	@Column(name="email", unique=true, nullable=false, length=50)
 	private String email;
 
 	@Column(name="phone")
@@ -83,6 +92,9 @@ public class User implements Serializable {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "rola")
 	private Roles rola;
+	
+	@OneToOne
+	private Avatar avatar;
 	
 	@OneToOne
 	@JoinColumn(updatable = true, name = "last_location_gps_id")
@@ -106,15 +118,6 @@ public class User implements Serializable {
 	private List<Area>areas;
 	
 	public User(){}
-	
-	public User(long id, String login, String password, String email, String phone, Roles rola){
-		this.id = id;
-		this.login = login;
-		this.password = password;
-		this.email = email;
-		this.phone = phone;
-		this.rola = rola;
-	}
 	
 	public long getId() {
 		return id;
@@ -156,11 +159,11 @@ public class User implements Serializable {
 		this.lastLocationGPS = lastLocationGPS;
 	}
 
-	public List<Area> getArea() {
+	public List<Area> getAreas() {
 		return areas;
 	}
 
-	public void setArea(List<Area> polygons) {
+	public void setAreas(List<Area> polygons) {
 		this.areas = polygons;
 	}
 
@@ -214,12 +217,41 @@ public class User implements Serializable {
 		this.rola = rola;
 	}
 
-	public List<Area> getAreas() {
-		return areas;
+//	public List<Area> getAreas() {
+//		return areas;
+//	}
+//
+//	public void setAreas(List<Area> areas) {
+//		this.areas = areas;
+//	}
+
+	public UserSetting getUserSetting() {
+		return userSetting;
 	}
 
-	public void setAreas(List<Area> areas) {
-		this.areas = areas;
+	public void setUserSetting(UserSetting userSetting) {
+		this.userSetting = userSetting;
+	}
+
+	public Avatar getAvatar() {
+		return avatar;
+	}
+
+	public void setAvatar(Avatar avatar) {
+		this.avatar = avatar;
+	}
+
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", userSetting=" + userSetting + ", login="
+				+ login + ", password=" + password + ", email=" + email
+				+ ", phone=" + phone + ", rola=" + rola + ", lastLocationGPS="
+				+ lastLocationGPS + ", lastLocationNetworkNaszaUsluga="
+				+ lastLocationNetworkNaszaUsluga
+				+ ", lastLocationNetworObcaUsluga="
+				+ lastLocationNetworObcaUsluga + ", locationGPS=" + locationGPS
+				+ ", locationNetwork=" + locationNetwork + ", areas=" + areas
+				+ "]";
 	}
 
 }

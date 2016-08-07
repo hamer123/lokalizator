@@ -42,7 +42,7 @@
 	        </p:selectOneMenu>
 	        <p:message for="mailMessageMode"/>
             
-            <p:commandButton value="Creacte" update=":#{p:component('growl')} :#{p:component('existPolygons')}" 
+            <p:commandButton value="Creacte" update=":#{p:component('growl')} :#{p:component('existPolygons')} :#{p:component('paths')} @form" 
 	                         action="#{polyglon.onSaveArea()}"/>
          </h:panelGrid>
 

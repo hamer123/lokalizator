@@ -4,21 +4,83 @@
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:c="http://java.sun.com/jsp/jstl/core"> 
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:acc="http://java.sun.com/jsf/composite/lokalizator/account/create"> 
 
     <h:head>  
-      <script src="https://maps.googleapis.com/maps/api/js"/>
+      <h:outputStylesheet library="css/account/create" name="context.css"/>
       <h:outputStylesheet library="css" name="default.css"/>
+      <f:event listener="#{createAccount.beginConversation()}" type="preRenderView"/>
       <title>Dane osobowe</title>
     </h:head>  
       
-    <h:body styleClass="body"> 
-      <form>
-        <p:panel header="???">
-        
-          
-        
-        </p:panel>
-      </form>
+    <h:body>
+      <acc:stage index="0"/>
+      <h:form>
+        <div id="context" class="context">
+          <div class="div_half_size">
+           <p:panel header="Rejestracja nowego uzytkownika">
+            <h:panelGrid columns="2" cellpadding="5" cellspacing="5" style="padding-left:10%; padding-top:3%">
+              
+              <p:outputLabel for="login" value="Login"/>
+              <p:inputText id="login" value="#{createAccount.user.login}" required="true" 
+                           title="Wprowadz nazwe uzytkownika o dlugosc 4-16 zawierajacy tylko cyfry i liter i znaki " 
+                           requiredMessage="Login: Login jest wymagany" maxlength="16">
+                           <p:ajax event="change" update=":#{p:component('msg')}"/>
+                           <o:validator validatorId="javax.faces.RegularExpression" 
+                                        pattern="^[a-zA-Z0-9_-]{4,16}$" 
+                                        message="Login: Login jest nie poprawny"/>
+                           <f:validator validatorId="loginUsedValidator"/>
+              </p:inputText>
+              
+              <p:outputLabel for="password" value="Hasło"/>
+              <p:password id="password" value="#{createAccount.user.password}" feedback="true"
+                          required="true" requiredMessage="Hasło: Hasło jest wymagane">
+                          <f:validateRegex pattern="^[a-zA-Z0-9_-]{4,16}$" for="password"/>
+                          <o:validator validatorId="javax.faces.RegularExpression" 
+                                       pattern="^[a-zA-Z0-9_-]{4,16}$" 
+                                       message="Hasło: Hasło jest nie poprawne" />
+              </p:password>
+              
+              <p:outputLabel for="passwordRepeat" value="Powtorz hasło"/>
+              <p:password id="passwordRepeat" value="#{createAccount.passwordRepeat}"
+                           required="true" requiredMessage="Powtorz hasło: Powtorz hasło jest wymagane">
+                           <o:validator validatorId="javax.faces.RegularExpression" 
+                                        pattern="^[a-zA-Z0-9_-]{4,16}$" 
+                                        message="Powtorz hasło: Hasło jest nie poprawne" />
+                           <o:validateEqual components="password passwordRepeat" message="Hasło: Hasła nie sa takie same" 
+                                            showMessageFor="password"/>
+              </p:password>
+              
+              <p:outputLabel for="email" value="Email"/>
+              <p:inputText id="email" value="#{createAccount.user.email}"
+                           required="true" requiredMessage="Email: Email jest wymagane">
+                           <o:validator validatorId="javax.faces.RegularExpression" 
+                                        pattern="([^.@]+)(\.[^.@]+)*@([^.@]+\.)+([^.@]+)" 
+                                        message="Email: Email jest nie poprawny"/>
+                           <p:ajax event="change" update=":#{p:component('msg')}"/>
+                           <f:validator validatorId="emailUsedValidator"/>
+              </p:inputText>
+              
+              <p:outputLabel for="phone" value="Telefon"/>
+              <p:inputMask id="phone" value="#{createAccount.user.phone}" mask="999-999-999"
+                           required="true" requiredMessage="Telefon: Telefon jest wymagany"/>
+
+              <p:commandButton value="Nastepny etap" action="#{createAccount.onDefaultSettingStage()}" update=":#{p:component('msg')}"/>
+            </h:panelGrid>
+           </p:panel>
+          </div>
+          <div class="div_half_size">
+            <p:panel header="Informacje">
+            <h:panelGrid>
+              <p:messages id="msg"/>
+              <h:outputText value="Login i haslo powinny zawierac tylko litery, cyfry, znaki '-' '_' i miec dlugosc od 4 do 16" />
+              <h:outputLabel value="Login i email moga byc juz zajete" />
+            </h:panelGrid>
+           </p:panel>
+          </div>
+        </div>
+      </h:form>    
     </h:body>  
 </html>

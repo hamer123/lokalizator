@@ -93,6 +93,7 @@ public class GoogleMapModel implements MapModel, Serializable{
 	}
 
 	@SuppressWarnings("unchecked")
+    @Deprecated
 	public Overlay findOverlay(String id) {
 		List list = getOverlayList(id);
 		
@@ -104,6 +105,16 @@ public class GoogleMapModel implements MapModel, Serializable{
 			}
 		}
 		return null;
+	}
+	
+	public Overlay findSingleOverlay(OverlayIdentyfikator identyfikator){
+		List<Overlay>list = findOverlay(identyfikator);
+		if(list.size() > 1)
+			throw new NotSingleResultException();
+		else if(list.isEmpty())
+			return null;
+		else
+			return list.get(0);
 	}
 	
 	public void removeOverlay(OverlayIdentyfikator identyfikator){

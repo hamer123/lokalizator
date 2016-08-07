@@ -7,13 +7,20 @@
       xmlns:c="http://java.sun.com/jsp/jstl/core"> 
 
    <h:form>
-      <p:dataTable id="areaEvents" value="#{messageController.areaEvents}" var="areaEvent" reflow="true" rows="20" paginator="true">
+      <p:dataTable id="areaEvents" value="#{messageController.areaEvents}" var="areaEvent" reflow="true" rows="20" paginator="true"
+                   widgetVar="areaEventsTable">
 
          <p:column headerText="Data">
            <h:outputText value="#{areaEvent.location.date}" />
          </p:column>
          
-         <p:column headerText="Typ providera">
+         <p:column headerText="Typ providera" filterBy="#{areaEvent.location.providerType}" filterMatchMode="exact">
+           <f:facet name="filter">
+             <p:selectOneMenu onchange="PF('areaEventsTable').filter()" immediate="true">
+               <f:selectItem itemLabel="Wszystkie" itemValue="#{null}" noSelectionOption="true" />
+               <f:selectItems value="#{messageController.providers()}" />
+             </p:selectOneMenu>
+           </f:facet>
            <h:outputText value="#{areaEvent.location.providerType}" />
          </p:column>
          

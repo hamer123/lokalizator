@@ -25,13 +25,18 @@ import com.pw.lokalizator.model.entity.Area;
 import com.pw.lokalizator.model.entity.AreaEvent;
 import com.pw.lokalizator.model.entity.AreaEventGPS;
 import com.pw.lokalizator.model.entity.AreaEventNetwork;
+import com.pw.lokalizator.model.entity.AreaMessageMail;
 import com.pw.lokalizator.model.entity.Location;
 import com.pw.lokalizator.model.entity.LocationNetwork;
 import com.pw.lokalizator.model.entity.AreaPoint;
+import com.pw.lokalizator.model.enums.AreaMailMessageModes;
+import com.pw.lokalizator.model.enums.Providers;
 import com.pw.lokalizator.repository.AreaEventGPSRepository;
 import com.pw.lokalizator.repository.AreaEventNetworkRepository;
+import com.pw.lokalizator.repository.AreaMessageMailRepository;
 import com.pw.lokalizator.repository.AreaRepository;
 import com.pw.lokalizator.repository.AreaPointRepository;
+import com.pw.lokalizator.serivce.qualifier.UserGoogleMap;
 
 @ViewScoped
 @Named("messageController")
@@ -46,8 +51,10 @@ public class MessageController implements Serializable{
 	private AreaEventNetworkRepository areaEventNetworkRepository;
 	@Inject
 	private AreaPointRepository areaPointRepository;
-	@Inject
+	@Inject @UserGoogleMap
 	private GoogleMapController dialogMap;
+	@Inject
+	private AreaMessageMailRepository areaMessageMailRepository;
 	
 	private Area selectedArea;
 	private List<Area> areaList;
@@ -57,42 +64,18 @@ public class MessageController implements Serializable{
 	private void postConstruct(){
 		long id = lokalizatorSession.getUser().getId();
 		areaList = areaRepository.findWithEagerFetchPointsAndTargetByProviderId(id); 
-		dialogMap.setZoom(15);
 	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////    ACTIONS     //////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public void onAreaSelect(SelectEvent event){
 		selectedArea = (Area)event.getObject();
 		areaEvents = findAreaAction(selectedArea);
 		sortAreaEventByDate(areaEvents);
 	}
-	
-	private List<AreaEvent> findAreaAction(Area area){
-		List<AreaEvent>areaEvents = new ArrayList<AreaEvent>();
-		
-		long id = area.getId();
-		areaEvents.addAll(areaEventGPSRepository.findByAreaId(id));
-		areaEvents.addAll(areaEventNetworkRepository.findByAreaId(id));
-		
-		return areaEvents;
-	}
-	
-	public String getLocalicationService(AreaEvent areaEvent){
-		Location location = areaEvent.getLocation();
-		
-		if(location instanceof LocationNetwork){
-			LocationNetwork locationNetwork = (LocationNetwork)location;
-			return locationNetwork.getLocalizationServices().toString();
-		}
-		
-		return null;
-	}
-	
-	private void sortAreaEventByDate(List<AreaEvent>areaEvents){
-		areaEvents = areaEvents.stream()
-		          .sorted((a1,a2) -> a1.getLocation().getDate().compareTo( a2.getLocation().getDate() ))
-		          .collect(Collectors.toList());       
-	}
-	
+
 	public void onDisplayLocationInDialog(AreaEvent areaEvent){
 		dialogMap.clear();
 		Location location = areaEvent.getLocation();
@@ -111,6 +94,22 @@ public class MessageController implements Serializable{
 		dialogMap.setCenter(GoogleMapModel.center(areaPoint.getLat(), areaPoint.getLng()));
 	}
 	
+	public void onAcceptEvent(){
+		AreaMessageMail areaMessageMail = selectedArea.getAreaMessageMail();
+		areaMessageMail.setAccept(true);
+		areaMessageMailRepository.save(areaMessageMail);
+	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////    UTILITIS    //////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	private void sortAreaEventByDate(List<AreaEvent>areaEvents){
+		areaEvents = areaEvents.stream()
+		          .sorted((a1,a2) -> a1.getLocation().getDate().compareTo( a2.getLocation().getDate() ))
+		          .collect(Collectors.toList());       
+	}
+
 	private Map<Integer, AreaPoint> mapAreaPoint(List<AreaPoint>areaPoints){
 		Map<Integer, AreaPoint>map = new HashMap<Integer, AreaPoint>();
 		
@@ -120,6 +119,31 @@ public class MessageController implements Serializable{
 		
 		return map;
 	}
+	
+	public String getLocalicationService(AreaEvent areaEvent){
+		Location location = areaEvent.getLocation();
+		
+		if(location instanceof LocationNetwork){
+			LocationNetwork locationNetwork = (LocationNetwork)location;
+			return locationNetwork.getLocalizationServices().toString();
+		}
+		
+		return null;
+	}
+	
+	private List<AreaEvent> findAreaAction(Area area){
+		List<AreaEvent>areaEvents = new ArrayList<AreaEvent>();
+		
+		long id = area.getId();
+		areaEvents.addAll(areaEventGPSRepository.findByAreaId(id));
+		areaEvents.addAll(areaEventNetworkRepository.findByAreaId(id));
+		
+		return areaEvents;
+	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////     GETTERS   SETTERS    //////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public List<AreaEvent> getAreaEvents() {
 		return areaEvents;
@@ -194,5 +218,18 @@ public class MessageController implements Serializable{
 	public void setAreaEvents(List<AreaEvent> areaEvents) {
 		this.areaEvents = areaEvents;
 	}
+	
+	public Providers[] providers(){
+		return Providers.values();
+	}
 
+	public AreaMessageMailRepository getAreaMessageMailRepository() {
+		return areaMessageMailRepository;
+	}
+
+	public void setAreaMessageMailRepository(
+			AreaMessageMailRepository areaMessageMailRepository) {
+		this.areaMessageMailRepository = areaMessageMailRepository;
+	}
+	
 }

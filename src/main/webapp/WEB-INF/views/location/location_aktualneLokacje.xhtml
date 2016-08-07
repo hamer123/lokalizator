@@ -17,29 +17,33 @@
                        <p:commandButton value="Dodaj do sledzenia" styleClass="components" actionListener="#{location.onAddUserToFollow}" 
                                         update=":#{p:component('followUsersTable')} :#{p:component('growl')} :#{p:component('gmap')}"/>
                     </p:row>
-                    <p:dataTable id="followUsersTable" var="user" value="#{location.users.values()}" rows="5" paginator="true" style="margin-top: 15px">
-                       <p:column headerText="login">
-                           <h:outputText value="#{user.login}" />
+                    <p:dataTable id="followUsersTable" var="user" value="#{location.users.values()}" rows="5" paginator="true" style="margin-top: 15px; align-content: center;">
+                       <p:column headerText="Login" style="text-align:center !important;">
+                           <p:commandButton value="#{user.login}" actionListener="#{location.onClickUserToDisplayData(user)}" oncomplete="PF('userDataDialog').show()"
+                                            update=":#{p:component('userData')}" title="Pokaz dane uzytkownika"/>
                        </p:column>
-                       <p:column headerText="Pokaz lokacje">
+                       <p:column headerText="Pokaz lokacje" style="text-align:center !important;">
                            <p:commandButton icon="ui-icon-search" title="Pokaz" actionListener="#{location.onShowUserLastLocations(user)}" 
-                                            update=":#{p:component('daneUser')}"/>
+                                            update=":#{p:component('daneUser')}" value="Pokaz"/>
                        </p:column>
-                       <p:column headerText="Usun">
-                          <p:commandButton  icon="fa fa-fw fa-remove" actionListener="#{location.onRemoveUserFromFollow(user)}" title="usun uzytkownika z listy sledzenia"
+                       <p:column headerText="Edytuj ustawienia widoku" style="text-align:center !important;">
+                         <p:commandButton value="Edytuj" icon="fa fa-edit" title="Edytuj ustawienia wygladu dla uzytkownika" oncomplete="PF('userViewSettingDialog').show()" 
+                                          actionListener="#{location.onEditUserSetting(user)}" update=":#{p:component('userViewSetting')}"/>
+                       </p:column>
+                       <p:column headerText="Usuń" style="text-align:center !important;">
+                          <p:commandButton  icon="fa fa-fw fa-remove" actionListener="#{location.onRemoveUserFromFollow(user)}" title="usun uzytkownika z listy sledzenia" value="Usuń"
                                             update=":#{p:component('gmap')} :#{p:component('daneUser')} :#{p:component('followUsersTable')} :#{p:component('growl')}"/>
                        </p:column>
                     </p:dataTable>
                  </h:form>
               </p:panel>
               <p:panel header="Uzytkownicy online">
-                 <p:dataList id="usersOnline" var="login" value="#{location.usersOnline()}" rows="10" paginator="true">
-                   <p:column headerText="Login">
-                     <p:commandLink title="Zobacz ostatnie lokacje" oncomplete="PF('gmapDialogSingleUser').show();" update=":#{p:component('googleMapDialog')}" 
-                                    actionListener="#{location.onShowOnlineUserLastLocations(login)}" styleClass="ui-icon ui-icon-search" 
-                                    style="float:left;margin-right:10px"/>
-                     <h:outputText value="#{login}" />
-                   </p:column>
+                 <p:dataList id="usersOnline" var="login" value="#{location.usersOnline()}" rows="10" paginator="true" type="unordered" itemType="none">
+                   <h:panelGrid columns="2">
+                     <p:commandButton actionListener="#{location.onShowOnlineUserLastLocations(login)}" oncomplete="PF('gmapDialogSingleUser').show();" title="Zobacz ostatnie lokacje"
+                                      update=":#{p:component('googleMapDialog')}" icon="ui-icon-search"/>
+                     <h:outputText value="#{login}"/>
+                   </h:panelGrid>
                  </p:dataList>
               </p:panel>
            </p:panelGrid>
@@ -47,10 +51,10 @@
 
            <p:outputPanel id="daneUser">
              <p:panel header="Dane" rendered="#{location.selectUser != null}" closable="true" >
-              <p:panelGrid columns="1" layout="grid">
+              <h:panelGrid columns="1" layout="grid">
                <p:panel header="Ostatnie lokacje">
                 <h:form>
-                 <p:dataTable id="ostatnieLokacje" var="cur_location" value="#{location.selectUserLocations()}" 
+                 <p:dataTable id="ostatnieLokacje" var="cur_location" value="#{location.selectedUserLocations()}" 
                               selectionMode="single" selection="#{location.selectLocation}" 
                               rowKey="#{cur_location.providerType} #{cur_location.id}">
                    <p:ajax event="rowSelect" listener="#{location.onShowLocation}" update=":#{p:component('gmap')}" />
@@ -92,7 +96,7 @@
                 </h:form>
                </p:panel>
                <p:panel header="Obszary sledzenia">
-                 <p:dataTable var="user_polygon" value="#{location.selectUser.area}">
+                 <p:dataTable var="user_polygon" value="#{location.selectUser.areas}" rows="10" paginator="true">
                    <p:column headerText="Nazwa">
                      <h:outputText value="#{user_polygon.name}" />
                    </p:column>
@@ -108,7 +112,7 @@
                    </p:column>
                  </p:dataTable>
                </p:panel>
-              </p:panelGrid>
+              </h:panelGrid>
              </p:panel>
            </p:outputPanel>
 

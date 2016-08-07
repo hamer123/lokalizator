@@ -22,7 +22,6 @@
              
             <p:outputLabel value="Do kiedy"/>
             <p:calendar id="younger" value="#{locationHistory.younger}" pattern="MM/dd/yyyy HH:mm:ss" effect="fold" required="true" locale="pl">
-              <f:validator validatorId="dateRangeValidator"/>
               <f:attribute name="from" value="#{olderDate}"/>
             </p:calendar>
             <p:message for="younger"/>

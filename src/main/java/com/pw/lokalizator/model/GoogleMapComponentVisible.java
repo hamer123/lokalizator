@@ -14,6 +14,9 @@ public class GoogleMapComponentVisible {
 		NO_POLYGON.setMarkerGps(true);
 		NO_POLYGON.setMarkerNetworkNasz(true);
 		NO_POLYGON.setMarkerNetworkObcy(true);
+		NO_POLYGON.setGpsRoute(true);
+		NO_POLYGON.setNetworkNaszRoute(true);
+		NO_POLYGON.setNetworkObcyRoute(true);
 	}
 	
 	private boolean activePolygon;
@@ -24,8 +27,10 @@ public class GoogleMapComponentVisible {
 	private boolean circleGps;
 	private boolean circleNetworkNasz;
 	private boolean circleNetworkObcy;
+	private boolean gpsRoute;
+	private boolean networkNaszRoute;
+	private boolean networkObcyRoute;
 	
-
 	public boolean isNotActivePolygon() {
 		return notActivePolygon;
 	}
@@ -73,6 +78,24 @@ public class GoogleMapComponentVisible {
 	}
 	public void setCircleNetworkObcy(boolean circleNetworkObcy) {
 		this.circleNetworkObcy = circleNetworkObcy;
+	}
+	public boolean isGpsRoute() {
+		return gpsRoute;
+	}
+	public void setGpsRoute(boolean gpsRoute) {
+		this.gpsRoute = gpsRoute;
+	}
+	public boolean isNetworkNaszRoute() {
+		return networkNaszRoute;
+	}
+	public void setNetworkNaszRoute(boolean networkNaszRoute) {
+		this.networkNaszRoute = networkNaszRoute;
+	}
+	public boolean isNetworkObcyRoute() {
+		return networkObcyRoute;
+	}
+	public void setNetworkObcyRoute(boolean networkObcyRoute) {
+		this.networkObcyRoute = networkObcyRoute;
 	}
 
 }

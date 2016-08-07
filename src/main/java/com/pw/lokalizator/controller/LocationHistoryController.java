@@ -31,6 +31,7 @@ import com.pw.lokalizator.model.enums.Providers;
 import com.pw.lokalizator.repository.LocationGPSRepository;
 import com.pw.lokalizator.repository.LocationNetworkRepository;
 import com.pw.lokalizator.repository.UserRepository;
+import com.pw.lokalizator.serivce.qualifier.UserGoogleMap;
 import com.pw.lokalizator.service.GoogleMapUserComponentService;
 import com.pw.lokalizator.service.LocationService;
 import com.pw.lokalizator.service.RouteService;
@@ -44,7 +45,7 @@ public class LocationHistoryController implements Serializable{
 	private LocationGPSRepository locationGPSRepository;
 	@Inject
 	private UserRepository userRepository;
-	@Inject
+	@Inject @UserGoogleMap
 	private GoogleMapController googleMapController;
 	@Inject
 	private GoogleMapUserComponentService googleMapUserComponentService;
@@ -211,5 +212,63 @@ public class LocationHistoryController implements Serializable{
 
 	public void setLocalizationServices(LocalizationServices localizationServices) {
 		this.localizationServices = localizationServices;
+	}
+
+	public LocationNetworkRepository getLocationNetworkRepository() {
+		return locationNetworkRepository;
+	}
+
+	public void setLocationNetworkRepository(
+			LocationNetworkRepository locationNetworkRepository) {
+		this.locationNetworkRepository = locationNetworkRepository;
+	}
+
+	public LocationGPSRepository getLocationGPSRepository() {
+		return locationGPSRepository;
+	}
+
+	public void setLocationGPSRepository(LocationGPSRepository locationGPSRepository) {
+		this.locationGPSRepository = locationGPSRepository;
+	}
+
+	public UserRepository getUserRepository() {
+		return userRepository;
+	}
+
+	public void setUserRepository(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
+
+	public GoogleMapUserComponentService getGoogleMapUserComponentService() {
+		return googleMapUserComponentService;
+	}
+
+	public void setGoogleMapUserComponentService(
+			GoogleMapUserComponentService googleMapUserComponentService) {
+		this.googleMapUserComponentService = googleMapUserComponentService;
+	}
+
+	public RouteService getRouteService() {
+		return routeService;
+	}
+
+	public void setRouteService(RouteService routeService) {
+		this.routeService = routeService;
+	}
+
+	public Logger getLogger() {
+		return logger;
+	}
+
+	public void setLogger(Logger logger) {
+		this.logger = logger;
+	}
+
+	public void setGoogleMapController(GoogleMapController googleMapController) {
+		this.googleMapController = googleMapController;
+	}
+
+	public void setRoute(Route route) {
+		this.route = route;
 	}
 }

@@ -29,7 +29,7 @@ public class LokalizatorSecurityController implements Serializable{
 	
 	public String login(){
 		try{
-			User user = userRepository.findUserWithSecurityByLoginAndPassword(login,password);
+			User user = userRepository.findUserFeatchDefaultSettingByLoginAndPassword(login,password);
 			lokalizatorSession.setUser(user);
 			return "/location.xhtml?faces-redirect=true"; 
 		} catch (Exception e){

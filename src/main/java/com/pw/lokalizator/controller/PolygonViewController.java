@@ -44,27 +44,26 @@ import com.pw.lokalizator.model.enums.AreaMailMessageModes;
 import com.pw.lokalizator.repository.AreaRepository;
 import com.pw.lokalizator.repository.AreaPointRepository;
 import com.pw.lokalizator.repository.UserRepository;
+import com.pw.lokalizator.serivce.qualifier.UserGoogleMap;
 
 @Named(value="polyglon")
 @ViewScoped
 public class PolygonViewController implements Serializable{
 	@Inject
 	private LokalizatorSession lokalizatorSession;
-	
 	@Inject
 	private UserRepository userRepository;
 	@Inject
 	private AreaRepository areaRepository;
 	@Inject
 	private AreaPointRepository polygonPointRepository;
-	
-	@Inject
+	@Inject @UserGoogleMap
 	private GoogleMapController googleMapController;
 	@Inject 
 	private Logger logger;
 	
-	private static final AreaMailMessageModes[] areaMailMessageModes = AreaMailMessageModes.values();
-	private static final AreaFollows[] polygonFollowTypes = AreaFollows.values();
+	static final AreaMailMessageModes[] areaMailMessageModes = AreaMailMessageModes.values();
+	static final AreaFollows[] polygonFollowTypes = AreaFollows.values();
 	
 	private Polygon polygon;
 	private Area area;
@@ -100,6 +99,7 @@ public class PolygonViewController implements Serializable{
 			area = areaRepository.create(area);
 			areaList.add(area);
 			clearArea();
+			clearPolygon();
 			JsfMessageBuilder.infoMessage("Udalo sie utworzyc obszar sledzenia o nazwie " + area.getName() + " sledzacy uzytkownika " + area.getTarget().getLogin());
 		} catch(Exception e) {
 			JsfMessageBuilder.errorMessage("Nie udalo sie utworzyc obszaru sledzenia " + e);
@@ -252,6 +252,10 @@ public class PolygonViewController implements Serializable{
 		area.setTarget(new User());
 		area.setPoints(new HashMap<Integer, AreaPoint>());
 	}
+	
+	void clearPolygon(){
+		polygon = PolygonBuilder.createEmpty();
+	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////  GETTERS SETTERS  ///////////////////////////////////////////////////////////////////
@@ -298,7 +302,72 @@ public class PolygonViewController implements Serializable{
 		this.area = area;
 	}
 
+	public LokalizatorSession getLokalizatorSession() {
+		return lokalizatorSession;
+	}
+
+	public void setLokalizatorSession(LokalizatorSession lokalizatorSession) {
+		this.lokalizatorSession = lokalizatorSession;
+	}
+
+	public UserRepository getUserRepository() {
+		return userRepository;
+	}
+
+	public void setUserRepository(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
+
+	public AreaRepository getAreaRepository() {
+		return areaRepository;
+	}
+
+	public void setAreaRepository(AreaRepository areaRepository) {
+		this.areaRepository = areaRepository;
+	}
+
+	public AreaPointRepository getPolygonPointRepository() {
+		return polygonPointRepository;
+	}
+
+	public void setPolygonPointRepository(AreaPointRepository polygonPointRepository) {
+		this.polygonPointRepository = polygonPointRepository;
+	}
+
 	public GoogleMapController getGoogleMapController() {
 		return googleMapController;
 	}
+
+	public void setGoogleMapController(GoogleMapController googleMapController) {
+		this.googleMapController = googleMapController;
+	}
+
+	public Logger getLogger() {
+		return logger;
+	}
+
+	public void setLogger(Logger logger) {
+		this.logger = logger;
+	}
+
+	public Polygon getPolygon() {
+		return polygon;
+	}
+
+	public void setPolygon(Polygon polygon) {
+		this.polygon = polygon;
+	}
+
+	public List<String> getTargetLoginList() {
+		return targetLoginList;
+	}
+
+	public void setTargetLoginList(List<String> targetLoginList) {
+		this.targetLoginList = targetLoginList;
+	}
+
+	public void setAreaList(List<Area> areaList) {
+		this.areaList = areaList;
+	}
+
 }

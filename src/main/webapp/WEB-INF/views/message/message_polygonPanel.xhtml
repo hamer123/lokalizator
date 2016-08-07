@@ -10,7 +10,7 @@
      <p:dataTable id="areaTable" var="area" value="#{messageController.areaList}"
                   selectionMode="single" selection="#{messageController.selectedArea}" rowKey="#{area.id}">
         <p:ajax event="rowSelect" listener="#{messageController.onAreaSelect}" 
-                update=":#{p:component('options')} :#{p:component('messages')} :#{p:component('messageBody')}"/>
+                update=":#{p:component('options')} :#{p:component('messages')}"/>
                 
         <p:column headerText="Nazwa">
           <h:outputText value="#{area.name}" />

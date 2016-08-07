@@ -39,7 +39,9 @@ public class GoogleMapUserComponentServiceImpl implements GoogleMapUserComponent
 		
 		int lastIndex = locations.size() - 1;
 		Marker start =  MarkerBuilder.createMarker(locations.get(0));
+		start.setIcon(MarkerBuilder.Icon.START_ROUTE_ICON_URL);
 		Marker end = MarkerBuilder.createMarker(locations.get(lastIndex));
+		end.setIcon(MarkerBuilder.Icon.END_ROUTE_ICON_URL);
 		
 		return new Route(start, end, polyline);
 	}
@@ -111,7 +113,7 @@ public class GoogleMapUserComponentServiceImpl implements GoogleMapUserComponent
 	public List<Polygon> polygons(User user) {
 		List<Polygon>polygons = new ArrayList<Polygon>();
 		
-		for(Area area : user.getArea())
+		for(Area area : user.getAreas())
 			polygons.add( PolygonBuilder.create(area) );
 		
 		return polygons;
@@ -129,6 +131,12 @@ public class GoogleMapUserComponentServiceImpl implements GoogleMapUserComponent
 			return PolygonBuilder.create(area);
 		
 		return null;
+	}
+	
+	@Override
+	public Route routeNoMarkers(List<Location> locations) {
+		Polyline polyline = PolylineBuilder.create(locations);
+		return new Route(polyline);
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -199,6 +207,4 @@ public class GoogleMapUserComponentServiceImpl implements GoogleMapUserComponent
 		if(location != null)
 			locations.add(location);
 	}
-
-
 }

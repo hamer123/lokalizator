@@ -1,0 +1,21 @@
+@CHARSET "UTF-8";
+
+.context{
+	padding-left: 20%;
+	padding-right: 20%;
+	
+    float:left;
+}
+
+.div_half_size{
+	width: 48%;
+	padding: 1%;
+	float:left;
+}
+
+.finalize_context{
+	padding-left: 40%;
+	padding-right: 40%;
+	margin:1%;
+	text-align: center;
+}
