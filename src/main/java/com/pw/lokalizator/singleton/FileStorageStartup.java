@@ -20,9 +20,9 @@ public class FileStorageStartup {
 	
 	@PostConstruct
 	public void startup(){
-		createDirection(LOKALIZATOR_PATH);
-		createDirection(IMAGE_PATH);
-		createStorage(new AvatarImageStorage());
+//		createDirection(LOKALIZATOR_PATH);
+//		createDirection(IMAGE_PATH);
+//		createStorage(new AvatarImageStorage());
 		
 		System.out.println(HOME_PATH);
 		System.out.println(LOKALIZATOR_PATH);
