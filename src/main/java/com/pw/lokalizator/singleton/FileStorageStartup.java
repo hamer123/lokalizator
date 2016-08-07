@@ -14,15 +14,15 @@ import com.pw.lokalizator.file.storage.StorageNotCreated;
 @Startup
 public class FileStorageStartup {
 
-	public static final String HOME_PATH = System.getProperty("user.home");
+	public static final String HOME_PATH = System.getProperty("user.home") + "/wildfly";
 	public static final String LOKALIZATOR_PATH =  HOME_PATH + "/lokalizator";
 	public static final String IMAGE_PATH = LOKALIZATOR_PATH + "/image";
 	
 	@PostConstruct
 	public void startup(){
-//		createDirection(LOKALIZATOR_PATH);
-//		createDirection(IMAGE_PATH);
-//		createStorage(new AvatarImageStorage());
+		createDirection(LOKALIZATOR_PATH);
+		createDirection(IMAGE_PATH);
+		createStorage(new AvatarImageStorage());
 		
 		System.out.println(HOME_PATH);
 		System.out.println(LOKALIZATOR_PATH);
