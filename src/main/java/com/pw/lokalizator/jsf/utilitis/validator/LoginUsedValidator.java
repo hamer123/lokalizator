@@ -24,7 +24,7 @@ public class LoginUsedValidator implements Validator{
 		User user = null;
 		
 		try{
-			user = userRepository.findByLogin(login);
+			user = userRepository.findByLogins(login);
 		}catch(Exception e){
 			//
 		} finally{

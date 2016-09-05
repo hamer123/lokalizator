@@ -1,8 +1,5 @@
 package com.pw.lokalizator.controller;
 
-import java.util.List;
-
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 import javax.inject.Named;
 
@@ -10,8 +7,7 @@ import org.primefaces.model.map.Overlay;
 
 import com.pw.lokalizator.jsf.utilitis.OverlayIdentyfikator;
 import com.pw.lokalizator.jsf.utilitis.OverlayIdentyfikator.OverlayIdentyfikatorBuilder;
-import com.pw.lokalizator.model.GoogleMapModel;
-import com.pw.lokalizator.model.Position;
+import com.pw.lokalizator.model.google.map.GoogleMapModel;
 import com.pw.lokalizator.model.entity.Location;
 import com.pw.lokalizator.model.enums.LocalizationServices;
 import com.pw.lokalizator.model.enums.Overlays;

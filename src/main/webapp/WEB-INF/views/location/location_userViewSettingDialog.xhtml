@@ -1,27 +1,30 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:f="http://java.sun.com/jsf/core"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:c="http://java.sun.com/jsp/jstl/core"
-      xmlns:lokalizator="http://java.sun.com/jsf/composite/lokalizator">
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
       
       <p:dialog id="userViewSetting" widgetVar="userViewSettingDialog" header="Ustawienia dla uzytkownika">
         <h:form>
             <p:panel header="Ustawienia widoku">
               <h:panelGrid columns="3" cellpadding="4" cellspacing="4">
-                <p:outputLabel value="Trasa sledzenia GPS"/>
-                <p:selectBooleanCheckbox value="#{location.userViewSettingDialog.gpsRoute.visible}"/>
-                <p:colorPicker value="#{location.userViewSettingDialog.gpsRouteColor}"/>
-                
-                <p:outputLabel value="Trasa sledzenia Network Obcy"/>
-                <p:selectBooleanCheckbox value="#{location.userViewSettingDialog.networkNaszRoute.visible}"/>
-                <p:colorPicker value="#{location.userViewSettingDialog.networkNaszColor}"/>
-                
-                <p:outputLabel value="Trasa sledzenia Network Nasz"/>
-                <p:selectBooleanCheckbox value="#{location.userViewSettingDialog.networkObcyRoute.visible}"/>
-                <p:colorPicker value="#{location.userViewSettingDialog.networkObcyColor}"/>
-                
+                  <c:if test="#{!location.userViewSettingDialog.disableGps}">
+                      <p:outputLabel value="Trasa sledzenia GPS"/>
+                      <p:selectBooleanCheckbox value="#{location.userViewSettingDialog.gpsRoute.visible}"/>
+                      <p:colorPicker value="#{location.userViewSettingDialog.gpsRouteColor}" />
+                  </c:if>
+
+                  <c:if test="#{!location.userViewSettingDialog.disableNetworkObcy}">
+                      <p:outputLabel value="Trasa sledzenia Network Obcy"/>
+                      <p:selectBooleanCheckbox value="#{location.userViewSettingDialog.networkNaszRoute.visible}"/>
+                      <p:colorPicker value="#{location.userViewSettingDialog.networkNaszColor}"/>
+                  </c:if>
+
+                  <c:if test="#{!location.userViewSettingDialog.disableNetworkNasz}">
+                      <p:outputLabel value="Trasa sledzenia Network Nasz"/>
+                      <p:selectBooleanCheckbox value="#{location.userViewSettingDialog.networkObcyRoute.visible}"/>
+                      <p:colorPicker value="#{location.userViewSettingDialog.networkObcyColor}"/>
+                  </c:if>
+
                 <p:commandButton value="Zapisz" update=":#{p:component('gmap')}" onclick="PF('userViewSettingDialog').hide()" 
                                  actionListener="#{location.userViewSettingDialog.onSaveChangeSetting()}"/>
               </h:panelGrid>

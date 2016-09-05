@@ -34,8 +34,10 @@ public class AreaEventWorker {
 	private AreaRepository areaRepository;
 	@Inject
 	private Logger logger;
+
 	@PersistenceContext
 	private EntityManager em;
+
 	private final AreaEventBuilder areaEventBuilder = new AreaEventBuilder();
 
 	@Schedule(minute="*/1", hour="*")
@@ -69,10 +71,10 @@ public class AreaEventWorker {
 	public Object log(InvocationContext ic) throws Exception {
 		long time = System.currentTimeMillis();
 		try{
-			logger.info("[AreaEventWorker] job has started");
+			logger.info(" job has started");
 			return ic.proceed();
 		} finally{
-			logger.info("[AreaEventWorker] job has ended after " + (System.currentTimeMillis() - time) + "ms");
+			logger.info(" job has ended after " + (System.currentTimeMillis() - time) + "ms");
 		}
 	}
 	

@@ -1,32 +1,14 @@
 package com.pw.lokalizator.model.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.TableGenerator;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.persistence.*;
+import javax.xml.bind.annotation.*;
 
 import com.pw.lokalizator.model.enums.Roles;
-
+import org.omnifaces.cdi.Eager;
 
 
 @Entity
@@ -47,18 +29,15 @@ import com.pw.lokalizator.model.enums.Roles;
 		              query="SELECT u.login FROM User u WHERE u.login LIKE :login"),
 		  @NamedQuery(name ="USER.findUserWithPolygonsByLogin", 
 		              query="SELECT u FROM User u INNER JOIN FETCH u.areas WHERE u.login =:login"),
-		  @NamedQuery(name ="USER.findUsersById",
-		              query="SELECT u FROM User u WHERE u.id IN (:id)"),
-		  @NamedQuery(name ="USER.findUserFeatchDefaultSettingByLoginAndPassword", 
-		              query="SELECT u FROM User u LEFT JOIN FETCH u.userSetting WHERE u.login =:login AND u.password =:password"),
-		  @NamedQuery(name ="USER.findByIdFetchEagerLastLocations", 
-		              query="SELECT u FROM User u LEFT JOIN FETCH u.lastLocationGPS LEFT JOIN FETCH u.lastLocationNetworkNaszaUsluga LEFT JOIN FETCH u.lastLocationNetworObcaUsluga "
-		              	  + "WHERE u.login =:login"),
+		  @NamedQuery(name ="USER.findUsersByIds",
+		              query="SELECT u FROM User u WHERE u.id IN (:ids)"),
+		  @NamedQuery(name ="USER.findUserFetchRolesByLoginAndPassword",
+		              query="SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.login =:login AND u.password =:password"),
 		  @NamedQuery(name ="USER.findByEmail",
 		              query="SELECT u FROM User u WHERE u.email =:email")
 		})
 @XmlRootElement
-@XmlAccessorType(XmlAccessType.NONE)
+@XmlAccessorType(XmlAccessType.FIELD)
 public class User implements Serializable {
 	@Id
     @TableGenerator(
@@ -71,16 +50,15 @@ public class User implements Serializable {
 	@GeneratedValue(strategy=GenerationType.TABLE, generator="userGen")
 	private long id;
 	
-	@OneToOne(optional = false, orphanRemoval = true, fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
+	@OneToOne(optional = false, orphanRemoval = true, cascade = {CascadeType.ALL})
 	@JoinColumn(name = "user_setting")
 	private UserSetting userSetting;
-	
-	@XmlElement
+
 	@Column(name="login", unique=true, updatable=false, nullable=false, length=16)
 	private String login;
-	
-	@XmlElement
-	@Column(name="password", unique=false, nullable=false, length=16)
+
+	@XmlTransient
+	@Column(name="password", nullable=false, length=16)
 	private String password;
 
 	@Column(name="email", unique=true, nullable=false, length=50)
@@ -88,10 +66,12 @@ public class User implements Serializable {
 
 	@Column(name="phone")
 	private String phone;
-	
+
+	@ElementCollection(targetClass = Roles.class, fetch = FetchType.EAGER)
+	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+	@Column(name = "role", nullable = false)
 	@Enumerated(EnumType.STRING)
-	@Column(name = "rola")
-	private Roles rola;
+	private List<Roles> roles = new ArrayList<>();
 	
 	@OneToOne
 	private Avatar avatar;
@@ -107,16 +87,11 @@ public class User implements Serializable {
 	@OneToOne
 	@JoinColumn(updatable = true, name = "last_location_network_obcy_id")
 	private LocationNetwork lastLocationNetworObcaUsluga;
-	
-	@OneToMany(mappedBy="user", orphanRemoval = true, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-	private List<LocationGPS> locationGPS;
-	
-	@OneToMany(mappedBy="user", orphanRemoval = true, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-	private List<LocationNetwork> locationNetwork;
-	
-	@OneToMany(mappedBy = "provider", orphanRemoval = true, fetch= FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+
+	@XmlTransient
+	@OneToMany(mappedBy = "provider", orphanRemoval = true, fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
 	private List<Area>areas;
-	
+
 	public User(){}
 	
 	public long getId() {
@@ -167,22 +142,6 @@ public class User implements Serializable {
 		this.areas = polygons;
 	}
 
-	public List<LocationGPS> getLocationGPS() {
-		return locationGPS;
-	}
-
-	public void setLocationGPS(List<LocationGPS> locationGPS) {
-		this.locationGPS = locationGPS;
-	}
-
-	public List<LocationNetwork> getLocationNetwork() {
-		return locationNetwork;
-	}
-
-	public void setLocationNetwork(List<LocationNetwork> locationNetwork) {
-		this.locationNetwork = locationNetwork;
-	}
-
 	public String getPhone() {
 		return phone;
 	}
@@ -209,22 +168,6 @@ public class User implements Serializable {
 		this.lastLocationNetworObcaUsluga = lastLocationNetworObcaUsluga;
 	}
 
-	public Roles getRola() {
-		return rola;
-	}
-
-	public void setRola(Roles rola) {
-		this.rola = rola;
-	}
-
-//	public List<Area> getAreas() {
-//		return areas;
-//	}
-//
-//	public void setAreas(List<Area> areas) {
-//		this.areas = areas;
-//	}
-
 	public UserSetting getUserSetting() {
 		return userSetting;
 	}
@@ -241,17 +184,11 @@ public class User implements Serializable {
 		this.avatar = avatar;
 	}
 
-	@Override
-	public String toString() {
-		return "User [id=" + id + ", userSetting=" + userSetting + ", login="
-				+ login + ", password=" + password + ", email=" + email
-				+ ", phone=" + phone + ", rola=" + rola + ", lastLocationGPS="
-				+ lastLocationGPS + ", lastLocationNetworkNaszaUsluga="
-				+ lastLocationNetworkNaszaUsluga
-				+ ", lastLocationNetworObcaUsluga="
-				+ lastLocationNetworObcaUsluga + ", locationGPS=" + locationGPS
-				+ ", locationNetwork=" + locationNetwork + ", areas=" + areas
-				+ "]";
+	public List<Roles> getRoles() {
+		return roles;
 	}
 
+	public void setRoles(List<Roles> roles) {
+		this.roles = roles;
+	}
 }

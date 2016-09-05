@@ -18,8 +18,7 @@ import org.primefaces.model.map.Polygon;
 
 import com.pw.lokalizator.jsf.utilitis.JsfMessageBuilder;
 import com.pw.lokalizator.jsf.utilitis.OverlayIdentyfikator;
-import com.pw.lokalizator.model.GoogleMapModel;
-import com.pw.lokalizator.model.LokalizatorSession;
+import com.pw.lokalizator.model.google.map.GoogleMapModel;
 import com.pw.lokalizator.model.entity.Area;
 import com.pw.lokalizator.model.entity.Location;
 import com.pw.lokalizator.model.enums.GoogleMaps;

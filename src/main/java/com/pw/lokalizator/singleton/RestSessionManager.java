@@ -1,11 +1,6 @@
 package com.pw.lokalizator.singleton;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -13,46 +8,59 @@ import javax.ejb.AccessTimeout;
 import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
 import javax.ejb.Singleton;
+
 import org.jboss.resteasy.logging.Logger;
-import com.pw.lokalizator.model.RestSession;
+import com.pw.lokalizator.model.session.RestSession;
 import com.pw.lokalizator.model.entity.User;
 
 @Singleton
 @ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)
 public class RestSessionManager {
 	Logger logger = Logger.getLogger(RestSessionManager.class);
-	private Map<String,RestSession>restSessions = new ConcurrentHashMap<String,RestSession>();
-	
-	public RestSession getRestSession(String token){
-		RestSession restSession = restSessions.get(token);
-		
-		if(restSession == null)
-			throw new SecurityException("Nie poprawny token");
-		
-		return restSession;
-	}
-	
+	private Map<String,RestSession> sessions = new ConcurrentHashMap<String,RestSession>();
+
 	public Set<String>tokens(){
-		return restSessions.keySet();
+		return sessions.keySet();
 	}
 	
 	public String getTokenForLogin(String login){
-		for(String token : restSessions.keySet()){
-			if (restSessions.get(token).getUser().getLogin().equals(login))
+		for(String token : sessions.keySet()){
+			if (sessions.get(token).getUser().getLogin().equals(login))
 				return token;
 		}
 		return null;
 	}
-	
-	public void addRestSession(String token, User user){
-		RestSession session = new RestSession(user);
-		restSessions.put(token, session);
-		logger.info("[RestSessionSimulator] nowa RESTSession :"  + user.getLogin());
+
+	public RestSession addSession(User user){
+		RestSession restSession = getSessionByUser(user);
+		if(restSession != null){
+			return restSession;
+		} else {
+			UUID uuid = UUID.randomUUID();
+			restSession = new RestSession(user);
+			restSession.setToken(uuid.toString());
+			restSession.setLastUsed(new Date());
+
+			sessions.put(uuid.toString(), restSession);
+			return restSession;
+		}
+	}
+
+	public RestSession getSession(String token){
+		return sessions.get(token);
+	}
+
+	public RestSession getSessionByUser(User user){
+		for(RestSession session : sessions.values()){
+			if(session.getUser().getId() == user.getId())
+				return session;
+		}
+		return null;
 	}
 	
 	public boolean invalidationRestSession(String token){
 		RestSession restSession = null;
-		if((restSession = restSessions.remove(token)) != null){
+		if((restSession = sessions.remove(token)) != null){
 			logger.info("[RestSessionSimulator] invalidationRestSession dla :" + restSession.getUser().getLogin());
 			return true;
 		}
@@ -61,7 +69,7 @@ public class RestSessionManager {
 	
 	@AccessTimeout(value = 1, unit = TimeUnit.MINUTES)
 	public Collection<RestSession> getRestSessionsCollection(){
-		return restSessions.values();
+		return sessions.values();
 	}
 	
 	public List<String>getUserOnlineLogins(){
@@ -74,7 +82,7 @@ public class RestSessionManager {
 	
 	public boolean isUserOnline(String login){
 		try{
-			Optional<RestSession> optionalRestSession = restSessions
+			Optional<RestSession> optionalRestSession = sessions
 					.values()
 					.stream()
 					.filter( rs -> rs.getUser().getLogin().equals(login))

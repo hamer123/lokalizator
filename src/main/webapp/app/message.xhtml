@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Wiadomosci</title>
+    <h:outputStylesheet library="css" name="default.css"/>
+    <h:outputScript library="js" name="messageGoogleMapDialog.js"/>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCs17b5OinBtGu-5P4VLLLV-yYuaMn2T4c"/>
+</h:head> 
+<h:body styleClass="body">
+   <ui:insert name="menu">
+     <ui:include src="/WEB-INF/views/menu_templete.xhtml" />
+   </ui:insert> 
+   
+   <p:panelGrid columns="2" cellspacing="2" layout="grid">
+   
+   <p:outputPanel id="firstHalf" layout="grid">
+     <p:panel id="polygons" header="Obszary sledzenia">
+       <ui:include src="/WEB-INF/views/message/message_polygonPanel.xhtml"/> 
+     </p:panel>
+     
+     <p:panel id="options" header="Options">
+       <ui:include src="/WEB-INF/views/message/message_optionPanel.xhtml"/>
+     </p:panel>
+   </p:outputPanel>
+   
+   <p:outputPanel id="secondHalf" layout="grid">
+
+     <p:panel id="messages" header="Wiadomosci">
+       <ui:include src="/WEB-INF/views/message/message_messagesPanel.xhtml"/>
+     </p:panel>
+   </p:outputPanel>
+   
+   </p:panelGrid>
+   
+   <ui:include src="/WEB-INF/views/message/message_dialogLocation.xhtml"/>
+
+</h:body> 
+</html>

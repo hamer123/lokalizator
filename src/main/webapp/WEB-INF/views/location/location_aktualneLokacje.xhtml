@@ -1,10 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
 <ui:composition  xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:f="http://java.sun.com/jsf/core"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:c="http://java.sun.com/jsp/jstl/core"> 
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
       
 
            <p:panelGrid columns="2" layout="grid">
@@ -12,8 +11,17 @@
                  <h:form>
                     <p:row>
                        <p:outputLabel for="findUserToFollow" value="Znajdz uzytkownika" styleClass="components"/>
-                       <p:autoComplete id="findUserToFollow" value="#{location.login}" completeMethod="#{location.onAutocompleteLogin}"
-                                       forceSelection="true" styleClass="components" required="true"/>
+                        <c:choose>
+                            <c:when test="#{lokalizatorSession.isInRole('ADMIN')}">
+                                <p:autoComplete id="findUserToFollow" value="#{location.login}" completeMethod="#{location.onAutocompleteLogin}"
+                                                forceSelection="true" styleClass="components" required="true"/>
+                            </c:when>
+                            <c:otherwise>
+                                <p:outputLabel value="Nie jestes adminem?"/>
+                                <p:autoComplete id="findUserToFollow" value="#{location.login}" completeMethod="#{location.onAutocompleteLogin}"
+                                                forceSelection="true" styleClass="components" required="true"/>
+                            </c:otherwise>
+                        </c:choose>
                        <p:commandButton value="Dodaj do sledzenia" styleClass="components" actionListener="#{location.onAddUserToFollow}" 
                                         update=":#{p:component('followUsersTable')} :#{p:component('growl')} :#{p:component('gmap')}"/>
                     </p:row>

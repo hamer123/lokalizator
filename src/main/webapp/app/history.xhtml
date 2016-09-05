@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"> 
+
+<h:head>
+  <title>Historia</title>
+  <h:outputStylesheet library="css" name="default.css"/>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCs17b5OinBtGu-5P4VLLLV-yYuaMn2T4c"/>
+</h:head> 
+
+<h:body styleClass="body"> 
+
+     <ui:insert name="menu" >
+	    <ui:include src="/WEB-INF/views/menu_templete.xhtml" />
+	  </ui:insert>
+	 
+	 <h:form>
+       <p:growl id="growl"/>
+     </h:form>
+     
+     <p:gmap id="gmap" model="#{locationHistory.googleMapController.googleMapModel}" style="width:100%;height:500px" 
+             center="#{locationHistory.googleMapController.center}" zoom="#{locationHistory.googleMapController.zoom}"
+             type="#{locationHistory.googleMapController.googleMapType}">
+     </p:gmap>
+
+
+     <p:panel header="Historia Lokacji">
+        <p:panelGrid columns="2" layout="grid">
+      
+           <p:outputPanel>
+              <p:panel header="Wyszukiwanie">
+                <ui:insert>
+                  <ui:include src="../WEB-INF/views/history/history_search.xhtml" />
+                </ui:insert>
+              </p:panel>
+              <p:panel id="option" header="Opcie dodatkowe">
+                 <ui:insert>
+                   <ui:include src="../WEB-INF/views/history/history_option.xhtml" />
+                 </ui:insert>
+              </p:panel>
+           </p:outputPanel> 
+           <p:panel header="Utworzone sciezka">
+             <ui:insert>
+               <ui:include src="../WEB-INF/views/history/history_route.xhtml" />
+             </ui:insert>
+           </p:panel>
+           
+        </p:panelGrid>
+     </p:panel>
+    
+</h:body> 
+</html>

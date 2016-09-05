@@ -6,7 +6,7 @@ import javax.ejb.Stateless;
 
 import org.primefaces.model.map.LatLng;
 
-import com.pw.lokalizator.model.Route;
+import com.pw.lokalizator.model.google.component.Route;
 import com.pw.lokalizator.service.RouteService;
 
 @Stateless

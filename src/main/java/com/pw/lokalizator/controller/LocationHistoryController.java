@@ -3,29 +3,21 @@ package com.pw.lokalizator.controller;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import javax.enterprise.context.Dependent;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.validator.ValidatorException;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.jboss.logging.Logger;
-import org.primefaces.model.map.Overlay;
 
 import com.pw.lokalizator.jsf.utilitis.JsfMessageBuilder;
-import com.pw.lokalizator.model.GoogleMapModel;
-import com.pw.lokalizator.model.LokalizatorSession;
-import com.pw.lokalizator.model.Route;
+import com.pw.lokalizator.model.google.map.GoogleMapModel;
+import com.pw.lokalizator.model.google.component.Route;
 import com.pw.lokalizator.model.entity.Location;
 import com.pw.lokalizator.model.entity.LocationGPS;
 import com.pw.lokalizator.model.entity.LocationNetwork;
-import com.pw.lokalizator.model.entity.User;
 import com.pw.lokalizator.model.enums.LocalizationServices;
 import com.pw.lokalizator.model.enums.Providers;
 import com.pw.lokalizator.repository.LocationGPSRepository;
@@ -33,7 +25,6 @@ import com.pw.lokalizator.repository.LocationNetworkRepository;
 import com.pw.lokalizator.repository.UserRepository;
 import com.pw.lokalizator.serivce.qualifier.UserGoogleMap;
 import com.pw.lokalizator.service.GoogleMapUserComponentService;
-import com.pw.lokalizator.service.LocationService;
 import com.pw.lokalizator.service.RouteService;
 
 @Named("locationHistory")

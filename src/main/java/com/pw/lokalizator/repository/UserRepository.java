@@ -11,15 +11,11 @@ import com.pw.lokalizator.model.entity.LocationNetwork;
 import com.pw.lokalizator.model.entity.User;
 @Local
 public interface UserRepository extends JpaRepository<User, Long> {
-	User findUserFeatchDefaultSettingByLoginAndPassword(String login, String password);
-	User findByLogin(String login);
-	List<User> findByLogin(List<String> logins);
+	User findUserFeatchRolesByLoginAndPassword(String login, String password);
+	User findByLogins(String login);
+	List<User> findByLogins(List<String> logins);
 	User findByLoginFetchArea(String login);
     List<String> findLoginByLoginLike(String loginLike);
-    User findByIdGetIdAndLoginAndCurrentLocationsForAllProviders(Long id);
-    User findUserWithPolygonsByLogin(String login);
-    List<User> findById(Set<Long>id);
-    List<User> findByIdFetchEagerLastLocations(Set<Long>id);
-    User findByIdFetchEagerLastLocations(String login);
+    List<User> findByIds(Set<Long>id);
     User findByEmail(String email);
 }

@@ -3,6 +3,9 @@ package com.pw.lokalizator.jsf.utilitis;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.pw.lokalizator.model.entity.User;
+import com.pw.lokalizator.model.enums.Providers;
+import com.pw.lokalizator.service.LocationService;
 import org.primefaces.model.map.LatLng;
 import org.primefaces.model.map.Polyline;
 
@@ -27,17 +30,78 @@ public class PolylineBuilder {
 	
 	public static Polyline create(List<Location>locations){
 		Polyline polyline = new Polyline();
-		
 		polyline.setId( id(locations.get(0)) );
 		polyline.setData ( locations );
 		polyline.setPaths( path(locations) );
 		polyline.setStrokeColor( color(polyline, locations.get(0)) );
 		polyline.setStrokeOpacity( POLYLINE_STROKE_OPACITY );
 		polyline.setStrokeWeight( POLYLINE_STROKE_WEIGHT );
-		
 		return polyline;
 	}
-	
+
+	public static Polyline create(Location location){
+		Polyline polyline = new Polyline();
+		List<Location>locations = new ArrayList<>();
+		locations.add(location);
+		polyline.setId(id(location));
+		polyline.setData(location);
+		polyline.setPaths(path(locations));
+		polyline.setStrokeColor( color(polyline, location) );
+		polyline.setStrokeOpacity( POLYLINE_STROKE_OPACITY );
+		polyline.setStrokeWeight( POLYLINE_STROKE_WEIGHT );
+		return polyline;
+	}
+
+	public static Polyline createNoData(Location location){
+		Polyline polyline = new Polyline();
+		List<Location>locations = new ArrayList<>();
+		locations.add(location);
+		polyline.setId(id(location));
+		polyline.setPaths(path(locations));
+		polyline.setStrokeColor( color(polyline, location) );
+		polyline.setStrokeOpacity( POLYLINE_STROKE_OPACITY );
+		polyline.setStrokeWeight( POLYLINE_STROKE_WEIGHT );
+		return polyline;
+	}
+
+	public static Polyline createNoData(List<Location>locations){
+		Polyline polyline = new Polyline();
+		polyline.setId(id(locations.get(0)));
+		polyline.setPaths(path(locations));
+		polyline.setStrokeColor(color(polyline, locations.get(0)));
+		polyline.setStrokeOpacity(POLYLINE_STROKE_OPACITY);
+		polyline.setStrokeWeight(POLYLINE_STROKE_WEIGHT);
+		return polyline;
+	}
+
+	public static Polyline empty(User user, Providers providers, LocalizationServices localizationServices){
+		Polyline polyline = new Polyline();
+		OverlayIdentyfikator overlayIdentyfikator = new OverlayIdentyfikatorBuilder().login(user.getLogin())
+				                                    .localzationServiceType(localizationServices)
+				                                    .overlayType(Overlays.POLYLINE)
+				                                    .providerType(providers)
+				                                    .build();
+		polyline.setId(overlayIdentyfikator.createIdentyfikator());
+		polyline.setPaths(new ArrayList<>());
+		polyline.setStrokeColor(color(providers, localizationServices));
+		polyline.setStrokeOpacity(POLYLINE_STROKE_OPACITY);
+		polyline.setStrokeWeight(POLYLINE_STROKE_WEIGHT);
+		return polyline;
+	}
+
+	private static String color(Providers providers, LocalizationServices localizationServices){
+		if(providers == Providers.GPS)
+			return GPS_POLYLINE_COLOR;
+		else if(providers == Providers.NETWORK){
+			if(localizationServices.equals(LocalizationServices.NASZ))
+				return NETWORK_NASZ_POLYLINE_COLOR;
+			else
+				return NETWORK_OBCY_POLYLINE_COLOR;
+		} else {
+			throw new RuntimeException("Nie oblusgiwany Provider " + providers);
+		}
+	}
+
 	private static String id(Location location){
 		return new OverlayIdentyfikator(location, Overlays.POLYLINE).createIdentyfikator();
 	}

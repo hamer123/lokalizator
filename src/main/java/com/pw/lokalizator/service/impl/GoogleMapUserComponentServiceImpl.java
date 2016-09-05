@@ -4,15 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.ejb.Stateless;
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.pw.lokalizator.service.GoogleMapUserComponentService;
 import org.primefaces.model.map.Circle;
-import org.primefaces.model.map.LatLng;
 import org.primefaces.model.map.Marker;
-import org.primefaces.model.map.Overlay;
 import org.primefaces.model.map.Polygon;
 import org.primefaces.model.map.Polyline;
 
@@ -20,18 +17,16 @@ import com.pw.lokalizator.jsf.utilitis.CircleBuilder;
 import com.pw.lokalizator.jsf.utilitis.MarkerBuilder;
 import com.pw.lokalizator.jsf.utilitis.PolygonBuilder;
 import com.pw.lokalizator.jsf.utilitis.PolylineBuilder;
-import com.pw.lokalizator.model.GoogleMapComponentVisible;
-import com.pw.lokalizator.model.Position;
-import com.pw.lokalizator.model.Route;
+import com.pw.lokalizator.model.google.map.GoogleMapComponentVisible;
+import com.pw.lokalizator.model.google.component.GoogleLocation;
+import com.pw.lokalizator.model.google.component.Route;
 import com.pw.lokalizator.model.entity.Area;
 import com.pw.lokalizator.model.entity.Location;
 import com.pw.lokalizator.model.entity.User;
-import com.pw.lokalizator.repository.UserRepository;
-import com.pw.lokalizator.service.GoogleMapUserComponentService;
 
 @Named
 @ApplicationScoped
-public class GoogleMapUserComponentServiceImpl implements GoogleMapUserComponentService{
+public class GoogleMapUserComponentServiceImpl implements GoogleMapUserComponentService {
 	
 	@Override
 	public Route route(List<Location> locations) {
@@ -43,69 +38,69 @@ public class GoogleMapUserComponentServiceImpl implements GoogleMapUserComponent
 		Marker end = MarkerBuilder.createMarker(locations.get(lastIndex));
 		end.setIcon(MarkerBuilder.Icon.END_ROUTE_ICON_URL);
 		
-		return new Route(start, end, polyline);
+		return Route.full(start, end, polyline);
 	}
 	
 	@Override
-	public List<Position> lastLocations(User user) {
+	public List<GoogleLocation> lastLocations(User user) {
 		List<Location>locations = getLocations(user);
-		List<Position>positions = new ArrayList<Position>();
+		List<GoogleLocation> googleLocations = new ArrayList<GoogleLocation>();
 		
 		for(Location location : locations)
-			positions.add( new Position( MarkerBuilder.createMarker(location), CircleBuilder.createCircle(location) ) );
+			googleLocations.add( new GoogleLocation( MarkerBuilder.createMarker(location), CircleBuilder.createCircle(location) ) );
 
-		return positions;
+		return googleLocations;
 	}
 
 	@Override
-	public List<Position> lastLocations(Set<User> users) {
+	public List<GoogleLocation> lastLocations(Set<User> users) {
 		List<Location>locations = new ArrayList<Location>();
-		List<Position>positions = new ArrayList<Position>();
+		List<GoogleLocation> googleLocations = new ArrayList<GoogleLocation>();
 		
 		for(User user : users)
 			locations.addAll( getLocations(user) );
 		
 		for(Location location : locations)
-			positions.add( new Position( MarkerBuilder.createMarker(location), CircleBuilder.createCircle(location) ) );
+			googleLocations.add( new GoogleLocation( MarkerBuilder.createMarker(location), CircleBuilder.createCircle(location) ) );
 		
-		return positions;
+		return googleLocations;
 	}
 	
 	@Override
-	public List<Position> lastLocations(User user,GoogleMapComponentVisible visible) {
-		List<Position>positions = new ArrayList<Position>();
+	public List<GoogleLocation> lastLocations(User user, GoogleMapComponentVisible visible) {
+		List<GoogleLocation> googleLocations = new ArrayList<GoogleLocation>();
 		
 		if(user.getLastLocationGPS() != null)
-			positions.add(positionGPS(user, visible));
+			googleLocations.add(positionGPS(user, visible));
 		if(user.getLastLocationNetworkNaszaUsluga() != null)
-			positions.add(positionNetworkNasz(user, visible));
+			googleLocations.add(positionNetworkNasz(user, visible));
 		if(user.getLastLocationNetworObcaUsluga() != null)
-			positions.add(positionNetworkObcy(user, visible));
+			googleLocations.add(positionNetworkObcy(user, visible));
 		
-		return positions;
+		return googleLocations;
 	}
 
 	@Override
-	public List<Position> lastLocations(Set<User> users,GoogleMapComponentVisible visible) {
-		List<Position>positions = new ArrayList<Position>();
+	public List<GoogleLocation> lastLocations(Set<User> users, GoogleMapComponentVisible visible) {
+		List<GoogleLocation> googleLocations = new ArrayList<GoogleLocation>();
 
 		for(User user : users){
 			if(user.getLastLocationGPS() != null)
-				positions.add(positionGPS(user, visible));
+				googleLocations.add(positionGPS(user, visible));
 			if(user.getLastLocationNetworkNaszaUsluga() != null)
-				positions.add(positionNetworkNasz(user, visible));
+				googleLocations.add(positionNetworkNasz(user, visible));
 			if(user.getLastLocationNetworObcaUsluga() != null)
-				positions.add(positionNetworkObcy(user, visible));
+				googleLocations.add(positionNetworkObcy(user, visible));
 		}
 		
-		return positions;
+		return googleLocations;
 	}
 	
 	@Override
-	public Position position(Location location) {
+	public GoogleLocation position(Location location) {
 		Marker marker = MarkerBuilder.createMarker(location);
 		Circle circle = CircleBuilder.createCircle(location);
-		return new Position(marker, circle);
+		return new GoogleLocation(marker, circle);
 	}
 	
 
@@ -136,7 +131,7 @@ public class GoogleMapUserComponentServiceImpl implements GoogleMapUserComponent
 	@Override
 	public Route routeNoMarkers(List<Location> locations) {
 		Polyline polyline = PolylineBuilder.create(locations);
-		return new Route(polyline);
+		return Route.onlyPolyline(polyline);
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -152,7 +147,7 @@ public class GoogleMapUserComponentServiceImpl implements GoogleMapUserComponent
 			return false;
 	}
 	
-	private Position positionGPS(User user, GoogleMapComponentVisible visible){
+	private GoogleLocation positionGPS(User user, GoogleMapComponentVisible visible){
 		Marker marker = null;
 		Circle circle = null;
 		
@@ -161,10 +156,10 @@ public class GoogleMapUserComponentServiceImpl implements GoogleMapUserComponent
 		if(visible.isMarkerGps())
 			marker = MarkerBuilder.createMarker(user.getLastLocationGPS());
 		
-		return new Position(marker, circle);
+		return new GoogleLocation(marker, circle);
 	}
 	
-	private Position positionNetworkNasz(User user, GoogleMapComponentVisible visible){
+	private GoogleLocation positionNetworkNasz(User user, GoogleMapComponentVisible visible){
 		Marker marker = null;
 		Circle circle = null;
 		
@@ -173,10 +168,10 @@ public class GoogleMapUserComponentServiceImpl implements GoogleMapUserComponent
 		if(visible.isMarkerNetworkNasz())
 			marker = MarkerBuilder.createMarker(user.getLastLocationNetworkNaszaUsluga());
 		
-		return new Position(marker, circle);
+		return new GoogleLocation(marker, circle);
 	}
 	
-	private Position positionNetworkObcy(User user, GoogleMapComponentVisible visible){
+	private GoogleLocation positionNetworkObcy(User user, GoogleMapComponentVisible visible){
 		Marker marker = null;
 		Circle circle = null;
 		
@@ -185,7 +180,7 @@ public class GoogleMapUserComponentServiceImpl implements GoogleMapUserComponent
 		if(visible.isMarkerNetworkObcy())
 			marker = MarkerBuilder.createMarker(user.getLastLocationNetworObcaUsluga());
 		
-		return new Position(marker, circle);
+		return new GoogleLocation(marker, circle);
 	}
 	
 	private List<Location> getLocations(User user){

@@ -1,23 +1,15 @@
 package com.pw.lokalizator.service.impl;
-
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import javax.ejb.Singleton;
-import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Default;
 import javax.inject.Named;
 import javax.transaction.Transactional;
-
-import com.pw.lokalizator.file.storage.AvatarImageStorage;
 import com.pw.lokalizator.service.ImageService;
+import com.pw.lokalizator.singleton.ResourceDirectionStartup;
 
 @Named
 @ApplicationScoped
@@ -37,16 +29,13 @@ public class AvatarService implements ImageService{
 	}
 
 	@Override
-	@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
-	public BufferedImage read(String uuid) {
-		// TODO Auto-generated method stub
+	public BufferedImage create(String s, BufferedImage bufferedImage) {
 		return null;
 	}
 
 	@Override
-	public void write(BufferedImage image, String uuid) {
-		// TODO Auto-generated method stub
-		
+	public BufferedImage update(String s, BufferedImage bufferedImage) {
+		return null;
 	}
 
 	@Override
@@ -54,9 +43,14 @@ public class AvatarService implements ImageService{
 		// TODO Auto-generated method stub
 		
 	}
-	
+
+	@Override
+	public BufferedImage find(String s) {
+		return null;
+	}
+
 	private String path(String uuid){
-		return    AvatarImageStorage.AVATAR_PATH 
+		return  ResourceDirectionStartup.ResourceDirectionURI.AVATAR
 				+ "/" 
 				+ uuid ;
 	}

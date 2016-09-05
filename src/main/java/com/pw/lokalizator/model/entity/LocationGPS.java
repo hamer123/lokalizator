@@ -1,17 +1,16 @@
 package com.pw.lokalizator.model.entity;
+import javax.persistence.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 
-import java.io.Serializable;
-
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-
-@Entity
 @NamedQueries(value = {
 		@NamedQuery(name = "findByUserLoginAndDateYoungerThanOlderThanOrderByDateDesc", 
 				    query = "SELECT l FROM LocationGPS l WHERE l.user.login =:login AND l.date > :older AND l.date < :younger ORDER BY l.date DESC")
 })
-public class LocationGPS extends Location implements Serializable{
-	
+@Entity
+@PrimaryKeyJoinColumn(referencedColumnName = "location_id", name = "location_gps_id")
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+public class LocationGPS extends Location{
 }

@@ -2,64 +2,46 @@ package com.pw.lokalizator.model.entity;
 
 import java.io.Serializable;
 import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.TableGenerator;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-
 import com.pw.lokalizator.model.enums.Providers;
-
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
-@MappedSuperclass
-//@DiscriminatorColumn(name="PROVIDER_TYPE", discriminatorType = DiscriminatorType.STRING)
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Location implements Serializable{
-    @Id
-    @TableGenerator(
-  		  name="LOCATION_GEN", 
-  		  table="ID_GEN", 
-  		  pkColumnName="GEN_KEY", 
-  		  valueColumnName="GEN_VALUE", 
-  		  pkColumnValue="LOCATIO_NETWORK_ID"
-  		  )
-    @GeneratedValue(strategy=GenerationType.TABLE, generator="LOCATION_GEN")
-    private long id;
+	@XmlElement
+	@Id
+	@TableGenerator(
+			name="LOCATION_GEN",
+			table="ID_GEN",
+			pkColumnName="GEN_KEY",
+			valueColumnName="GEN_VALUE",
+			pkColumnValue="LOCATIO_NETWORK_ID"
+	)
+	@GeneratedValue(strategy=GenerationType.TABLE, generator="LOCATION_GEN")
+	@Column(name = "location_id")
+    private Long id;
 	
 	@XmlElement
 	@Column(name="latitude", nullable=false, updatable = false)
 	private double latitude;
-	
-	@Column(name="longtitude", nullable=false, updatable = false)
+
 	@XmlElement
+	@Column(name="longtitude", nullable=false, updatable = false)
 	private double longitude;
 	
 	@ManyToOne
 	@JoinColumn(name="user_id")
 	private User user;
-	
+
+	@XmlElement
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="date", nullable=false, updatable = false)
-	@XmlElement
 	private Date date;
 	
 	@XmlElement
@@ -78,11 +60,11 @@ public abstract class Location implements Serializable{
 	@Column(name = "event_check")
 	private boolean eventCheck;
 
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

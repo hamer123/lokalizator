@@ -21,6 +21,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <jackson.version>2.8.1</jackson.version>
     </properties>
     
     <dependencies>
@@ -40,17 +41,27 @@
     </dependency>
 
 <!-- JAX-B JACKSON IMPL -->
+        <!--
 <dependency>
 	<groupId>com.fasterxml.jackson.core</groupId>
 	<artifactId>jackson-core</artifactId>
-	<version>2.7.3</version>
+	<version>${jackson.version}</version>
 </dependency>
 
 <dependency>
 	<groupId>com.fasterxml.jackson.core</groupId>
 	<artifactId>jackson-databind</artifactId>
-	<version>2.7.3</version>
+	<version>${jackson.version}</version>
 </dependency>
+-->
+        <!-- Jackson only for test case -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-jaxb-annotations</artifactId>
+            <version>2.4.0</version>
+            <scope>test</scope>
+        </dependency>
+
 
 <!-- APACHE COMMON LANG -->
 <dependency>

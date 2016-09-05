@@ -1,16 +1,6 @@
 package com.pw.lokalizator.model.entity;
 
-import java.io.Serializable;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementRef;
@@ -18,7 +8,6 @@ import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlRootElement;
 import com.pw.lokalizator.model.enums.LocalizationServices;
 
-@Entity
 @NamedQueries(value = {
 		@NamedQuery(name = "findByUserLoginAndDateYoungerThanAndOlderThanAndServiceEqualsNaszOrderByDateDesc",
 				   query = "SELECT l FROM LocationNetwork l WHERE l.user.login =:login AND "
@@ -31,16 +20,16 @@ import com.pw.lokalizator.model.enums.LocalizationServices;
 						 + "l.localizationServices = com.pw.lokalizator.model.enums.LocalizationServices.OBCY "
 						 + "ORDER BY l.date DESC")
 })
+@Entity
+@PrimaryKeyJoinColumn(referencedColumnName = "location_id", name = "location_network_id")
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class LocationNetwork extends Location implements Serializable{
-	
+public class LocationNetwork extends Location{
 	@OneToOne( orphanRemoval = true, cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.LAZY)
 	@JoinColumn(name="cell_info_id")
-	
 	@XmlElementRefs(value = {
-			@XmlElementRef(name = "cellInfoLte", type = CellInfoLte.class, required = true),
-			@XmlElementRef(name = "cellInfoGSM", type = CellInfoGSM.class, required = true)
+			@XmlElementRef(name = "cellInfoLte", type = CellInfoLte.class),
+			@XmlElementRef(name = "cellInfoGSM", type = CellInfoGSM.class)
 	})
 	private CellInfoMobile cellInfoMobile;
 	

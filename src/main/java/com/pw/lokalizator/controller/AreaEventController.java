@@ -8,8 +8,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.omnifaces.cdi.Param;
 import org.primefaces.model.map.Polygon;
-import com.pw.lokalizator.model.GoogleMapModel;
-import com.pw.lokalizator.model.Position;
+import com.pw.lokalizator.model.google.map.GoogleMapModel;
+import com.pw.lokalizator.model.google.component.GoogleLocation;
 import com.pw.lokalizator.model.entity.Area;
 import com.pw.lokalizator.model.entity.AreaEvent;
 import com.pw.lokalizator.model.entity.AreaPoint;
@@ -57,10 +57,10 @@ public class AreaEventController implements Serializable{
 				areaEvent.setArea(area);
 				
 				Polygon polygon = googleMapUserComponentService.polygon(areaEvent.getArea());
-				Position position = googleMapUserComponentService.position(areaEvent.getLocation());
+				GoogleLocation googleLocation = googleMapUserComponentService.position(areaEvent.getLocation());
 				
 				googleMapController.addOverlay(polygon);
-				googleMapController.addOverlay(position.overlays());
+				googleMapController.addOverlay(googleLocation.overlays());
 				
 				googleMapController.setCenter(GoogleMapModel.center(areaEvent.getLocation()));
 				validParams = true;

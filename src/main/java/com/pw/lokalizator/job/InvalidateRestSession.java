@@ -8,7 +8,7 @@ import javax.inject.Inject;
 
 import org.jboss.logging.Logger;
 
-import com.pw.lokalizator.model.RestSession;
+import com.pw.lokalizator.model.session.RestSession;
 import com.pw.lokalizator.singleton.RestSessionManager;
 
 @Singleton
@@ -23,7 +23,7 @@ public class InvalidateRestSession {
 		logger.info("[InvalidateRestSession] job has started");
 		
 		for(String token : restSessionSimulator.tokens()){
-			RestSession restSession = restSessionSimulator.getRestSession(token);
+			RestSession restSession = restSessionSimulator.getSession(token);
 			if(isPassedTime(restSession.getLastUsed()))
 				restSessionSimulator.invalidationRestSession(token);
 		}
