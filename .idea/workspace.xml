@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="433d58e5-7e57-410f-b38b-8278cb35c035" name="Default" comment="">
+    <list default="true" id="433d58e5-7e57-410f-b38b-8278cb35c035" name="Default" comment="cleaning">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/pw/lokalizator/service/impl/AvatarService.java" afterPath="$PROJECT_DIR$/src/main/java/com/pw/lokalizator/service/impl/AvatarService.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/pw/lokalizator/service/impl/GoogleMapUserComponentServiceImpl.java" afterPath="$PROJECT_DIR$/src/main/java/com/pw/lokalizator/service/impl/GoogleMapUserComponentServiceImpl.java" />
@@ -1163,7 +1163,7 @@
       <updated>1472302099944</updated>
       <workItem from="1472302101088" duration="54775000" />
       <workItem from="1472467508514" duration="16210000" />
-      <workItem from="1473115707714" duration="4390000" />
+      <workItem from="1473115707714" duration="4407000" />
     </task>
     <task id="LOCAL-00001" summary="cleaning">
       <created>1473117031194</created>
@@ -1207,11 +1207,18 @@
       <option name="project" value="LOCAL" />
       <updated>1473121500296</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="cleaning">
+      <created>1473121512356</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1473121512356</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="75375000" />
+    <option name="totallyTimeSpent" value="75392000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
