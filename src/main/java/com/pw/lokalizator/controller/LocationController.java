@@ -53,6 +53,10 @@ import com.pw.lokalizator.singleton.RestSessionManager;
 @Named(value="location")
 public class LocationController implements Serializable{
 	private static final long serialVersionUID = -5534429129019431383L;
+	@Inject @UserGoogleMap
+	private GoogleMapController googleMapController;
+	@Inject @DialogUserLocationGoogleMap
+	private DialogUserLocationGoogleMapController googleMapSingleUserDialogController;
 	@Inject
 	private UserRepository userRepository;
 	@Inject
@@ -65,10 +69,6 @@ public class LocationController implements Serializable{
 	private AreaEventNetworkRepository areaEventNetworkRepository;
 	@Inject
 	private AreaEventGPSRepository areaEventGPSRepository;
-	@Inject @UserGoogleMap
-	private GoogleMapController googleMapController;
-	@Inject @DialogUserLocationGoogleMap
-	private DialogUserLocationGoogleMapController googleMapSingleUserDialogController;
 	@Inject
 	private GoogleMapUserComponentService googleMapUserComponentService;
 	@Inject
@@ -126,9 +126,9 @@ public class LocationController implements Serializable{
 			users.put(user.getLogin(),user);
 			createAndAddComponentsToGoogleMap(user);
 			addUserToRouteManagers(user);
-			JsfMessageBuilder.infoMessage("user.success.add.to.follow.list");
+			JsfMessageBuilder.infoMessageBundle("user.success.add.to.follow.list");
 		} catch(Exception e){
-			JsfMessageBuilder.errorMessage("Błąd przy próbie dodania użytkownika");
+			JsfMessageBuilder.errorMessageBundle("error.on.add.user.to.follow.list");
 			e.printStackTrace();
 		}
 	}
