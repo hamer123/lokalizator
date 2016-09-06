@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="433d58e5-7e57-410f-b38b-8278cb35c035" name="Default" comment="commit shitssssssssss">
+    <list default="true" id="433d58e5-7e57-410f-b38b-8278cb35c035" name="Default" comment="">
       <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/pw/lokalizator/service/impl/AvatarService.java" afterPath="$PROJECT_DIR$/src/main/java/com/pw/lokalizator/service/impl/AvatarService.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/pw/lokalizator/service/impl/GoogleMapUserComponentServiceImpl.java" afterPath="$PROJECT_DIR$/src/main/java/com/pw/lokalizator/service/impl/GoogleMapUserComponentServiceImpl.java" />
@@ -147,6 +147,9 @@
         </entry>
       </file>
     </leaf>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
   <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
@@ -719,10 +722,18 @@
     <option name="remove_strategy" value="false" />
   </component>
   <component name="TaskManager">
+    <task id="LOCAL-00001" summary="commit shitssssssssss">
+      <created>1473122144317</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1473122144317</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="5000" />
+    <option name="totallyTimeSpent" value="16000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -763,6 +774,10 @@
     <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
       <collection />
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="commit shitssssssssss" />
+    <option name="LAST_COMMIT_MESSAGE" value="commit shitssssssssss" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
